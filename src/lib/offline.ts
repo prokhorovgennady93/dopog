@@ -15,40 +15,39 @@ export async function downloadTopic(
   if (typeof window === "undefined") return;
 
   try {
-    // 1. Fetch Question Data
     const response = await fetch(`/api/topics/${topicId}/questions`);
     if (!response.ok) throw new Error("Failed to fetch questions");
     const questions = await response.json();
 
-    // 2. Cache Data in LocalStorage
     localStorage.setItem(`topic_${topicId}_data`, JSON.stringify(questions));
 
-    // 3. Cache Images AND the Page Routes in CacheStorage
     if ("caches" in window) {
       const cache = await caches.open("dopog-cache-v1");
       
-      // Cache the Study Page Route itself
-      const studyUrl = `/study/${courseId}?topicId=${topicId}`;
-      try {
-        await cache.add(studyUrl);
-        console.log(`Cached route: ${studyUrl}`);
-      } catch (e) {
-        console.warn(`Failed to cache route: ${studyUrl}`, e);
-      }
+      // Robust individual asset caching
+      const assets = [
+        `/study/${courseId}?topicId=${topicId}`,
+        "/manifest.json",
+        "/icon.png"
+      ];
 
-      // Cache all images for this topic
-      const imageUrls = questions
-        .map((q: any) => q.imageUrl)
-        .filter((url: string | null) => url && url.length > 0);
+      // Add topic images
+      questions.forEach((q: any) => {
+        if (q.imageUrl) assets.push(q.imageUrl);
+      });
 
-      for (let i = 0; i < imageUrls.length; i++) {
+      // Sequential cache put (avoiding addAll which fails on 1 error)
+      for (let i = 0; i < assets.length; i++) {
         try {
-          await cache.add(imageUrls[i]);
+          const assetResponse = await fetch(assets[i]);
+          if (assetResponse.ok) {
+            await cache.put(assets[i], assetResponse);
+          }
         } catch (e) {
-          console.warn(`Failed to cache image: ${imageUrls[i]}`, e);
+          console.warn(`[Sync] Failed to cache asset: ${assets[i]}`, e);
         }
         if (onProgress) {
-          onProgress(Math.round(((i + 1) / imageUrls.length) * 100));
+          onProgress(Math.round(((i + 1) / assets.length) * 100));
         }
       }
     }
