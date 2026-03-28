@@ -25,7 +25,7 @@ export default function RulesPage() {
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_transport_rules_1774706828665.png" 
+                src="/images/articles/rules.png" 
                 alt="Правила перевозки ОГ" 
                 fill 
                 className="object-cover"

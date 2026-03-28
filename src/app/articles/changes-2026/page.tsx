@@ -26,7 +26,7 @@ export default function Changes2026Page() {
           {/* Main Banner Image */}
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl shadow-orange-950/20 mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_2026_banner_1774706782473.png" 
+                src="/images/articles/hero.png" 
                 alt="ДОПОГ 2026 Изменения" 
                 fill 
                 className="object-cover transition-transform duration-700 hover:scale-105"

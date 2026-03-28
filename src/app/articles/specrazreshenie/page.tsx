@@ -33,7 +33,7 @@ export default function SpecPermitPage() {
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_special_permit_digital_1774706987867.png" 
+                src="/images/articles/permit.png" 
                 alt="Спецразрешение ДОПОГ Госуслуги" 
                 fill 
                 className="object-cover"

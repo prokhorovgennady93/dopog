@@ -25,7 +25,7 @@ export default function ConsultantPage() {
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_safety_consultant_pro_1774707024983.png" 
+                src="/images/articles/consultant.png" 
                 alt="Консультант ДОПОГ" 
                 fill 
                 className="object-cover transition-transform duration-700 hover:scale-[1.02]"

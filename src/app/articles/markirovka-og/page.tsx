@@ -109,7 +109,7 @@ export default function MarkingPage() {
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_marking_signs_1774706797521.png" 
+                src="/images/articles/marking.png" 
                 alt="Маркировка ДОПОГ" 
                 fill 
                 className="object-cover"

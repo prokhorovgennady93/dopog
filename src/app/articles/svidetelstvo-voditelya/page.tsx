@@ -25,7 +25,7 @@ export default function DriverCertPage() {
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
              <Image 
-                src="/adr_driver_certificate_1774706813658.png" 
+                src="/images/articles/driver_card.png" 
                 alt="Свидетельство водителя ДОПОГ" 
                 fill 
                 className="object-cover transition-transform duration-700 hover:scale-[1.02]"

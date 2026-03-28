@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpen, GraduationCap, ArrowRight, ChevronRight, Bookmark, ShieldCheck, Truck, FileText, Award } from "lucide-react";
+import Image from "next/image";
 
 const articles = [
   {
@@ -81,6 +82,12 @@ export default function ArticlesPage() {
     <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen">
       {/* Header section with glassmorphism */}
       <header className="relative bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 py-20 sm:py-32 overflow-hidden">
+        <Image 
+          src="/images/articles/hero.png" 
+          alt="ДОПОГ Библиотека" 
+          fill 
+          className="object-cover opacity-10 dark:opacity-20"
+        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(234,88,12,0.08)_0%,transparent_50% )]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <Link href="/" className="inline-flex items-center gap-2 text-sm font-black text-zinc-400 hover:text-orange-600 transition-colors mb-8 group">
