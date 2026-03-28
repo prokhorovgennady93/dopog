@@ -17,19 +17,26 @@ export default function LoginPage() {
     setError("");
     
     try {
-      const result = await signIn("credentials", {
+      const result = await (signIn as any)("credentials", {
         login,
         password,
         redirect: false,
       });
 
+      console.log("SignIn result:", result);
+
       if (result?.error) {
-        setError("Неверный логин или пароль");
-      } else {
+        if (result.error === "CredentialsSignin") {
+          setError("Неверный номер телефона или пароль");
+        } else {
+          setError(`Ошибка входа: ${result.error}`);
+        }
+      } else if (result?.url) {
         router.push("/dashboard");
       }
-    } catch (err) {
-      setError("Произошла непредвиденная ошибка");
+    } catch (err: any) {
+      console.error("Login error object:", err);
+      setError(`Системная ошибка: ${err.message || 'неизвестно'}`);
     }
   };
 

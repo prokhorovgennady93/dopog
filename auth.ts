@@ -41,39 +41,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (!user.id) return true;
-      
-      // Admin exception
-      const dbUser = await db.user.findUnique({ where: { id: user.id } });
-      if (dbUser?.isAdmin) return true;
-
-      // multi-device limit (max 3)
-      const sessionCount = await db.session.count({
-        where: { userId: user.id }
-      });
-
-      if (sessionCount >= 3) {
-        // Option A: Logout oldest
-        const oldestSession = await db.session.findFirst({
-          where: { userId: user.id },
-          orderBy: { lastUsedAt: 'asc' }
-        });
-        
-        if (oldestSession) {
-          await db.session.delete({ where: { id: oldestSession.id } });
-        }
-      }
-
-      // Record new session (simplified tracking)
-      await db.session.create({
-        data: {
-          userId: user.id,
-          token: Math.random().toString(36).substring(7), // dummy token for JWT mode
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-        }
-      });
-
+    async signIn({ user }) {
+      // ВРЕМЕННО: Отключаем лимиты и запись сессий для отладки
+      console.log(`DEBUG: SignIn callback for user ${user.id} (${user.phone})`);
       return true;
     },
     async session({ session, token }) {
