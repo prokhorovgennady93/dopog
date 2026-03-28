@@ -18,7 +18,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           const { login, password } = parsedCredentials.data;
           console.log(`Authorize: attempting login for ${login}`);
           
-          const user = await db.user.findFirst({ 
+          const user = await (db.user as any).findFirst({ 
             where: { 
               phone: login 
             } 
@@ -61,7 +61,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             : token.fullAccessExpiresAt;
       }
       if (Array.isArray(token.purchases) && session.user) {
-        (session.user as any).purchases = token.purchases.map((p: any) => ({
+        (session.user as any).purchases = (token.purchases as any[]).map((p: any) => ({
           ...p,
           expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
         }));
@@ -79,7 +79,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
     async jwt({ token }) {
       if (!token.sub) return token;
-      const user = await db.user.findUnique({ 
+      const user = await (db.user as any).findUnique({ 
         where: { id: token.sub },
         include: { purchases: { select: { courseId: true, expiresAt: true } } }
       });
@@ -90,7 +90,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           ? user.fullAccessExpiresAt.toISOString() 
           : user.fullAccessExpiresAt;
           
-        token.purchases = user.purchases.map(p => ({
+        token.purchases = (user.purchases as any[]).map(p => ({
           ...p,
           expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
         }));
