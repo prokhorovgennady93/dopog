@@ -66,9 +66,10 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
             <div className="space-y-4 mb-12">
               <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                <h2 className="text-xl font-bold flex items-center gap-2">
+                <h2 className="text-xl font-black flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-yellow-500" />
                   Темы обучения
+                  <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">Скачать</span>
                 </h2>
                 <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest mr-4">вопросов</span>
               </div>
