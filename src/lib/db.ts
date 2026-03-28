@@ -5,8 +5,10 @@ import { DatabaseSync } from "node:sqlite";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 const createPrismaClient = () => {
-  const url = "file:./dev.db";
-  const adapter = new PrismaNodeSQLite({ url });
+  const url = process.env.DATABASE_URL || "file:./dev.db";
+  // Prisma handles the 'file:' prefix, but the adapter needs a clean path if it's passed differently
+  const cleanUrl = url.replace('file:', '');
+  const adapter = new PrismaNodeSQLite({ url: cleanUrl });
   return new PrismaClient({ adapter });
 };
 
