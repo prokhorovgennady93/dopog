@@ -43,7 +43,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   callbacks: {
     async signIn({ user }) {
       // ВРЕМЕННО: Отключаем лимиты и запись сессий для отладки
-      console.log(`DEBUG: SignIn callback for user ${user.id} (${user.phone})`);
+      console.log(`DEBUG: SignIn callback for user ${user.id} (${(user as any).phone})`);
       return true;
     },
     async session({ session, token }) {
