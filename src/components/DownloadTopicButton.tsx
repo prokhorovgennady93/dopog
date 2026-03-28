@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { CloudDownload, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { checkTopicDownloaded, downloadTopic } from "@/lib/offline";
