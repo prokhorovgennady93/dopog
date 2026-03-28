@@ -102,7 +102,7 @@ async function main() {
       const topic = await prisma.topic.create({
         data: {
           title: theme.title,
-          courseId: course.id,
+          course: { connect: { id: course.id } },
         }
       });
 
@@ -110,10 +110,10 @@ async function main() {
         await prisma.question.create({
           data: {
             text: q.text,
-            topicId: topic.id,
+            topic: { connect: { id: topic.id } },
             explanation: q.explanation || null,
             imageUrl: q.imageUrl || null,
-            courseId: course.id,
+            course: { connect: { id: course.id } },
             options: {
               create: q.options.map((o: any) => ({
                 text: o.text || 'Вариант',

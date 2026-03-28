@@ -50,7 +50,7 @@ export function QuestionView({
 
   const [phase, setPhase] = useState<Phase>('QUESTION');
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(() => {
+  const [currentIndex, setCurrentIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
