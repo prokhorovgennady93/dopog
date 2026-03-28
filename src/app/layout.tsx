@@ -53,7 +53,6 @@ export default async function RootLayout({
           <YandexMetrica />
           <ServiceWorkerRegistration />
           <OfflineIndicator />
-          <OfflineIndicator />
           <Header session={session} />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
