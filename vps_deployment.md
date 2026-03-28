@@ -28,7 +28,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 
 # Установка Docker Compose
-apt install -y docker-compose
+apt install -y docker-compose-v2
 ```
 
 ## 3. Загрузка проекта на сервер
@@ -69,7 +69,7 @@ mkdir -p data
 
 Соберите и запустите контейнер:
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 После завершения билда сайт будет доступен по адресу: `http://ВАШ_IP_АДРЕС:3000`.
@@ -87,4 +87,4 @@ docker-compose up -d --build
 3. Рекомендуется установить **Nginx** и **Certbot** (SSL) для работы по HTTPS. Если нужно, я дам инструкцию и для этого шага.
 
 > [!TIP]
-> Команда `docker-compose logs -f app` поможет вам увидеть логи приложения в реальном времени, если что-то пойдет не так.
+> Команда `docker compose logs -f app` поможет вам увидеть логи приложения в реальном времени, если что-то пойдет не так.
