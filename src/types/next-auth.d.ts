@@ -4,11 +4,11 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      isPremium: boolean;
+      hasFullAccess: boolean;
     } & DefaultSession["user"];
   }
 
   interface JWT {
-    isPremium: boolean;
+    hasFullAccess: boolean;
   }
 }

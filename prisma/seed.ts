@@ -39,7 +39,7 @@ async function main() {
       email: "test@example.com",
       name: "Алексей Иванов",
       password: hashedPassword,
-      isPremium: true,
+      hasFullAccess: true,
     },
   });
 
@@ -47,12 +47,12 @@ async function main() {
   const adminHash = await bcrypt.hash("3ghZ3Z32", 10);
   await prisma.user.upsert({
     where: { email: "grevelien@yandex.ru" },
-    update: { isAdmin: true, isPremium: true },
+    update: { isAdmin: true, hasFullAccess: true },
     create: {
       email: "grevelien@yandex.ru",
       name: "Администратор",
       password: adminHash,
-      isPremium: true,
+      hasFullAccess: true,
       isAdmin: true,
     },
   });
