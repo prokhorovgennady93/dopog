@@ -1,6 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft, FileText, CheckCircle, Info, HelpCircle, ShieldAlert, Globe } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle, Info, HelpCircle, ShieldAlert, Globe, XCircle, Clock } from "lucide-react";
 import Image from "next/image";
+
+const rejectionPoints = [
+  { t: "Несоответствие документов", d: "Сведения в заявлении не совпадают с приложенными сканами СТС или свидетельств ДОПОГ." },
+  { t: "Истечение срока свидетельств", d: "Срок действия свидетельства на водителя или ТС заканчивается раньше периода перевозки." },
+  { t: "Отсутствие паспорта ТБ", d: "На ТС не оформлен паспорт обеспечения транспортной безопасности (согласно Постановлению №1640)." },
+  { t: "Ошибка в маршруте", d: "Указанный маршрут технически не предназначен для проезда ТС с заявленными весовыми характеристиками." },
+  { t: "Неверный груз", d: "Заявленный груз не относится к категории повышенной опасности (в этом случае разрешение не требуется)." }
+];
 
 export default function SpecPermitPage() {
   return (
@@ -14,13 +22,13 @@ export default function SpecPermitPage() {
           </Link>
           <div className="flex items-center gap-3 mb-6">
              <span className="bg-orange-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Library</span>
-             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">11 мин чтения</span>
+             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">16 мин чтения</span>
           </div>
           <h1 className="text-4xl sm:text-7xl font-black mb-8 leading-[1.05] tracking-tighter text-zinc-900 dark:text-white">
             <span className="text-orange-600">Спецразрешение</span> на опасные грузы
           </h1>
           <p className="text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium mb-12 max-w-3xl">
-             Для перевозки грузов повышенной опасности в России требуется специальное разрешение Ространснадзора. Разберемся, кому оно нужно, как его получить через Госуслуги и какие документы подготовить.
+             Полный юридический гайд по получению спецразрешения в Ространснадзоре. Разберем 5 причин отказа, сроки согласования и требования Приказа Минтранса №127.
           </p>
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
@@ -40,46 +48,44 @@ export default function SpecPermitPage() {
         <div className="prose prose-zinc dark:prose-invert max-w-none space-y-16 font-medium">
            
            <section>
-              <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4 uppercase text-sm tracking-widest">1. Кому нужно спецразрешение?</h2>
+              <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4 uppercase text-sm tracking-widest">1. Законодательство и Приказы</h2>
               <div className="space-y-6 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-                 <p>Многие ошибочно полагают, что спецразрешение нужно на любой опасный груз. Это не так. Согласно Приказу Минтранса №127, документ требуется только для так называемых <b>«грузов повышенной опасности»</b>, перечень которых приведен в главе 1.10.3 ДОПОГ.</p>
-                 
-                 <div className="bg-zinc-50 dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800">
-                    <h4 className="font-bold text-zinc-900 dark:text-white mb-4">Типичные грузы повышенной опасности:</h4>
-                    <ul className="list-disc pl-6 space-y-2 text-sm">
-                       <li>Взрывчатые вещества (Класс 1) в определенных количествах;</li>
-                       <li>Легковоспламеняющиеся жидкости (Класс 3) более 3000 литров в цистерне;</li>
-                       <li>Токсичные газы (Класс 2) в баллонах или цистернах;</li>
-                       <li>Радиоактивные материалы (Класс 7).</li>
-                    </ul>
-                 </div>
+                 <p>Порядок выдачи специальных разрешений на движение по автомобильным дорогам транспортных средств, осуществляющих перевозки опасных грузов, установлен <b>Приказом Минтранса России от 11.04.2022 №127</b>.</p>
+                 <p>Разрешение выдается Ространснадзором (Госавтодорнадзором) только для грузов повышенной опасности (Раздел 1.10.3 ДОПОГ). Если Ваш груз опасен, но не входит в этот список — получение спецразрешения <u>не требуется</u>.</p>
               </div>
            </section>
 
            <section>
-              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white">Процесс получения (Пошагово)</h2>
-              <div className="space-y-8">
-                 <div className="flex gap-8 items-start">
-                    <div className="w-12 h-12 bg-zinc-900 dark:bg-white rounded-2xl flex items-center justify-center shrink-0 text-white dark:text-black font-black">1</div>
-                    <div>
-                       <h4 className="font-bold text-xl mb-2 text-zinc-900 dark:text-white">Регистрация в ГИС ЭПД</h4>
-                       <p className="text-sm">Перед подачей заявления убедитесь, что Ваша организация зарегистрирована в системе электронных перевозочных документов.</p>
-                    </div>
+              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white uppercase text-sm tracking-widest leading-none">2. Сроки и этапы согласования</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div className="p-8 bg-zinc-900 rounded-[40px] text-white overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-600 opacity-10 blur-3xl group-hover:scale-150 transition-transform" />
+                    <Clock className="w-10 h-10 text-orange-600 mb-6" />
+                    <h4 className="text-xl font-black mb-4 uppercase tracking-tighter italic">2 рабочих дня</h4>
+                    <p className="text-xs text-zinc-400 font-bold leading-relaxed">В этот срок Ространснадзор обязан направить запрос владельцам автомобильных дорог для согласования маршрута ТС.</p>
                  </div>
-                 <div className="flex gap-8 items-start">
-                    <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shrink-0 text-white font-black">2</div>
-                    <div>
-                       <h4 className="font-bold text-xl mb-2 text-zinc-900 dark:text-white">Подача через Госуслуги</h4>
-                       <p className="text-sm">Прикрепите скан-копии СТС, свидетельства ДОПОГ на ТС и свидетельства на водителя. Укажите маршрут следования (начальный и конечный пункты).</p>
-                    </div>
+                 <div className="p-8 bg-zinc-900 rounded-[40px] text-white overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-600 opacity-10 blur-3xl group-hover:scale-150 transition-transform" />
+                    <CheckCircle className="w-10 h-10 text-orange-600 mb-6" />
+                    <h4 className="text-xl font-black mb-4 uppercase tracking-tighter italic">1 год</h4>
+                    <p className="text-xs text-zinc-400 font-bold leading-relaxed">Максимальный срок, на который выдается разрешение. Оно может быть аннулировано при истечении срока ДОПОГ на водителя или ТС.</p>
                  </div>
-                 <div className="flex gap-8 items-start">
-                    <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center shrink-0 text-zinc-900 dark:text-white font-black">3</div>
-                    <div>
-                       <h4 className="font-bold text-xl mb-2 text-zinc-900 dark:text-white">Срок выдачи</h4>
-                       <p className="text-sm">Обычно разрешение выдается в течение 5–10 рабочих дней на срок до 1 года (или на срок действия свидетельств ДОПОГ).</p>
+              </div>
+           </section>
+
+           <section className="bg-zinc-50 dark:bg-zinc-900/50 p-8 sm:p-16 rounded-[48px] border border-zinc-100 dark:border-zinc-800 shadow-2xl shadow-zinc-950/20">
+              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white uppercase text-sm tracking-widest">3. Особенности отказа в выдаче</h2>
+              <p className="text-sm text-zinc-400 font-black mb-10 uppercase tracking-widest italic">Почему 30% заявок отклоняются:</p>
+              <div className="space-y-4">
+                 {rejectionPoints.map((p, i) => (
+                    <div key={i} className="flex gap-6 items-start p-6 bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-zinc-800 group hover:border-orange-600 transition-all">
+                       <XCircle className="w-6 h-6 text-red-500 shrink-0 mt-1 group-hover:scale-110 transition-transform" />
+                       <div>
+                          <h5 className="font-black text-zinc-900 dark:text-white mb-1 uppercase text-xs tracking-widest">{p.t}</h5>
+                          <p className="text-xs text-zinc-500 font-bold leading-relaxed">{p.d}</p>
+                       </div>
                     </div>
-                 </div>
+                 ))}
               </div>
            </section>
 
@@ -89,28 +95,27 @@ export default function SpecPermitPage() {
                     <ShieldAlert className="w-12 h-12 text-red-600" />
                  </div>
                  <div>
-                    <h3 className="text-2xl font-black text-red-900 dark:text-red-500 mb-4">Штрафы за отсутствие</h3>
+                    <h3 className="text-2xl font-black text-red-900 dark:text-red-500 mb-4">Безопасность (Постановление №1640)</h3>
                     <p className="text-lg text-red-800/80 dark:text-red-500/70 font-bold leading-relaxed">
-                       Перевозка груза повышенной опасности без спецразрешения влечет штраф до 500 000 рублей для юридических лиц и лишение прав для водителя. Это самое серьезное нарушение в сфере ДОПОГ.
+                       С 2021 года отсутствие паспорта транспортной безопасности ТС является законным основанием для отказа в выдаче спецразрешения. Убедитесь, что Ваше транспортное средство внесено в реестр категорированных объектов.
                     </p>
                  </div>
               </div>
            </section>
 
-           <section className="bg-zinc-900 p-8 sm:p-16 rounded-[56px] text-white">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-12">
-                 <div className="max-w-md">
-                    <Globe className="w-16 h-16 text-orange-600 mb-6" />
-                    <h2 className="text-3xl font-black mb-4">Нужна помощь в подготовке?</h2>
-                    <p className="text-zinc-400 font-medium leading-relaxed">Раздел «Спецразрешения» входит в расширенный курс подготовки водителей. Мы научим Вас отличать грузы повышенной опасности и правильно оформлять документы.</p>
-                 </div>
-                 <Link 
-                    href="/#courses" 
-                    className="bg-orange-600 text-white px-12 py-5 rounded-3xl font-black text-lg hover:bg-orange-500 transition-all active:scale-95 whitespace-nowrap"
-                 >
-                    Курс обучения
-                 </Link>
-              </div>
+           <section className="bg-orange-600 rounded-[56px] p-12 sm:p-24 text-white text-center shadow-3xl shadow-orange-900/40 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-96 h-96 bg-white opacity-10 blur-3xl transform -translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-all duration-1000" />
+              <Globe className="w-20 h-20 mx-auto mb-8 text-white drop-shadow-lg" />
+              <h2 className="text-4xl sm:text-6xl font-black mb-6">Нужна помощь?</h2>
+              <p className="text-xl mb-12 opacity-80 max-w-xl mx-auto font-medium font-sans italic">
+                 Раздел «Спецразрешения» — один из сложнейших в курсе ДОПОГ. Подготовьтесь к тестам и разберите все правовые тонкости на нашем тренажере.
+              </p>
+              <Link 
+                 href="/#courses" 
+                 className="inline-flex bg-black text-white px-16 py-6 rounded-3xl font-black text-xl hover:bg-zinc-800 transition-all active:scale-95 shadow-2xl"
+              >
+                 Курсы подготовки
+              </Link>
            </section>
         </div>
       </div>
@@ -118,8 +123,8 @@ export default function SpecPermitPage() {
       <footer className="max-w-4xl mx-auto px-4 mt-20 pt-12 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-sm font-bold text-zinc-400">
          <p>© 2026 ДОПОГ Экзамен</p>
          <div className="flex gap-6">
-            <Link href="/articles" className="hover:text-orange-500 transition-colors">Библиотека</Link>
-            <Link href="/" className="hover:text-orange-500 transition-colors">Главная</Link>
+            <Link href="/articles" className="hover:text-orange-500 transition-colors cursor-pointer">Библиотека</Link>
+            <Link href="/" className="hover:text-orange-500 transition-colors cursor-pointer">Главная</Link>
          </div>
       </footer>
     </div>

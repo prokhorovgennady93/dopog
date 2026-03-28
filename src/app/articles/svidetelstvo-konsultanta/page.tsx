@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, UserCheck, ShieldCheck, GraduationCap, Gavel, HelpCircle, Target } from "lucide-react";
+import { ArrowLeft, UserCheck, ShieldCheck, GraduationCap, Gavel, HelpCircle, Target, BookOpen, AlertCircle, Clock } from "lucide-react";
 import Image from "next/image";
 
 export default function ConsultantPage() {
@@ -14,13 +14,13 @@ export default function ConsultantPage() {
           </Link>
           <div className="flex items-center gap-3 mb-6">
              <span className="bg-orange-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Library</span>
-             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">12 мин чтения</span>
+             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">14 мин чтения</span>
           </div>
-          <h1 className="text-4xl sm:text-7xl font-black mb-8 leading-[1.05] tracking-tighter text-zinc-900 dark:text-white">
+          <h1 className="text-4xl sm:text-7xl font-black mb-8 leading-[1.05] tracking-tighter text-zinc-900 dark:text-white uppercase leading-none">
             <span className="text-orange-600">Консультант</span> по безопасности ДОПОГ
           </h1>
-          <p className="text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium mb-12 max-w-3xl">
-             Согласно разделу 1.8.3 ДОПОГ, каждое предприятие, деятельность которого связана с перевозкой опасных грузов, обязано назначить одного или нескольких консультантов по вопросам безопасности.
+          <p className="text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium mb-12 max-w-3xl font-sans leading-relaxed">
+             Полный профессиональный обзор квалификационных требований к консультантам (DGSA) в соответствии с разделом 1.8.3 ДОПОГ и Приказом Минтранса №257.
           </p>
 
           <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-zinc-100 dark:border-zinc-800">
@@ -28,91 +28,97 @@ export default function ConsultantPage() {
                 src="/adr_safety_consultant_pro_1774707024983.png" 
                 alt="Консультант ДОПОГ" 
                 fill 
-                className="object-cover"
+                className="object-cover transition-transform duration-700 hover:scale-[1.02]"
              />
              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-12">
-                <p className="text-white text-2xl font-black max-w-md">Профессиональная экспертиза: Гарантия безопасности и отсутствия штрафов.</p>
+                <p className="text-white text-2xl font-black max-w-md italic tracking-widest uppercase text-xs">Профессиональная экспертиза 2026.</p>
              </div>
           </div>
         </header>
 
         {/* Article Body */}
-        <div className="prose prose-zinc dark:prose-invert max-w-none space-y-16 font-medium">
+        <div className="prose prose-zinc dark:prose-invert max-w-none space-y-16 font-medium font-sans">
            
            <section>
-              <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4 uppercase text-sm tracking-widest">1. Роль и обязанности</h2>
+              <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4 uppercase text-sm tracking-widest leading-none">1. Правовое основание и Свидетельство</h2>
               <div className="space-y-6 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-                 <p>Основной задачей консультанта является поиск путей осуществления деятельности предприятия в соответствии с правилами ДОПОГ наиболее безопасными способами.</p>
-                 <p><b>Ключевые обязанности включают:</b></p>
-                 <ul className="list-disc pl-6 space-y-2">
-                    <li>Контроль за соблюдением правил классификации и маркировки грузов;</li>
-                    <li>Проработка маршрутов для грузов повышенной опасности;</li>
-                    <li>Инструктаж персонала и проверка оборудования ТС;</li>
-                    <li>Подготовка ежегодных отчетов по безопасности для руководства предприятия.</li>
-                 </ul>
-              </div>
-           </section>
-
-           <section className="bg-zinc-50 dark:bg-zinc-900/50 p-8 sm:p-16 rounded-[48px] border border-zinc-100 dark:border-zinc-800">
-              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white">Сложность экзамена 2026</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                 <div className="flex gap-6">
-                    <div className="w-12 h-12 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                       <Target className="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                       <h4 className="font-bold text-lg mb-2 text-zinc-900 dark:text-white">Тестирование</h4>
-                       <p className="text-sm">40 сложных вопросов. Для успешной сдачи необходимо ответить правильно минимум на 32 из них (80%).</p>
-                    </div>
-                 </div>
-                 <div className="flex gap-6">
-                    <div className="w-12 h-12 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                       <Gavel className="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                       <h4 className="font-bold text-lg mb-2 text-zinc-900 dark:text-white">Практический кейс</h4>
-                       <p className="text-sm">Решение реальной задачи (ситуации) с использованием томов ДОПОГ. Оценивается логика и правильность выбранных ссылок.</p>
+                 <p>С 2022 года требования к аттестации консультантов по безопасности регулируются <b>Приказом Минтранса РФ №257 от 23.06.2022</b>. Согласно ДОПОГ 1.8.3, любое предприятие (за исключением случаев, предусмотренных в 1.8.3.2), перевозящее опасные грузы, обязано иметь в штате (или по договору) сертифицированного консультанта.</p>
+                 <div className="bg-zinc-50 dark:bg-zinc-900 p-8 rounded-[32px] border border-zinc-100 dark:border-zinc-800 overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-600 opacity-5 blur-3xl group-hover:scale-150 transition-all font-sans" />
+                    <h4 className="font-bold text-zinc-900 dark:text-white mb-4 uppercase tracking-widest text-[10px]">Критерии успешной аттестации:</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="bg-white dark:bg-zinc-950 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800">
+                          <h5 className="font-black text-orange-600 mb-2 uppercase text-[10px]">Письменный тест</h5>
+                          <p className="text-xs font-bold">40 вопросов. Требуется минимум <b>75%</b> правильных ответов (30 из 40).</p>
+                       </div>
+                       <div className="bg-white dark:bg-zinc-950 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800">
+                          <h5 className="font-black text-orange-600 mb-2 uppercase text-[10px]">Практическая задача</h5>
+                          <p className="text-xs font-bold">Детальный кейс. Требуется <b>100%</b> корректное решение без методологических ошибок.</p>
+                       </div>
                     </div>
                  </div>
               </div>
            </section>
 
            <section>
-              <h2 className="text-3xl font-black mb-8">Требования к кандидатам</h2>
-              <div className="space-y-6 text-lg leading-relaxed">
-                 <p>Кандидат в консультанты должен пройти специализированный курс обучения (от 40 до 80 часов) в аккредитованном центре. Наличие высшего технического или юридического образования является преимуществом, но не обязательным требованием по закону.</p>
-                 <div className="bg-yellow-500/10 border-l-4 border-orange-600 p-8 rounded-r-3xl italic">
-                    «Свидетельство консультанта выдается сроком на 5 лет. Для продления необходимо пройти обучение и успешно сдать экзамен в течение последнего года действия текущего свидетельства».
+              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white uppercase text-sm tracking-widest">2. Обязанности и ответственность (Chapter 8)</h2>
+              <div className="space-y-10">
+                 <div className="flex gap-8 items-start">
+                    <BookOpen className="w-10 h-10 text-orange-600 shrink-0" />
+                    <div>
+                       <h4 className="text-xl font-black mb-3 italic">Классификация и аудит</h4>
+                       <p className="text-sm text-zinc-500 mb-4 leading-relaxed">Консультант обязан проверять правильность идентификации грузов предприятием и соответствие маркировки требованиям ДОПОГ. Он проводит внутренний аудит транспортных процедур не реже одного раза в квартал.</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-8 items-start">
+                    <Gavel className="w-10 h-10 text-orange-600 shrink-0" />
+                    <div>
+                       <h4 className="text-xl font-black mb-3 italic">Ежегодный отчет</h4>
+                       <p className="text-sm text-zinc-500 leading-relaxed">Главный официальный документ консультанта. Отчет должен храниться на предприятии в течении 5 лет и предоставляться по первому требованию Ространснадзора. В отчете фиксируются все инциденты, объемы перевезенных грузов и нарушения.</p>
+                    </div>
                  </div>
               </div>
            </section>
 
-           <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-              <div className="bg-zinc-900 p-8 rounded-3xl group hover:border-orange-600 border border-transparent transition-all">
-                 <ShieldCheck className="w-8 h-8 text-orange-600 mb-6" />
-                 <h4 className="text-xl font-black text-white mb-4">Отчетность</h4>
-                 <p className="text-sm text-zinc-500 font-medium">Консультант готовит ежегодный отчет для предприятия, который должен храниться на предприятии в течение 5 лет и предоставляться по запросу Ространснадзора.</p>
-              </div>
-              <div className="bg-zinc-900 p-8 rounded-3xl group hover:border-orange-600 border border-transparent transition-all">
-                 <UserCheck className="w-8 h-8 text-orange-600 mb-6" />
-                 <h4 className="text-xl font-black text-white mb-4">Аудит</h4>
-                 <p className="text-sm text-zinc-500 font-medium">Консультант имеет право проводить внеплановые аудиты транспортных операций для выявления нарушений требований ДОПОГ.</p>
+           <section className="bg-zinc-900 p-8 sm:p-16 rounded-[56px] text-zinc-400 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600 opacity-5 blur-3xl group-hover:scale-150 transition-all duration-1000" />
+              <h2 className="text-2xl font-black text-white mb-8 flex items-center gap-3 italic">
+                 <Clock className="w-6 h-6 text-orange-600" /> Валидность и Сроки
+              </h2>
+              <div className="space-y-6 text-sm leading-relaxed font-bold font-sans">
+                 <p className="text-zinc-200">Свидетельство консультанта по безопасности ДОПОГ действительно в течение <b>5 лет</b>.</p>
+                 <p>Для продления свидетельства на новый пятилетний период владелец должен успешно сдать контрольный экзамен в течение последнего года, предшествующего дате истечения срока действия свидетельства.</p>
+                 <div className="mt-8 pt-8 border-t border-zinc-800 text-xs uppercase tracking-widest font-black leading-none text-zinc-600">Область действия: Все страны-участницы ДОПОГ.</div>
               </div>
            </section>
 
-           <section className="bg-orange-600 rounded-[56px] p-12 sm:p-24 text-white text-center">
-              <GraduationCap className="w-20 h-20 mx-auto mb-8 text-white" />
-              <h2 className="text-4xl sm:text-6xl font-black mb-6">Подготовка <span className="text-black">Консультантов</span></h2>
-              <p className="text-xl mb-12 opacity-80 max-w-xl mx-auto font-medium">
-                 Станьте востребованным экспертом в сфере опасных грузов. Все темы экзамена консультанта включены в наш профессиональный курс.
-              </p>
-              <Link 
-                 href="/#courses" 
-                 className="inline-flex bg-white text-orange-600 px-16 py-6 rounded-3xl font-black text-xl hover:bg-zinc-100 transition-all active:scale-95 shadow-2xl"
-              >
-                 Начать обучение
-              </Link>
+           <section>
+              <h2 className="text-3xl font-black mb-8 italic">Экзаменационные темы</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {["Классификация", "Упаковка", "Маркировка", "Документация", "Цистерны", "Транспорт", "Экипаж", "Операции"].map((t) => (
+                    <div key={t} className="p-6 border border-zinc-100 dark:border-zinc-800 rounded-2xl text-center group hover:border-orange-600 transition-all">
+                       <span className="text-xs font-black uppercase tracking-widest group-hover:text-orange-600 transition-colors leading-none">{t}</span>
+                    </div>
+                 ))}
+              </div>
+           </section>
+
+           <section className="bg-zinc-50 dark:bg-zinc-900 border-l-8 border-orange-600 rounded-r-[56px] p-12 sm:p-20 shadow-2xl shadow-orange-950/20">
+              <div className="flex flex-col md:flex-row gap-12 items-center">
+                 <div className="w-24 h-24 bg-orange-600 rounded-3xl flex items-center justify-center shrink-0 rotate-12 group-hover:rotate-0 transition-transform">
+                    <GraduationCap className="w-12 h-12 text-white" />
+                 </div>
+                 <div className="text-center md:text-left">
+                    <h2 className="text-4xl font-black mb-4 text-zinc-900 dark:text-white uppercase leading-none">Станьте экспертом</h2>
+                    <p className="text-zinc-500 font-bold leading-relaxed mb-10 max-w-md font-sans leading-relaxed">Программа обучения консультантов — это высшая ступень в системе ДОПОГ. Подготовьтесь к государственному экзамену на нашем профессиональном тренажере.</p>
+                    <Link 
+                       href="/#courses" 
+                       className="bg-zinc-900 dark:bg-white text-white dark:text-black px-12 py-5 rounded-2xl font-black text-sm hover:scale-[1.05] transition-all uppercase tracking-widest shadow-xl shadow-zinc-950/50"
+                    >
+                       Пройти тест
+                    </Link>
+                 </div>
+              </div>
            </section>
         </div>
       </div>
@@ -120,8 +126,8 @@ export default function ConsultantPage() {
       <footer className="max-w-4xl mx-auto px-4 mt-20 pt-12 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-sm font-bold text-zinc-400">
          <p>© 2026 ДОПОГ Экзамен</p>
          <div className="flex gap-6">
-            <Link href="/articles" className="hover:text-orange-500 transition-colors">Библиотека</Link>
-            <Link href="/" className="hover:text-orange-500 transition-colors">Главная</Link>
+            <Link href="/articles" className="hover:text-orange-500 transition-colors cursor-pointer">Библиотека</Link>
+            <Link href="/" className="hover:text-orange-500 transition-colors cursor-pointer">Главная</Link>
          </div>
       </footer>
     </div>
