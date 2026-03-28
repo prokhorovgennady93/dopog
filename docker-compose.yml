@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: adr-platform
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/prisma/data
+    environment:
+      - DATABASE_URL=file:/app/prisma/data/prod.db
+      - AUTH_SECRET=${AUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - AUTH_TRUST_HOST=true
+    restart: always
+
+# Для работы SQLite на сервере мы создаем папку ./data и монтируем ее внутрь контейнера.
+# Все данные будут храниться в файле ./data/prod.db на вашем VPS.

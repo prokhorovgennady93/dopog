@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String?        @unique
+  phone         String?        @unique
+  password      String?
+  image         String?
+  hasFullAccess Boolean        @default(false)
+  isAdmin       Boolean        @default(false)
+  fullAccessExpiresAt DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  examAttempts  ExamAttempt[]
+  purchases     Purchase[]
+  progress      UserProgress[]
+}
+
+model Course {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  description  String?
+  icon         String?
+  examAttempts ExamAttempt[]
+  purchases    Purchase[]
+  questions    Question[]
+  themes       Topic[]
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Topic {
+  id        String     @id @default(cuid())
+  title     String
+  order     Int        @default(0)
+  courseId  String
+  questions Question[]
+  course    Course     @relation(fields: [courseId], references: [id])
+}
+
+model Question {
+  id          String         @id @default(cuid())
+  text        String
+  explanation String?
+  imageUrl    String?
+  courseId    String
+  topicId     String
+  options     Option[]
+  topic       Topic          @relation(fields: [topicId], references: [id])
+  course      Course         @relation(fields: [courseId], references: [id])
+  progress    UserProgress[]
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model UserProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  questionId      String
+  isCorrect       Boolean?
+  lastAttemptedAt DateTime @default(now())
+  question        Question @relation(fields: [questionId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, questionId])
+}
+
+model ExamAttempt {
+  id         String    @id @default(cuid())
+  userId     String
+  courseId   String
+  score      Int
+  isPassed   Boolean
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  timeTaken  Int?
+  course     Course    @relation(fields: [courseId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+}
