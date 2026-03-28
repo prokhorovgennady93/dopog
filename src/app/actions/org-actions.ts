@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { auth } from "@/auth";
+import { auth } from "@/../auth";
 import { revalidatePath } from "next/cache";
 
 export async function updateOrgProfile(formData: FormData) {
