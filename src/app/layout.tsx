@@ -7,6 +7,8 @@ import Link from "next/link";
 import { auth } from "../../auth";
 import { Footer } from "@/components/Footer";
 import { YandexMetrica } from "@/components/YandexMetrica";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +23,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ДОПОГ Экзамен 2026 - Подготовка онлайн",
   description: "Лучшая платформа для подготовки к экзаменам ДОПОГ (ADR). Тесты, курсы и статистика прогресса.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ДОПОГ 2026",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default async function RootLayout({
@@ -39,6 +50,8 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
         <Providers>
           <YandexMetrica />
+          <ServiceWorkerRegistration />
+          <OfflineIndicator />
           <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative z-50">
               <Link href="/" className="flex items-center gap-2">

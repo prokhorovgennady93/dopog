@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { OverallMasteryGauge, MasteryHeatmap, WeakestThemeCard } from "@/components/dashboard/DashboardCharts";
 import { RecentHistory } from "@/components/dashboard/RecentHistory";
 import { AchievementGrid, DailyStreakCard } from "@/components/dashboard/Achievements";
+import { PushManager } from "@/components/PushManager";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -136,6 +137,8 @@ export default async function DashboardPage() {
              </form>
           </div>
         </header>
+
+        <PushManager />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
            <OverallMasteryGauge mastery={overallMastery} />

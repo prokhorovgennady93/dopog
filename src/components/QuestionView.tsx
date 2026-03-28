@@ -50,6 +50,7 @@ export function QuestionView({
 
   const [phase, setPhase] = useState<Phase>('QUESTION');
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [currentIndex, setCurrentIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(storageKey);
@@ -59,6 +60,27 @@ export function QuestionView({
     }
     return 0;
   });
+
+  // Handle Offline Recovery
+  useEffect(() => {
+    if (typeof window !== 'undefined' && questions.length === 0 && currentTopicId) {
+      const savedData = localStorage.getItem(`topic_${currentTopicId}_data`);
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          setLocalQuestions(parsed);
+        } catch (e) {
+          console.error("Failed to parse offline data", e);
+        }
+      }
+    } else {
+      setLocalQuestions(questions);
+      if (questions.length > 0 && currentTopicId) {
+        localStorage.setItem(`topic_${currentTopicId}_data`, JSON.stringify(questions));
+      }
+    }
+  }, [questions, currentTopicId]);
+
   const [answers, setAnswers] = useState<Record<number, { selectedId: string, isCorrect: boolean }>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(storageKey);
@@ -89,7 +111,7 @@ export function QuestionView({
 
   const hasValidAccess = isFullAccessActive || isPurchaseActive;
   const isGuestRestricted = !hasValidAccess && currentIndex >= GUEST_LIMIT;
-  const currentQuestion = questions[currentIndex] || null;
+  const currentQuestion = localQuestions[currentIndex] || null;
 
   const hasAnsweredCurrentInfo = answers[currentIndex];
   const showAnswer = !!hasAnsweredCurrentInfo;
@@ -108,7 +130,7 @@ export function QuestionView({
   const handleOptionSelect = (optionId: string) => {
     if (showAnswer || isGuestRestricted) return;
 
-    const isCorrect = currentQuestion.options.find(o => o.id === optionId)?.isCorrect || false;
+    const isCorrect = localQuestions[currentIndex].options.find(o => o.id === optionId)?.isCorrect || false;
 
     setAnswers(prev => ({
       ...prev,
@@ -116,7 +138,7 @@ export function QuestionView({
     }));
   };
 
-  const isLastQuestion = currentIndex === questions.length - 1;
+  const isLastQuestion = currentIndex === localQuestions.length - 1;
 
   const handleNextStep = () => {
     if (isLastQuestion) {
@@ -189,7 +211,7 @@ export function QuestionView({
   };
 
   // Metrics Logic
-  const totalQuestions = questions.length;
+  const totalQuestions = localQuestions.length;
   const answeredCount = Object.keys(answers).length;
   let correctCount = 0;
   let incorrectCount = 0;
@@ -256,7 +278,7 @@ export function QuestionView({
     const errorsByTopic: Record<string, number> = {};
     Object.entries(answers).forEach(([idx, ans]) => {
       if (!ans.isCorrect) {
-        const topicName = questions[Number(idx)]?.topic;
+        const topicName = localQuestions[Number(idx)]?.topic;
         if (topicName) {
           errorsByTopic[topicName] = (errorsByTopic[topicName] || 0) + 1;
         }
@@ -340,7 +362,7 @@ export function QuestionView({
               <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-zinc-950 to-transparent pointer-events-none z-20" />
 
               <div className="flex gap-2 overflow-x-auto scroll-smooth py-2 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {questions.map((q, idx) => {
+                {localQuestions.map((q, idx) => {
                   const isActive = currentIndex === idx;
                   const ans = answers[idx];
                   let btnClass = isActive
@@ -382,7 +404,7 @@ export function QuestionView({
               </div>
               <h2 className="text-2xl sm:text-3xl font-black mb-4">Время перейти на новый уровень!</h2>
               <p className="text-zinc-500 dark:text-zinc-400 max-w-md mb-8 leading-relaxed font-medium">
-                Вы успешно ознакомились с первыми 25 вопросами. Получите доступ ко всем {questions.length} вопросам этого курса и неограниченному режиму экзамена!
+                Вы успешно ознакомились с первыми 25 вопросами. Получите доступ ко всем {localQuestions.length} вопросам этого курса и неограниченному режиму экзамена!
               </p>
 
               <div className="flex flex-col gap-6 w-full max-w-2xl justify-center mb-8 transition-all">

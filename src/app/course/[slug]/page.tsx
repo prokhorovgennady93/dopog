@@ -2,7 +2,8 @@ import { db } from "@/lib/db";
 import { auth } from "@/../auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookOpen, Play, CheckCircle, Lock } from "lucide-react";
+import { BookOpen, Play, CheckCircle, Lock, CloudDownload } from "lucide-react";
+import { DownloadTopicButton } from "@/components/DownloadTopicButton";
 
 export default async function CoursePage({ params }: { params: { slug: string } }) {
   const { slug } = await params;
@@ -63,17 +64,25 @@ export default async function CoursePage({ params }: { params: { slug: string } 
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {(course as any).themes.map((topic: any) => (
-                  <Link 
+                  <div 
                     key={topic.id} 
-                    href={`/study/${course.id}?topicId=${topic.id}`}
-                    className="flex items-center justify-between gap-3 bg-zinc-50 dark:bg-zinc-900 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/50 transition-all group"
+                    className="flex items-center justify-between gap-3 bg-zinc-50 dark:bg-zinc-900 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/50 transition-all group lg:pr-8"
                   >
-                    <div className="flex items-center gap-3">
+                    <Link 
+                      href={`/study/${course.id}?topicId=${topic.id}`}
+                      className="flex-1 flex items-center gap-3"
+                    >
                       <CheckCircle className="w-4 h-4 text-zinc-300 group-hover:text-yellow-500" />
                       <span className="text-sm font-semibold">{topic.title}</span>
+                    </Link>
+                    
+                    <div className="flex items-center gap-6">
+                       <DownloadTopicButton topicId={topic.id} topicTitle={topic.title} />
+                       <span className="text-sm font-black text-zinc-600 dark:text-zinc-300 w-16 pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">
+                          {topic._count.questions}
+                       </span>
                     </div>
-                    <span className="text-sm font-black text-zinc-600 dark:text-zinc-300 w-16 pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">{topic._count.questions}</span>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
