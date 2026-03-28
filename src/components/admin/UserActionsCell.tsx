@@ -1,13 +1,14 @@
 "use client";
 
 import { useTransition } from "react";
-import { toggleFullAccess, toggleAdmin, deleteUser, generateNewPassword } from "@/app/admin/userActions";
-import { Crown, Shield, Trash2, Key, Loader2 } from "lucide-react";
+import { toggleFullAccess, toggleAdmin, toggleOrganization, deleteUser, generateNewPassword } from "@/app/admin/userActions";
+import { Crown, Shield, Trash2, Key, Loader2, Building2 } from "lucide-react";
 
 interface UserActionsCellProps {
   userId: string;
   hasFullAccess: boolean;
   isAdmin: boolean;
+  isOrganization: boolean;
   userEmail?: string | null;
   currentUserEmail?: string | null;
 }
@@ -16,6 +17,7 @@ export function UserActionsCell({
   userId, 
   hasFullAccess, 
   isAdmin, 
+  isOrganization,
   userEmail, 
   currentUserEmail 
 }: UserActionsCellProps) {
@@ -43,6 +45,12 @@ export function UserActionsCell({
   const handleToggleAdmin = () => {
     if (confirm(`Берегись! Вы действительно хотите изменить права администратора для ${userEmail}?`)) {
       startTransition(() => toggleAdmin(userId, isAdmin));
+    }
+  };
+
+  const handleToggleOrganization = () => {
+    if (confirm(`Вы действительно хотите изменить роль Организации для ${userEmail}?`)) {
+      startTransition(() => toggleOrganization(userId, isOrganization));
     }
   };
 
@@ -91,6 +99,18 @@ export function UserActionsCell({
             } ${isSelf ? "opacity-30 cursor-not-allowed" : ""}`}
           >
             <Shield className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={handleToggleOrganization}
+            title={isOrganization ? "Убрать роль организации" : "Сделать организацией"}
+            className={`p-1.5 rounded-lg transition-colors ${
+              isOrganization 
+                ? "bg-blue-100 text-blue-700 hover:bg-blue-200" 
+                : "bg-zinc-100 text-zinc-400 hover:bg-zinc-200"
+            }`}
+          >
+            <Building2 className="w-4 h-4" />
           </button>
 
           <button

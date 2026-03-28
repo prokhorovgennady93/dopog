@@ -1,165 +1,159 @@
 import Link from "next/link";
-import { BookOpen, GraduationCap, ArrowRight, ChevronRight, Bookmark, ShieldCheck, Truck, FileText, Award } from "lucide-react";
-import Image from "next/image";
+import { BookOpen, Clock, ArrowRight, Shield, Zap, Info, FileText, LayoutList } from "lucide-react";
+import { Metadata } from "next";
 
-const articles = [
+export const metadata: Metadata = {
+  title: "База знаний ДОПОГ 2026 — Статьи, правила, подготовка",
+  description: "Полезные материалы для водителей и консультантов по опасным грузам. Все о правилах ДОПОГ (ADR) в 2026 году.",
+};
+
+const ARTICLES = [
   {
-    id: "changes-2026",
-    title: "ДОПОГ 2026: Главные изменения в правилах",
-    description: "Разбор актуального соглашения 2025/2026. Литиевые батареи, цифровизация документов и новые требования к безопасности.",
-    icon: <Bookmark className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
+    slug: "changes-2026",
+    title: "Обзор изменений ДОПОГ 2026",
+    excerpt: "Самый полный гайд по актуальным изменениям в правилах перевозки опасных грузов на 2025-2026 годы.",
+    tag: "Аналитика",
     readTime: "15 мин",
-    tag: "Тренды 2026"
+    icon: <Zap className="w-5 h-5" />,
+    color: "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
   },
   {
-    id: "markirovka-og",
-    title: "Маркировка ОГ: Ромбы и Оранжевые плиты",
-    description: "Полный гид по знакам опасности и информационным таблицам согласно ГОСТ Р 57479. Схемы размещения на ТС.",
-    icon: <ShieldCheck className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
+    slug: "how-to-pass",
+    title: "Как сдать экзамен с первого раза",
+    excerpt: "Практические советы и стратегия подготовки к тестированию в Ространснадзоре.",
+    tag: "Обучение",
     readTime: "10 мин",
-    tag: "Маркировка"
+    icon: <BookOpen className="w-5 h-5" />,
+    color: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"
   },
   {
-    id: "how-to-pass",
-    title: "Как сдать экзамен и получить свидетельство",
-    description: "Стратегия подготовки в Ространснадзоре. Разбор сложных вопросов, ловушек и психологическая подготовка.",
-    icon: <GraduationCap className="w-6 h-6 text-orange-600" />,
-    date: "27 марта 2026",
-    readTime: "12 мин",
-    tag: "Экзамен"
-  },
-  {
-    id: "pravila-perevozki",
-    title: "Правила перевозки: Постановление №2200",
-    description: "Разбор законодательной базы РФ. Электронные накладные, обязанности экипажа и требования к оборудованию.",
-    icon: <Truck className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
-    readTime: "12 мин",
-    tag: "Законы РФ"
-  },
-  {
-    id: "svidetelstvo-voditelya",
-    title: "Свидетельство водителя: Базовый и спецкурсы",
-    description: "Различия между Базовым курсом, Цистернами и спецкурсами 1 и 7 классов. Сроки действия и продление.",
-    icon: <Award className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
-    readTime: "14 мин",
-    tag: "Сертификация"
-  },
-  {
-    id: "specrazreshenie",
-    title: "Спецразрешение на грузы повышенной опасности",
-    description: "Порядок оформления через Госуслуги. Когда оно нужно и какие штрафы за отсутствие документа.",
-    icon: <FileText className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
-    readTime: "11 мин",
-    tag: "Допуски"
-  },
-  {
-    id: "svidetelstvo-konsultanta",
-    title: "Консультант по безопасности: Роль и экзамен",
-    description: "Обязанности по разделу 1.8.3 ДОПОГ. Как стать экспертом по безопасности опасных грузов.",
-    icon: <BookOpen className="w-6 h-6 text-orange-600" />,
-    date: "28 марта 2026",
-    readTime: "12 мин",
-    tag: "Карьера"
-  },
-  {
-    id: "materials",
-    title: "Библиотека материалов и томов ДОПОГ",
-    description: "Прямые ссылки на официальные издания ООН 2025/2026. Учебники, справочники и методические пособия.",
-    icon: <BookOpen className="w-6 h-6 text-orange-600" />,
-    date: "26 марта 2026",
+    slug: "materials",
+    title: "Полезные материалы и документы",
+    excerpt: "Ссылки на официальные издания ООН (Том 1 и 2), таблицы ООН и справочники.",
+    tag: "Документы",
     readTime: "5 мин",
-    tag: "Ресурсы"
+    icon: <FileText className="w-5 h-5" />,
+    color: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+  },
+  {
+    slug: "markirovka-og",
+    title: "Маркировка опасных грузов",
+    excerpt: "Все о знаках опасности, табличках оранжевого цвета и правилах их размещения на ТС.",
+    tag: "Маркировка",
+    readTime: "12 мин",
+    icon: <Shield className="w-5 h-5" />,
+    color: "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400"
+  },
+  {
+    slug: "pravila-perevozki",
+    title: "Общие правила перевозки",
+    excerpt: "Фундаментальные требования к упаковке, совместной погрузке и обработке грузов.",
+    tag: "Правила",
+    readTime: "20 мин",
+    icon: <LayoutList className="w-5 h-5" />,
+    color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"
+  },
+  {
+    slug: "svidetelstvo-voditelya",
+    title: "Свидетельство водителя ДОПОГ",
+    excerpt: "Требования к водителям, категории курсов (базовый, спецкурсы) и продление.",
+    tag: "Квалификация",
+    readTime: "8 мин",
+    icon: <Zap className="w-5 h-5" />,
+    color: "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400"
+  },
+  {
+    slug: "specrazreshenie",
+    title: "Спецразрешение на перевозку",
+    excerpt: "Когда оно необходимо, как получить и какие грузы считаются грузами повышенной опасности.",
+    tag: "Закон",
+    readTime: "7 мин",
+    icon: <Info className="w-5 h-5" />,
+    color: "bg-yellow-50 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-400"
+  },
+  {
+    slug: "svidetelstvo-konsultanta",
+    title: "Консультант по безопасности",
+    excerpt: "Роль консультанта в транспортной компании, его обязанности и процесс аттестации.",
+    tag: "Профи",
+    readTime: "9 мин",
+    icon: <Shield className="w-5 h-5" />,
+    color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400"
   }
 ];
 
 export default function ArticlesPage() {
   return (
-    <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen">
-      {/* Header section with glassmorphism */}
-      <header className="relative bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 py-20 sm:py-32 overflow-hidden">
-        <Image 
-          src="/images/articles/hero.png" 
-          alt="ДОПОГ Библиотека" 
-          fill 
-          className="object-cover opacity-10 dark:opacity-20"
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(234,88,12,0.08)_0%,transparent_50% )]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-black text-zinc-400 hover:text-orange-600 transition-colors mb-8 group">
-             <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> 
-             На главную
-          </Link>
-          <h1 className="text-5xl sm:text-8xl font-black mb-6 tracking-tighter leading-none">
-            База знаний <span className="text-orange-600">ДОПОГ</span>
+    <div className="min-h-screen bg-white dark:bg-zinc-950 py-20 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <header className="mb-20 text-center animate-in fade-in slide-in-from-top-4 duration-1000">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-6 font-bold text-xs uppercase tracking-widest text-zinc-500">
+            <BookOpen className="w-4 h-4 text-orange-600" />
+            База знаний ДОПОГ
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
+            Полезные статьи и <span className="text-orange-600">Обучение</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-zinc-500 dark:text-zinc-400 max-w-2xl leading-relaxed font-bold">
-            Профессиональная библиотека для водителей и экспертов. Исчерпывающая база знаний по правилам перевозки опасных грузов.
+          <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed">
+            Мы собрали все необходимые материалы в одном месте, чтобы ваша подготовка к экзамену была максимально эффективной.
           </p>
-        </div>
-      </header>
+        </header>
 
-      {/* Grid section for cards */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
-          {articles.map((article) => (
+        {/* Articles Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+          {ARTICLES.map((article) => (
             <Link 
-              key={article.id} 
-              href={`/articles/${article.id}`}
-              className="group bg-white dark:bg-zinc-900 border-2 border-transparent hover:border-orange-600 hover:scale-[1.02] rounded-[48px] p-10 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-orange-950/10 flex flex-col justify-between"
+                key={article.slug} 
+                href={`/articles/${article.slug}`}
+                className="group flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden hover:border-orange-600/50 hover:shadow-2xl hover:shadow-orange-900/10 transition-all duration-500"
             >
-              <div>
-                <div className="flex items-center justify-between mb-8">
-                  <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-800 rounded-3xl flex items-center justify-center group-hover:bg-orange-600/10 transition-all duration-500">
-                    {article.icon}
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-full">
-                    {article.tag}
-                  </span>
+              <div className="p-8 flex-1">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-500 ${article.color}`}>
+                  {article.icon}
                 </div>
                 
-                <h2 className="text-3xl font-black mb-4 leading-[1.05] group-hover:text-orange-600 transition-colors tracking-tight">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded-lg">
+                    {article.tag}
+                  </span>
+                  <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                    <Clock className="w-3.5 h-3.5" /> {article.readTime}
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-black mb-4 leading-tight group-hover:text-orange-600 transition-colors">
                   {article.title}
                 </h2>
-                <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-10 line-clamp-3 font-bold group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">
-                  {article.description}
+                
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed font-semibold">
+                  {article.excerpt}
                 </p>
               </div>
-
-              <div className="pt-8 border-t border-zinc-50 dark:border-zinc-800 flex items-center justify-between">
-                <div className="flex flex-col">
-                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Время на чтение</span>
-                   <span className="text-sm font-black text-zinc-900 dark:text-white">{article.readTime}</span>
-                </div>
-                <div className="w-14 h-14 rounded-3xl bg-zinc-900 dark:bg-zinc-800 text-white flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all transform group-hover:rotate-45">
-                  <ChevronRight className="w-6 h-6 flex-shrink-0" />
+              
+              <div className="px-8 pb-8">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-orange-600 group-hover:gap-4 transition-all">
+                   Подробнее <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
             </Link>
           ))}
         </div>
 
-        {/* Call to Learning - Premium Banner */}
-        <section className="mt-32 bg-orange-600 rounded-[56px] p-12 sm:p-24 overflow-hidden relative group shadow-3xl shadow-orange-950/20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 blur-[100px] transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-1000" />
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <h2 className="text-4xl sm:text-7xl font-black text-white mb-6 leading-none tracking-tighter">Начните подготовку <br />по актуальным билетам</h2>
-            <p className="text-white/80 text-xl font-bold mb-12 max-w-xl mx-auto">
-               Теория становится сильнее только с практикой. Переходите к тренажеру экзамена ДОПОГ прямо сейчас.
-            </p>
+        {/* CTA */}
+        <div className="mt-20 p-8 sm:p-12 rounded-[2.5rem] bg-zinc-900 text-white relative overflow-hidden text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 animate-in fade-in duration-1000 delay-500 shadow-2xl">
+            <div className="relative z-10 max-w-md">
+                <h3 className="text-3xl font-black mb-4 tracking-tighter">Готовы к тесту?</h3>
+                <p className="text-zinc-400 font-bold opacity-80">Переходите в тренажер экзамена ДОПОГ 2026 и проверьте свои знания.</p>
+            </div>
             <Link 
               href="/#courses" 
-              className="bg-white hover:bg-zinc-100 text-orange-600 px-16 py-6 rounded-3xl font-black text-xl transition-all active:scale-95 shadow-2xl shadow-orange-950/20"
+              className="relative z-10 px-10 py-5 bg-yellow-500 text-black font-black rounded-2xl hover:bg-yellow-400 active:scale-95 transition-all shadow-xl shadow-yellow-500/20 whitespace-nowrap"
             >
-              Открыть каталог курсов
+              Начать обучение
             </Link>
-          </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

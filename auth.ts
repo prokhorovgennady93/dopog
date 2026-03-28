@@ -60,6 +60,12 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (typeof token.isAdmin === "boolean" && session.user) {
         (session.user as any).isAdmin = token.isAdmin;
       }
+      if (typeof token.isOrganization === "boolean" && session.user) {
+        (session.user as any).isOrganization = token.isOrganization;
+      }
+      if (typeof token.orgName === "string" && session.user) {
+        (session.user as any).orgName = token.orgName;
+      }
       return session;
     },
     async jwt({ token }) {
@@ -73,6 +79,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.fullAccessExpiresAt = user.fullAccessExpiresAt;
         token.purchases = user.purchases;
         token.isAdmin = user.isAdmin;
+        token.isOrganization = (user as any).isOrganization;
+        token.orgName = (user as any).orgName;
       }
       return token;
     },

@@ -37,7 +37,7 @@ export function Header({ session }: HeaderProps) {
   const navLinks = [
     { name: "Курсы", href: "/", icon: GraduationCap },
     { name: "Для организаций", href: "/organizations", icon: Building2 },
-    { name: "База знаний", href: "/library", icon: BookMarked },
+    { name: "База знаний", href: "/articles", icon: BookMarked },
     { name: "Тарифы", href: "/pricing", icon: CreditCard },
   ];
 
@@ -57,7 +57,6 @@ export function Header({ session }: HeaderProps) {
           </div>
           <div className="flex flex-col -space-y-1">
             <span className="font-black text-lg tracking-tight">ДОПОГ Экзамен</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-400">Study Command Center</span>
           </div>
         </Link>
 

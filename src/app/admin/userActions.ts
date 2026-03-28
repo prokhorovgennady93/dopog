@@ -68,6 +68,17 @@ export async function toggleAdmin(userId: string, currentStatus: boolean) {
   revalidatePath("/admin");
 }
 
+export async function toggleOrganization(userId: string, currentStatus: boolean) {
+  if (!(await checkAdmin())) throw new Error("Unauthorized");
+
+  await db.user.update({
+    where: { id: userId },
+    data: { isOrganization: !currentStatus }
+  });
+
+  revalidatePath("/admin");
+}
+
 export async function deleteUser(userId: string) {
   if (!(await checkAdmin())) throw new Error("Unauthorized");
 

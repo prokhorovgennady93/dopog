@@ -14,7 +14,8 @@ import {
   Shield,
   Clock,
   LogOut,
-  Search
+  Search,
+  Building2
 } from "lucide-react";
 import { UserActionsCell } from "@/components/admin/UserActionsCell";
 
@@ -66,6 +67,9 @@ export default async function AdminPage({
         },
         purchases: {
           include: { course: { select: { title: true } } }
+        },
+        ownedCodes: {
+          select: { id: true, usedCount: true, maxUses: true }
         },
         _count: { select: { progress: true } },
       },
@@ -237,7 +241,10 @@ export default async function AdminPage({
                       Пользователь
                     </th>
                     <th className="text-left px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
-                      Доступ
+                      Доступ / Роль
+                    </th>
+                    <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
+                      Лицензии
                     </th>
                     <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                       Ответов
@@ -294,9 +301,26 @@ export default async function AdminPage({
                             )}
                           </div>
                           {user.isAdmin && (
-                            <span className="mt-1 inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
+                            <span className="mt-1 inline-flex items-center gap-1 bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-full">
                               Admin
                             </span>
+                          )}
+                          {user.isOrganization && (
+                            <span className="mt-1 inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-full">
+                              <Building2 className="w-3 h-3" /> Орг: {user.orgName || "—"}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          {user.isOrganization ? (
+                            <div className="flex flex-col items-center">
+                              <span className="font-bold text-zinc-700">
+                                {user.ownedCodes.reduce((sum: number, c: any) => sum + c.usedCount, 0)} / {user.ownedCodes.reduce((sum: number, c: any) => sum + c.maxUses, 0)}
+                              </span>
+                              <span className="text-[10px] text-zinc-400 font-medium">кодов</span>
+                            </div>
+                          ) : (
+                            <span className="text-zinc-300">—</span>
                           )}
                         </td>
                         <td className="px-4 py-4 text-center">
@@ -315,6 +339,7 @@ export default async function AdminPage({
                             userId={user.id} 
                             hasFullAccess={user.hasFullAccess} 
                             isAdmin={user.isAdmin} 
+                            isOrganization={user.isOrganization}
                             userEmail={user.email} 
                             currentUserEmail={session.user?.email} 
                           />
