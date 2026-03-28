@@ -78,41 +78,46 @@ export function DownloadTopicButton({ topicId, topicTitle, hasAccess }: Download
   };
 
   return (
-    <button
-      onClick={handleDownload}
-      disabled={status === "downloading"}
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest ${
-        status === "downloaded"
-          ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
-          : status === "downloading"
-          ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
-          : status === "locked"
-          ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-300 opacity-60"
-          : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-orange-500 hover:text-orange-600 active:scale-95"
-      }`}
-      title={status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Доступно офлайн" : "Скачать для работы без интернета")}
-    >
-      {status === "downloading" ? (
-        <>
-          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          <span>{progress}%</span>
-        </>
-      ) : status === "downloaded" ? (
-        <>
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Скачано</span>
-        </>
-      ) : status === "locked" ? (
-        <>
-          <Lock className="w-3.5 h-3.5" />
-          <span>Premium</span>
-        </>
-      ) : (
-        <>
-          <CloudDownload className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Офлайн</span>
-        </>
+    <div className="flex flex-col items-center gap-1">
+      {status === "idle" && (
+        <span className="text-[10px] font-black uppercase tracking-tighter text-zinc-400 group-hover:text-orange-500 transition-colors">Скачать</span>
       )}
-    </button>
+      <button
+        onClick={handleDownload}
+        disabled={status === "downloading"}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest ${
+          status === "downloaded"
+            ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
+            : status === "downloading"
+            ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
+            : status === "locked"
+            ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-300 opacity-60"
+            : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-orange-500 hover:text-orange-600 active:scale-95 shadow-sm"
+        }`}
+        title={status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Доступно офлайн" : "Скачать для работы без интернета")}
+      >
+        {status === "downloading" ? (
+          <>
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <span>{progress}%</span>
+          </>
+        ) : status === "downloaded" ? (
+          <>
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Скачано</span>
+          </>
+        ) : status === "locked" ? (
+          <>
+            <Lock className="w-3.5 h-3.5" />
+            <span>Premium</span>
+          </>
+        ) : (
+          <>
+            <CloudDownload className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Офлайн</span>
+          </>
+        )}
+      </button>
+    </div>
   );
 }

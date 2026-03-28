@@ -70,7 +70,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   <BookOpen className="w-5 h-5 text-yellow-500" />
                   Темы обучения
                 </h2>
-                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mr-4">вопросов</span>
+                <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest mr-4">вопросов</span>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {(course as any).themes.map((topic: any) => (
@@ -92,7 +92,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                          topicTitle={topic.title} 
                          hasAccess={hasAccess} 
                        />
-                       <span className="text-sm font-black text-zinc-600 dark:text-zinc-300 w-16 pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">
+                       <span className="text-xs sm:text-sm font-black text-zinc-600 dark:text-zinc-300 w-12 sm:w-16 pl-2 sm:pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">
                           {topic._count.questions}
                        </span>
                     </div>

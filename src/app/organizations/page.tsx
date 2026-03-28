@@ -38,38 +38,26 @@ export default function OrganizationsPage() {
   return (
     <div className="bg-white dark:bg-zinc-950 min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center pt-20 pb-20 overflow-hidden border-b border-zinc-100 dark:border-zinc-900">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent dark:from-zinc-950 dark:via-zinc-950/90 dark:to-transparent z-10" />
-          <img 
-            src="/adr_b2b_partners_hero_1774716039123_1774726858603.png" 
-            alt="ADR Partners" 
-            className="w-full h-full object-cover object-right opacity-80 dark:opacity-40"
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+      <section className="relative pt-20 pb-20 sm:pt-32 sm:pb-32 overflow-hidden border-b border-zinc-100 dark:border-zinc-900">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-yellow-500/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-500/10 text-orange-600 border border-orange-200 dark:border-orange-500/20 mb-8 animate-in fade-in slide-in-from-left-4 duration-700">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-500/10 text-orange-600 border border-orange-200 dark:border-orange-500/20 mb-6">
               <Building2 className="w-3.5 h-3.5" />
               <span className="text-[10px] uppercase font-black tracking-widest">Для бизнеса и автошкол</span>
             </div>
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] mb-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-              Масштабируйте <br />
-              <span className="text-orange-600">обучение</span>
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-8">
+              Готовьте водителей <span className="text-orange-600">эффективнее</span>
             </h1>
-            <p className="text-xl sm:text-2xl text-zinc-500 dark:text-zinc-400 font-bold mb-12 leading-tight max-w-xl animate-in fade-in slide-in-from-left-12 duration-1000 delay-300">
-              Профессиональная экосистема для контроля подготовки водителей ДОПОГ 2026. Надежность. Прозрачность. Результат.
+            <p className="text-xl text-zinc-500 dark:text-zinc-400 font-bold mb-10 leading-relaxed max-w-2xl">
+              Единая платформа для контроля обучения ДОПОГ/ADR в вашей организации. Автоматизируйте подготовку и гарантируйте успешную сдачу экзаменов.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
-              <Link 
-                href="/register"
-                className="bg-orange-600 text-white px-10 py-5 rounded-2xl font-black text-lg shadow-2xl shadow-orange-900/40 hover:scale-105 hover:bg-orange-500 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                Начать партнерство <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/pricing" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white px-10 py-5 rounded-2xl font-black text-lg border-2 border-zinc-100 dark:border-zinc-800 hover:border-orange-600/30 transition-all flex items-center justify-center">
-                Тарифы
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-5 rounded-2xl font-black text-lg shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-2">
+                Запросить КП <ArrowRight className="w-5 h-5" />
+              </button>
+              <Link href="/pricing" className="bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white px-8 py-5 rounded-2xl font-black text-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all flex items-center justify-center">
+                Узнать цены
               </Link>
             </div>
           </div>

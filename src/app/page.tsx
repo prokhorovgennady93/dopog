@@ -70,6 +70,7 @@ export default async function Home() {
                 description={course.description}
                 icon={course.icon}
                 questionCount={course._count.questions}
+                hasAccess={session?.user && (session.user as any).hasFullAccess}
               />
             ))}
           </div>

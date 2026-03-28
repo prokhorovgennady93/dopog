@@ -4,9 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/actions/auth-actions";
-import { Phone, Lock, ArrowRight, Sparkles } from "lucide-react";
 
 export default function RegisterPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,6 +20,8 @@ export default function RegisterPage() {
     setLoading(true);
     
     const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
 
@@ -47,63 +50,64 @@ export default function RegisterPage() {
           <p className="text-zinc-400 text-sm">Присоединяйтесь к платформе подготовки ДОПОГ</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-4 rounded-xl text-center font-bold tracking-tight animate-in fade-in zoom-in duration-300">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center font-medium transition-all">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Контактный телефон</label>
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-yellow-500 transition-colors">
-                <Phone className="w-4 h-4" />
-              </div>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
-                placeholder="+7 (999) 999-99-99"
-                required
-              />
-            </div>
+            <label className="text-sm font-medium text-zinc-300 ml-1">ФИО</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
+              placeholder="Иванов Иван Иванович"
+              required
+            />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Пароль</label>
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-yellow-500 transition-colors">
-                <Lock className="w-4 h-4" />
-              </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
-                placeholder="••••••••"
-                required
-              />
-            </div>
+            <label className="text-sm font-medium text-zinc-300 ml-1">Номер телефона</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
+              placeholder="+7 (999) 000-00-00"
+              required
+            />
           </div>
 
-          <div className="flex items-start gap-4 p-2">
-            <input 
-              type="checkbox" 
-              id="legal-agree"
-              required
-              className="mt-1.5 h-4 w-4 rounded border-zinc-800 bg-zinc-800/30 text-yellow-500 focus:ring-yellow-500/20"
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300 ml-1">Email <span className="text-zinc-600">(необязательно)</span></label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
+              placeholder="name@example.com"
             />
-            <label htmlFor="legal-agree" className="text-xs text-zinc-500 font-bold leading-tight">
-              Даю согласие на <Link href="/data-policy" className="text-zinc-400 hover:text-yellow-500 underline">обработку персональных данных</Link> и принимаю <Link href="/terms" className="text-zinc-400 hover:text-yellow-500 underline">пользовательское соглашение</Link>
-            </label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300 ml-1">Пароль</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
+              placeholder="••••••••"
+              required
+            />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full ${loading ? 'opacity-50 cursor-not-allowed bg-zinc-700 text-zinc-400' : 'bg-yellow-500 hover:bg-yellow-400 text-black active:scale-[0.98]'} font-bold py-4 rounded-2xl shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-all transform select-none touch-manipulation`}
+            className={`w-full ${loading ? 'opacity-50 cursor-not-allowed bg-zinc-700 text-zinc-400' : 'bg-yellow-500 hover:bg-yellow-400 text-black active:scale-[0.98]'} font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-all transform`}
           >
             {loading ? "Создание..." : "Зарегистрироваться"}
           </button>

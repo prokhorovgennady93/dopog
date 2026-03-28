@@ -18,9 +18,12 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           const { login, password } = parsedCredentials.data;
           console.log(`Authorize: attempting login for ${login}`);
           
-          const user = await (db.user as any).findFirst({ 
+          const user = await db.user.findFirst({ 
             where: { 
-              phone: login 
+              OR: [
+                { email: login },
+                { phone: login }
+              ]
             } 
           });
           
@@ -41,11 +44,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      // ВРЕМЕННО: Отключаем лимиты и запись сессий для отладки
-      console.log(`DEBUG: SignIn callback for user ${user.id} (${(user as any).phone})`);
-      return true;
-    },
     async session({ session, token }) {
       if (token?.sub && session.user) {
         session.user.id = token.sub;
@@ -53,18 +51,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (typeof token.hasFullAccess === "boolean" && session.user) {
         (session.user as any).hasFullAccess = token.hasFullAccess;
       }
-      // Предотвращаем передачу объектов Date на клиент
       if (token.fullAccessExpiresAt && session.user) {
-        (session.user as any).fullAccessExpiresAt = 
-          token.fullAccessExpiresAt instanceof Date 
-            ? token.fullAccessExpiresAt.toISOString() 
-            : token.fullAccessExpiresAt;
+        (session.user as any).fullAccessExpiresAt = token.fullAccessExpiresAt;
       }
       if (Array.isArray(token.purchases) && session.user) {
-        (session.user as any).purchases = (token.purchases as any[]).map((p: any) => ({
-          ...p,
-          expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
-        }));
+        (session.user as any).purchases = token.purchases;
       }
       if (typeof token.isAdmin === "boolean" && session.user) {
         (session.user as any).isAdmin = token.isAdmin;
@@ -79,22 +70,14 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
     async jwt({ token }) {
       if (!token.sub) return token;
-      const user = await (db.user as any).findUnique({ 
+      const user = await db.user.findUnique({ 
         where: { id: token.sub },
         include: { purchases: { select: { courseId: true, expiresAt: true } } }
       });
       if (user) {
         token.hasFullAccess = user.hasFullAccess;
-        // Конвертируем дату в строку сразу в токене
-        token.fullAccessExpiresAt = user.fullAccessExpiresAt instanceof Date 
-          ? user.fullAccessExpiresAt.toISOString() 
-          : user.fullAccessExpiresAt;
-          
-        token.purchases = (user.purchases as any[]).map(p => ({
-          ...p,
-          expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
-        }));
-
+        token.fullAccessExpiresAt = user.fullAccessExpiresAt;
+        token.purchases = user.purchases;
         token.isAdmin = user.isAdmin;
         token.isOrganization = (user as any).isOrganization;
         token.orgName = (user as any).orgName;

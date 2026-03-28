@@ -1,23 +1,12 @@
-const CACHE_NAME = 'dopog-cache-v2';
+const CACHE_NAME = 'dopog-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
+  '/dashboard',
   '/manifest.json',
   '/icon.png',
-  '/dashboard',
-  '/organizations',
-  '/articles',
-  '/pricing',
-  '/login',
-  '/register'
-];
-
-// URLs to be cached when "Download All" is clicked
-const PREMIUM_ASSETS = [
-  // App Shell Components
-  '/_next/static/chunks/main.js',
-  '/_next/static/css/app/layout.css',
-  // Images
-  '/adr_b2b_partners_hero_1774716039123_1774726858603.png',
+  '/images/articles/hero.png',
+  '/images/articles/marking.png',
+  '/images/articles/rules.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -44,54 +33,38 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Message listener for manual caching (Download All)
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'CACHE_URLS') {
-    event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.addAll(event.data.urls);
-      })
-    );
-  }
-});
-
 self.addEventListener('fetch', (event) => {
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
 
-  // Cache-first for images and static assets
+  // Stale-while-revalidate for static assets and routes
   if (
-    url.pathname.startsWith('/images/') || 
-    url.pathname.endsWith('.png') || 
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.startsWith('/_next/static/')
+    ASSETS_TO_CACHE.includes(url.pathname) || 
+    url.pathname.startsWith('/_next/static/') ||
+    url.pathname.startsWith('/study/') ||
+    url.pathname.startsWith('/course/')
   ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).then((networkResponse) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+            });
+          }
+          return networkResponse;
         });
+        return cachedResponse || fetchPromise;
       })
     );
     return;
   }
 
-  // Network-first with fallback to cache for pages
+  // Network-first for other requests (including API)
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
-        if (response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return response;
-      })
       .catch(() => {
         return caches.match(event.request);
       })
