@@ -15,12 +15,32 @@ model User {
   image         String?
   hasFullAccess Boolean        @default(false)
   isAdmin       Boolean        @default(false)
+  isOrganization Boolean       @default(false)
+  orgName       String?
   fullAccessExpiresAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   examAttempts  ExamAttempt[]
   purchases     Purchase[]
   progress      UserProgress[]
+  ownedCodes    PromoCode[]    @relation("OrgCodes")
+  redeemedCodes PromoCode[]    @relation("RedeemedCodes")
+}
+
+model PromoCode {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  type           String   @default("FULL") // FULL or COURSE_ID
+  courseId       String?
+  organizationId String
+  usedByUserId   String?  @unique
+  maxUses        Int      @default(1)
+  usedCount      Int      @default(0)
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime?
+  
+  organization   User     @relation("OrgCodes", fields: [organizationId], references: [id])
+  usedByUser     User?    @relation("RedeemedCodes", fields: [usedByUserId], references: [id])
 }
 
 model Course {

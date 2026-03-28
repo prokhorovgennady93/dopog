@@ -75,7 +75,8 @@ export function QuestionView({
       }
     } else {
       setLocalQuestions(questions);
-      if (questions.length > 0 && currentTopicId) {
+      // Only cache for offline if the user has valid access
+      if (questions.length > 0 && currentTopicId && hasValidAccess) {
         localStorage.setItem(`topic_${currentTopicId}_data`, JSON.stringify(questions));
       }
     }

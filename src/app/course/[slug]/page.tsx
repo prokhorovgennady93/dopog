@@ -29,6 +29,16 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   }
 
   const isLoggedIn = !!session;
+  const user = session?.user as any;
+  const isFullAccess = user?.hasFullAccess === true;
+  const fullAccessExpiry = user?.fullAccessExpiresAt ? new Date(user.fullAccessExpiresAt) : null;
+  const isFullAccessActive = isFullAccess && (!fullAccessExpiry || fullAccessExpiry > new Date());
+  
+  const coursePurchase = user?.purchases?.find((p: any) => p.courseId === course.id);
+  const purchaseExpiry = coursePurchase?.expiresAt ? new Date(coursePurchase.expiresAt) : null;
+  const isPurchaseActive = !!coursePurchase && (!purchaseExpiry || purchaseExpiry > new Date());
+
+  const hasAccess = isFullAccessActive || isPurchaseActive;
 
   return (
     <div className="flex-1 bg-white dark:bg-zinc-950">
@@ -77,7 +87,11 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                     </Link>
                     
                     <div className="flex items-center gap-6">
-                       <DownloadTopicButton topicId={topic.id} topicTitle={topic.title} />
+                       <DownloadTopicButton 
+                         topicId={topic.id} 
+                         topicTitle={topic.title} 
+                         hasAccess={hasAccess} 
+                       />
                        <span className="text-sm font-black text-zinc-600 dark:text-zinc-300 w-16 pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">
                           {topic._count.questions}
                        </span>
@@ -94,15 +108,20 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               <div className="mb-6">
                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Статус</span>
                 <div className="flex items-center gap-2 mt-1">
-                  {isLoggedIn ? (
+                  {hasAccess ? (
                     <>
                       <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span className="text-sm font-medium">Доступ открыт</span>
+                      <span className="text-sm font-medium">Премиум доступ</span>
+                    </>
+                  ) : isLoggedIn ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <span className="text-sm font-medium">Бесплатный режим</span>
                     </>
                   ) : (
                     <>
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      <span className="text-sm font-medium">Демо-режим (5 вопр.)</span>
+                      <div className="w-2 h-2 rounded-full bg-zinc-400" />
+                      <span className="text-sm font-medium">Гостевой доступ</span>
                     </>
                   )}
                 </div>
