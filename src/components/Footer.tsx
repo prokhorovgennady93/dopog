@@ -17,7 +17,12 @@ export function Footer() {
           {/* Legal Section */}
           <div className="flex flex-col gap-3">
              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Навигация</h4>
-             <Link href="/articles" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">База знаний (Статьи)</Link>
+             <Link 
+               href="/articles" 
+               className="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-500 text-white text-xs font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all shadow-lg shadow-orange-900/20 active:scale-95 mb-2 text-center"
+             >
+                База знаний
+             </Link>
              <Link href="/terms" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Пользовательское соглашение</Link>
              <Link href="/privacy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Политика конфиденциальности</Link>
              <Link href="/data-policy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Обработка персональных данных</Link>

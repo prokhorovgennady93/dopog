@@ -1,123 +1,144 @@
 import Link from "next/link";
-import { ArrowLeft, GraduationCap, CheckCircle, Target, BrainCircuit } from "lucide-react";
+import { ArrowLeft, GraduationCap, CheckCircle, Target, BrainCircuit, ShieldAlert, Award, Clock } from "lucide-react";
+import Image from "next/image";
 
-const tips = [
-  {
-    title: "Изучите структуру билетов",
-    description: "Экзамен состоит из базового курса и спецкурсов. Поймите, сколько вопросов в каждом и какой процент ошибок допустим (обычно не более 10%).",
-    icon: <Target className="w-5 h-5 text-yellow-500" />
-  },
-  {
-    title: "Метод регулярной практики",
-    description: "Проходите по 2-3 теста каждый день, а не 50 за раз. Мозг лучше усваивает информацию порционно.",
-    icon: <BrainCircuit className="w-5 h-5 text-yellow-500" />
-  },
-  {
-    title: "Разбирайте объяснения",
-    description: "Не зазубривайте ответы! Если ошиблись — прочитайте пункт ДОПОГ в наших комментариях. Понимание логики правил — 90% успеха.",
-    icon: <CheckCircle className="w-5 h-5 text-yellow-500" />
-  }
+const roadmap = [
+  { step: "1-5 День", t: "Базовый курс (Классификация)", d: "Изучение классов опасности (1-9). Основное внимание на Класс 3, 8 и 9 — это 60% вопросов." },
+  { step: "6-10 День", t: "Маркировка и знаки", d: "Разбор оранжевых табличек и Hazard Diamonds. Правила их размещения на цистернах и фургонах." },
+  { step: "11-20 День", t: "Практика в режиме 'Тема'", d: "Проходите вопросы по темам: Спецразрешения, Оборудование ТС, Меры первой помощи." },
+  { step: "21-30 День", t: "Имитация экзамена", d: "Решайте билеты целиком. Ваша цель — 3 дня подряд без единой ошибки." }
 ];
 
 export default function HowToPassPage() {
   return (
-    <div className="bg-white dark:bg-zinc-950 min-h-screen py-12 sm:py-20 font-sans">
+    <div className="bg-white dark:bg-zinc-950 min-h-screen py-10 sm:py-20 font-sans">
       <article className="max-w-4xl mx-auto px-4">
         {/* Navigation Header */}
         <header className="mb-12">
-          <Link href="/articles" className="inline-flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-yellow-600 transition-colors mb-8 group">
+          <Link href="/articles" className="inline-flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-orange-600 transition-colors mb-8 group">
              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
-             Назад к статьям
+             К списку статей
           </Link>
           <div className="flex items-center gap-3 mb-6">
-             <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Советы экспертов</span>
-             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">6 мин чтения</span>
+             <span className="bg-green-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Guide 2026</span>
+             <span className="text-zinc-400 text-sm font-bold tracking-tight px-4 border-l border-zinc-100 dark:border-zinc-800">12 мин чтения</span>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black mb-8 leading-[1.1] tracking-tight text-zinc-900 dark:text-white">
-            Как сдать экзамен ДОПОГ <span className="text-yellow-500">с первого раза</span>
+          <h1 className="text-4xl sm:text-7xl font-black mb-8 leading-[1.05] tracking-tighter text-zinc-900 dark:text-white">
+            Как сдать экзамен <span className="text-orange-600">с первого раза</span>
           </h1>
-          <p className="text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-             Экзамен в Ространснадзоре считается одним из самых сложных для водителей. Мы собрали практические советы тех, кто уже прошел этот путь и получил свидетельство.
+          <p className="text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium mb-12 max-w-3xl">
+             Экзамен в комиссии Ространснадзора — это не просто проверка знаний, а психологическое испытание со множеством ловушек. Мы подготовили исчерпывающую стратегию подготовки, чтобы вы ушли оттуда с заветной пластиковой карточкой ДОПОГ.
           </p>
         </header>
 
-        {/* Article Body */}
-        <div className="prose prose-zinc dark:prose-invert max-w-none space-y-12">
+        {/* Content Body */}
+        <div className="prose prose-zinc dark:prose-invert max-w-none space-y-16">
+           
            <section>
-              <h2 className="text-2xl sm:text-3xl font-black mb-8 flex items-center gap-4">
-                 Стратегия подготовки
-                 <div className="flex-1 h-[2px] bg-zinc-100 dark:bg-zinc-800" />
+              <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-8 flex items-center gap-4 uppercase tracking-tighter">
+                 <Award className="w-10 h-10 text-orange-600 shrink-0" />
+                 Структура Вашего успеха
               </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                 {tips.map((tip, i) => (
-                    <div key={i} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-6 rounded-3xl group hover:border-yellow-500 transition-all">
-                       <div className="w-10 h-10 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:bg-yellow-500/10 group-hover:scale-110 transition-all">
-                          {tip.icon}
+              <div className="space-y-6 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
+                 <p>
+                    Система аттестации водителей ДОПОГ в России состоит из нескольких последовательных этапов. Прежде всего, это <b>Базовый курс</b>, без успешной сдачи которого вы не допускаетесь к специальным курсам (Цистерны, Класс 1, Класс 7). 
+                 </p>
+                 <p>
+                    На Базовый курс отводится 45 минут, в течение которых нужно ответить на 25 вопросов. Допустимое количество ошибок — всего 2. Это означает, что цена каждой ошибки крайне высока. На спецкурс «Цистерны» дается 30 минут на 15 вопросов, где можно ошибиться лишь раз. 
+                 </p>
+                 <p>
+                    Ловушка кроется в том, что вопросы часто сформулированы максимально похоже. Например, отличия «грузового отделения» от «транспортной единицы» может показаться незначительной деталью, но в ДОПОГ это фундаментально разные понятия с разными требованиями к тушению пожара или маркировке.
+                 </p>
+              </div>
+           </section>
+
+           <section className="bg-zinc-50 dark:bg-zinc-900/50 p-8 sm:p-16 rounded-[48px] border border-zinc-100 dark:border-zinc-800">
+              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white">Техника работы с вопросами</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                 <div className="flex gap-6">
+                    <Target className="w-8 h-8 text-orange-600 shrink-0 mt-1" />
+                    <div>
+                       <h4 className="font-bold text-lg mb-2">Метод исключения</h4>
+                       <p className="text-sm text-zinc-500">Обычно из 4 вариантов 2 являются абсолютно абсурдными. Уберите их сразу. Оставшиеся два будут отличаться одним ключевым словом (например, «только» или «всегда»). Ищите подвох в этих словах.</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-6">
+                    <BrainCircuit className="w-8 h-8 text-orange-600 shrink-0 mt-1" />
+                    <div>
+                       <h4 className="font-bold text-lg mb-2">Логика безопасности</h4>
+                       <p className="text-sm text-zinc-500">Если вы не знаете точный пункт правил, выберите тот ответ, который в реальности приведет к максимальной безопасности. ДОПОГ строится на минимизации любого риска.</p>
+                    </div>
+                 </div>
+              </div>
+           </section>
+
+           <section>
+              <h2 className="text-3xl font-black mb-12">Ваш 30-дневный план победы</h2>
+              <div className="space-y-4">
+                 {roadmap.map((item, i) => (
+                    <div key={i} className="flex flex-col sm:flex-row items-center gap-8 bg-zinc-900 p-8 rounded-[32px] hover:translate-x-2 transition-transform duration-300">
+                       <div className="text-orange-500 font-bold text-sm uppercase tracking-widest whitespace-nowrap">{item.step}</div>
+                       <div className="flex-1">
+                          <h4 className="text-xl font-black text-white mb-2">{item.t}</h4>
+                          <p className="text-sm text-zinc-400 font-medium leading-relaxed">{item.d}</p>
                        </div>
-                       <h3 className="font-bold text-lg mb-3">{tip.title}</h3>
-                       <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">{tip.description}</p>
+                       <div className="hidden sm:block w-10 h-10 border-2 border-orange-600 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-orange-600" />
+                       </div>
                     </div>
                  ))}
               </div>
            </section>
 
-           <section className="bg-zinc-900 rounded-3xl p-8 sm:p-12 text-zinc-400 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-500 opacity-5 blur-3xl" />
-              <h2 className="text-2xl sm:text-3xl font-black text-white mb-6">Частые ловушки в вопросах</h2>
-              <p className="text-lg leading-relaxed font-medium mb-8">
-                 Авторы билетов часто используют похожие термины: «грузовой транспорт», «транспортная единица», «перевозка в упаковках». Разберитесь в отличиях между ними — именно на таких нюансах «валятся» 40% кандидатов.
-              </p>
-              <Link 
-                href="/#courses" 
-                className="inline-flex items-center gap-2 text-yellow-500 font-black uppercase text-xs tracking-widest hover:text-white transition-colors"
-              >
-                Начать тренировку сейчас <ArrowLeft className="w-4 h-4 rotate-180" />
-              </Link>
+           <section className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-[40px] p-8 sm:p-12">
+              <div className="flex flex-col md:flex-row gap-10 items-center">
+                 <div className="w-24 h-24 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center shrink-0">
+                    <ShieldAlert className="w-12 h-12 text-amber-600" />
+                 </div>
+                 <div>
+                    <h3 className="text-2xl font-black text-amber-900 dark:text-amber-500 mb-4">Главный совет: Не зазубривайте!</h3>
+                    <p className="text-lg text-amber-800/80 dark:text-amber-500/70 font-bold leading-relaxed">
+                       База вопросов Ространснадзора в 2026 году регулярно обновляется. Зазубривание «правильных букв» — это путь в никуда. Понимая логику классов опасности и требований к ТС, вы ответите даже на вопрос, который видите впервые.
+                    </p>
+                 </div>
+              </div>
            </section>
 
-           <section>
-              <h2 className="text-2xl sm:text-3xl font-black mb-6">День экзамена: Рекомендации</h2>
-              <ul className="space-y-6">
-                 <li className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-black shrink-0">1</div>
-                    <div>
-                       <h4 className="font-bold text-lg mb-1">Не спешите</h4>
-                       <p className="text-zinc-500 dark:text-zinc-400 font-medium">На базовый курс дается 45 минут. Читайте вопрос до конца, даже если ответ кажется очевидным.</p>
-                    </div>
-                 </li>
-                 <li className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-black shrink-0">2</div>
-                    <div>
-                       <h4 className="font-bold text-lg mb-1">Используйте логику</h4>
-                       <p className="text-zinc-500 dark:text-zinc-400 font-medium">ДОПОГ — это не просто закон, это правила безопасности. Представьте реальную ситуацию на дороге, и правильный ответ придет сам собой.</p>
-                    </div>
-                 </li>
-              </ul>
+           <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+              <div className="border border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 relative overflow-hidden group hover:border-orange-500 transition-all">
+                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Clock className="w-24 h-24 text-black dark:text-white" />
+                 </div>
+                 <h3 className="text-xl font-black mb-4">Тайм-менеджмент</h3>
+                 <p className="text-zinc-500 font-medium leading-relaxed">Разделите время на тесте. Проходите все легкие вопросы в первые 10 минут. Оставшееся время (35 минут!) потратьте на «сомнительные» баллы. Не зацикливайтесь на одном вопросе — идите дальше и вернитесь к нему в конце.</p>
+              </div>
+              <div className="border border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 relative overflow-hidden group hover:border-orange-500 transition-all">
+                 <h3 className="text-xl font-black mb-4">День накануне</h3>
+                 <p className="text-zinc-500 font-medium leading-relaxed">Никакой учебы после 18:00. Мозгу нужно «заархивировать» данные. Крепкий сон важнее, чем еще одна пройденная тема. Приходите на экзамен на 20 минут раньше, чтобы привыкнуть к обстановке.</p>
+              </div>
            </section>
 
-           <section className="bg-yellow-50 border-2 border-yellow-200 dark:bg-yellow-500/5 dark:border-yellow-500/20 rounded-3xl p-8 sm:p-12 text-center">
-              <GraduationCap className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
-              <h2 className="text-3xl font-black text-yellow-700 dark:text-yellow-500 mb-4">Готовы подтвердить квалификацию?</h2>
-              <p className="text-zinc-600 dark:text-zinc-400 font-bold mb-8 max-w-lg mx-auto leading-relaxed">
-                 Наша система обучения адаптируется под ваши ошибки и помогает закрыть пробелы в знаниях за несколько вечеров.
+           <section className="bg-orange-600 rounded-[56px] p-12 sm:p-24 text-white text-center shadow-3xl shadow-orange-950/20">
+              <GraduationCap className="w-20 h-20 mx-auto mb-8 text-white drop-shadow-lg" />
+              <h2 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">Ваш тренажер <span className="text-black">ДОПОГ 2026</span></h2>
+              <p className="text-xl mb-12 opacity-80 max-w-xl mx-auto font-medium">
+                 Все описанные методики и правила внедрены в нашу систему обучения. Начните тренироваться сейчас и будьте уверены в своем результате.
               </p>
               <Link 
-                href="/#courses" 
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-12 py-5 rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-yellow-500/20"
+                 href="/#courses" 
+                 className="inline-flex bg-black text-white px-16 py-6 rounded-3xl font-black text-xl hover:bg-zinc-800 transition-all active:scale-95 shadow-2xl"
               >
-                Открыть каталог курсов
+                 Начать подготовку
               </Link>
            </section>
         </div>
       </article>
 
-      {/* Footer / Sidebar mini */}
       <footer className="max-w-4xl mx-auto px-4 mt-20 pt-12 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-sm font-bold text-zinc-400">
          <p>© 2026 ДОПОГ Экзамен</p>
          <div className="flex gap-6">
-            <Link href="/articles" className="hover:text-yellow-600 transition-colors">Другие статьи</Link>
-            <Link href="/" className="hover:text-yellow-600 transition-colors">Главная</Link>
+            <Link href="/articles" className="hover:text-orange-600 transition-colors">База знаний</Link>
+            <Link href="/" className="hover:text-orange-600 transition-colors">Главная</Link>
          </div>
       </footer>
     </div>
