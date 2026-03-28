@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/actions/auth-actions";
-import InputMask from "react-input-mask";
 import { Phone, Lock, ArrowRight, Sparkles } from "lucide-react";
 
 export default function RegisterPage() {
@@ -12,12 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,23 +60,14 @@ export default function RegisterPage() {
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-yellow-500 transition-colors">
                 <Phone className="w-4 h-4" />
               </div>
-              {isMounted ? (
-                <InputMask
-                  mask="+7 (999) 999-99-99"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
-                  placeholder="+7 (___) ___-__-__"
-                  required
-                />
-              ) : (
-                <input
-                  type="text"
-                  className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 font-bold tracking-tight"
-                  placeholder="+7 (___) ___-__-__"
-                  disabled
-                />
-              )}
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
+                placeholder="+7 (999) 999-99-99"
+                required
+              />
             </div>
           </div>
 

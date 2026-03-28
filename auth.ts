@@ -83,11 +83,18 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (typeof token.hasFullAccess === "boolean" && session.user) {
         (session.user as any).hasFullAccess = token.hasFullAccess;
       }
+      // Предотвращаем передачу объектов Date на клиент
       if (token.fullAccessExpiresAt && session.user) {
-        (session.user as any).fullAccessExpiresAt = token.fullAccessExpiresAt;
+        (session.user as any).fullAccessExpiresAt = 
+          token.fullAccessExpiresAt instanceof Date 
+            ? token.fullAccessExpiresAt.toISOString() 
+            : token.fullAccessExpiresAt;
       }
       if (Array.isArray(token.purchases) && session.user) {
-        (session.user as any).purchases = token.purchases;
+        (session.user as any).purchases = token.purchases.map((p: any) => ({
+          ...p,
+          expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
+        }));
       }
       if (typeof token.isAdmin === "boolean" && session.user) {
         (session.user as any).isAdmin = token.isAdmin;
@@ -108,8 +115,16 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       });
       if (user) {
         token.hasFullAccess = user.hasFullAccess;
-        token.fullAccessExpiresAt = user.fullAccessExpiresAt;
-        token.purchases = user.purchases;
+        // Конвертируем дату в строку сразу в токене
+        token.fullAccessExpiresAt = user.fullAccessExpiresAt instanceof Date 
+          ? user.fullAccessExpiresAt.toISOString() 
+          : user.fullAccessExpiresAt;
+          
+        token.purchases = user.purchases.map(p => ({
+          ...p,
+          expiresAt: p.expiresAt instanceof Date ? p.expiresAt.toISOString() : p.expiresAt
+        }));
+
         token.isAdmin = user.isAdmin;
         token.isOrganization = (user as any).isOrganization;
         token.orgName = (user as any).orgName;
