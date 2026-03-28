@@ -69,9 +69,11 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 <h2 className="text-xl font-black flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-yellow-500" />
                   Темы обучения
-                  <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">Скачать</span>
                 </h2>
-                <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest mr-4">вопросов</span>
+                <div className="flex items-center gap-6 pr-4 sm:pr-8">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Скачать</span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest w-12 sm:w-16 text-center">вопросов</span>
+                </div>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {(course as any).themes.map((topic: any) => (
@@ -91,6 +93,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                        <DownloadTopicButton 
                          topicId={topic.id} 
                          topicTitle={topic.title} 
+                         courseId={course.id}
                          hasAccess={hasAccess} 
                        />
                        <span className="text-xs sm:text-sm font-black text-zinc-600 dark:text-zinc-300 w-12 sm:w-16 pl-2 sm:pl-4 text-center border-l border-zinc-200 dark:border-zinc-800">

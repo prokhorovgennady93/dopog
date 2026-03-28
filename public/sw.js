@@ -34,12 +34,20 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') return;
+  // Intercept navigation requests to serve cached HTML
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          return caches.match(event.request) || caches.match('/');
+        })
+    );
+    return;
+  }
 
   const url = new URL(event.request.url);
 
-  // Stale-while-revalidate for static assets and routes
+  // Stale-while-revalidate for static assets and specific routes
   if (
     ASSETS_TO_CACHE.includes(url.pathname) || 
     url.pathname.startsWith('/_next/static/') ||
@@ -55,7 +63,8 @@ self.addEventListener('fetch', (event) => {
             });
           }
           return networkResponse;
-        });
+        }).catch(() => null); // Ignore fetch errors in SWR
+        
         return cachedResponse || fetchPromise;
       })
     );

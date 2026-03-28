@@ -8,10 +8,13 @@ export default async function Home() {
   const session = await auth();
   const courses = await db.course.findMany({
     include: {
+      themes: {
+        select: { id: true }
+      },
       _count: {
         select: { questions: true }
       }
-    }
+    } as any
   });
 
   return (
@@ -71,6 +74,7 @@ export default async function Home() {
                 icon={course.icon}
                 questionCount={course._count.questions}
                 hasAccess={session?.user && (session.user as any).hasFullAccess}
+                themes={course.themes}
               />
             ))}
           </div>

@@ -1,15 +1,15 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { CloudDownload, CheckCircle2, Loader2, Lock } from "lucide-react";
+import { checkTopicDownloaded, downloadTopic } from "@/lib/offline";
 
 interface DownloadTopicButtonProps {
   topicId: string;
   topicTitle: string;
+  courseId: string;
   hasAccess: boolean;
 }
 
-export function DownloadTopicButton({ topicId, topicTitle, hasAccess }: DownloadTopicButtonProps) {
+export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }: DownloadTopicButtonProps) {
   const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "error" | "locked">("idle");
   const [progress, setProgress] = useState(0);
 
@@ -18,9 +18,9 @@ export function DownloadTopicButton({ topicId, topicTitle, hasAccess }: Download
       setStatus("locked");
       return;
     }
-    // Check if already downloaded
-    const checkStatus = () => {
-      const isDownloaded = localStorage.getItem(`topic_${topicId}_offline`) === "true";
+    
+    const checkStatus = async () => {
+      const isDownloaded = await checkTopicDownloaded(topicId);
       if (isDownloaded) setStatus("downloaded");
       else setStatus("idle");
     };
@@ -36,39 +36,15 @@ export function DownloadTopicButton({ topicId, topicTitle, hasAccess }: Download
       return;
     }
 
-    if (status === "downloaded") return;
+    if (status === "downloaded" || status === "downloading") return;
 
     setStatus("downloading");
     setProgress(0);
 
     try {
-      // 1. Fetch Question Data
-      const response = await fetch(`/api/topics/${topicId}/questions`);
-      const questions = await response.json();
-
-      if (!response.ok) throw new Error("Failed to fetch questions");
-
-      // 2. Cache Data in LocalStorage (Simple JSON store)
-      localStorage.setItem(`topic_${topicId}_data`, JSON.stringify(questions));
-
-      // 3. Cache Images in CacheStorage
-      if ("caches" in window) {
-        const cache = await caches.open("dopog-questions-images");
-        const imageUrls = questions
-          .map((q: any) => q.imageUrl)
-          .filter((url: string | null) => url && url.length > 0);
-
-        for (let i = 0; i < imageUrls.length; i++) {
-          try {
-            await cache.add(imageUrls[i]);
-          } catch (e) {
-            console.warn(`Failed to cache image: ${imageUrls[i]}`, e);
-          }
-          setProgress(Math.round(((i + 1) / imageUrls.length) * 100));
-        }
-      }
-
-      localStorage.setItem(`topic_${topicId}_offline`, "true");
+      await downloadTopic(topicId, courseId, (p) => {
+        setProgress(p);
+      });
       setStatus("downloaded");
     } catch (error) {
       console.error("Download failed:", error);
