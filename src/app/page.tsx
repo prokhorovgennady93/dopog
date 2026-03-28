@@ -53,8 +53,8 @@ export default async function Home() {
       {/* Courses Catalog */}
       <section id="courses" className="mt-12 sm:mt-0 scroll-mt-20 py-16 sm:py-24 bg-zinc-50/50 dark:bg-zinc-950/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4 pr-1 sm:pr-0">
-            <div className="w-full text-right sm:text-left">
+          <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4">
+            <div className="w-full text-left">
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">Каталог курсов</h2>
               <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400">Выберите категорию для начала подготовки</p>
             </div>

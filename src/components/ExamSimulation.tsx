@@ -51,6 +51,7 @@ export function ExamSimulation({
   const [isFinished, setIsFinished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -176,15 +177,29 @@ export function ExamSimulation({
                 </button>
             </div>
             
-            <div className="group relative">
-               <HelpCircle className="w-5 h-5 text-zinc-400 hover:text-yellow-500 transition-colors cursor-help" />
-               <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all z-50 border border-zinc-800">
-                  <p className="font-bold mb-1 text-yellow-500">Режимы ответов:</p>
-                  <p className="text-zinc-400 leading-relaxed font-medium">
-                    <span className="text-white">Подтверждение</span> — вы выбираете вариант и нажимаете кнопку для перехода к следующему вопросу.<br/><br/>
-                    <span className="text-white">Автопереход</span> — следующий вопрос появится автоматически сразу после выбора варианта.
-                  </p>
-               </div>
+            <div className="relative">
+               <button 
+                onClick={() => setIsHelpOpen(!isHelpOpen)}
+                className="focus:outline-none flex items-center justify-center p-1"
+                aria-label="Показать справку"
+               >
+                 <HelpCircle className={`w-5 h-5 transition-colors cursor-help ${isHelpOpen ? 'text-yellow-500' : 'text-zinc-400 hover:text-yellow-500'}`} />
+               </button>
+               {isHelpOpen && (
+                 <>
+                   <div 
+                    className="fixed inset-0 z-40 sm:hidden" 
+                    onClick={() => setIsHelpOpen(false)} 
+                   />
+                   <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] rounded-xl shadow-2xl z-50 border border-zinc-800 animate-in fade-in zoom-in duration-200">
+                      <p className="font-bold mb-1 text-yellow-500">Режимы ответов:</p>
+                      <p className="text-zinc-400 leading-relaxed font-medium">
+                        <span className="text-white">Подтверждение</span> — вы выбираете вариант и нажимаете кнопку для перехода к следующему вопросу.<br/><br/>
+                        <span className="text-white">Автопереход</span> — следующий вопрос появится автоматически сразу после выбора варианта.
+                      </p>
+                   </div>
+                 </>
+               )}
             </div>
           </div>
         </div>
