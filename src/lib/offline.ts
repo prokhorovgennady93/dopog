@@ -25,8 +25,10 @@ export async function downloadTopic(
       const cache = await caches.open("dopog-cache-v1");
       
       // Robust individual asset caching
+      const studyUrl = `/study/${courseId}?topicId=${topicId}`;
       const assets = [
-        `/study/${courseId}?topicId=${topicId}`,
+        studyUrl,
+        `${studyUrl}&_rsc=1`, // RSC Data for this specific topic
         "/manifest.json",
         "/icon.png"
       ];
@@ -67,17 +69,28 @@ export async function downloadCourse(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // 1. Cache the Course Landing Page AND Home/Dashboard
+  // 1. Deep Shell Sync (Fetch HTML and RSC Data for navigation)
   if ("caches" in window) {
     const cache = await caches.open("dopog-cache-v1");
-    const routesToCache = [`/course/${slug}`, "/", "/dashboard"];
+    // Standard URLs + RSC Data fetching to prime the Next.js internal cache
+    const shellRoutes = [
+      `/course/${slug}`,
+      "/",
+      "/dashboard"
+    ];
     
-    for (const route of routesToCache) {
+    for (const route of shellRoutes) {
       try {
-        await cache.add(route);
-        console.log(`Cached route: ${route}`);
+        // Fetch HTML
+        const htmlRes = await fetch(route);
+        if (htmlRes.ok) await cache.put(route, htmlRes);
+
+        // Fetch RSC Payload (Next.js transition data)
+        const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
+        const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
+        if (rscRes.ok) await cache.put(rscUrl, rscRes);
       } catch (e) {
-        console.warn(`Failed to cache route: ${route}`, e);
+        console.warn(`[DeepSync] Failed to cache shell route: ${route}`, e);
       }
     }
   }

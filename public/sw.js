@@ -56,30 +56,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. GET Requests for Static Assets and Next.js internal data
+  // 2. Master Interceptor: Use Cache-First for all same-origin GET requests
+  // This captures all JS, CSS, Images, and Next.js internal data (RSC)
   if (event.request.method === 'GET' && isSameOrigin) {
     if (url.pathname.startsWith('/api/auth')) return;
 
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
+        // Return from cache immediately if available, but also update in background
         const fetchPromise = fetch(event.request).then((networkResponse) => {
-          // Update cache for assets, next.js internals, and downloaded routes
-          if (
-            networkResponse && 
-            networkResponse.status === 200 && 
-            (
-              ASSETS_TO_CACHE.includes(url.pathname) ||
-              url.pathname.startsWith('/_next/') ||
-              url.pathname.startsWith('/course/') ||
-              url.pathname.startsWith('/study/') ||
-              url.pathname.endsWith('.json') ||
-              url.pathname.endsWith('.js') ||
-              url.pathname.endsWith('.css') ||
-              url.pathname.endsWith('.png') ||
-              url.pathname.endsWith('.jpg') ||
-              url.pathname.endsWith('.svg')
-            )
-          ) {
+          if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, networkResponse.clone());
             });
@@ -87,13 +73,15 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         }).catch(() => null);
 
-        return cachedResponse || fetchPromise;
+        // For .json, .js, and next.js internal data, we prefer cache-first for speed
+        if (cachedResponse) return cachedResponse;
+        return fetchPromise;
       })
     );
     return;
   }
 
-  // 3. Simple Fallback for other requests
+  // 3. Fallback for everything else (Cross-origin icons, etc.)
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
