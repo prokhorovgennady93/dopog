@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import InputMask from "react-input-mask";
+import { Phone, Lock, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
   const [login, setLogin] = useState("");
@@ -39,8 +41,8 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(234,179,8,0.3)]">
             <span className="text-black font-bold text-2xl">ADR</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">С возвращением</h1>
-          <p className="text-zinc-400 text-sm">Войдите, чтобы продолжить подготовку ДОПОГ</p>
+          <h1 className="text-2xl font-bold text-white mb-2 italic">С возвращением</h1>
+          <p className="text-zinc-400 text-sm font-bold">Введите номер телефона, чтобы продолжить подготовку</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -51,27 +53,37 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300 ml-1">Email или Номер телефона</label>
-            <input
-              type="text"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
-              placeholder="+7 (999) 000-00-00 или name@example.com"
-              required
-            />
+            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Контактный телефон</label>
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-yellow-500 transition-colors">
+                <Phone className="w-4 h-4" />
+              </div>
+              <InputMask
+                mask="+7 (999) 999-99-99"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
+                placeholder="+7 (___) ___-__-__"
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300 ml-1">Пароль</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all"
-              placeholder="••••••••"
-              required
-            />
+            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Пароль</label>
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-yellow-500 transition-colors">
+                <Lock className="w-4 h-4" />
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-zinc-800/30 border border-zinc-800 rounded-2xl pl-11 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/10 focus:border-yellow-500/50 transition-all font-bold tracking-tight"
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
 
           <div className="flex justify-end">

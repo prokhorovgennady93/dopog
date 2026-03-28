@@ -1,7 +1,7 @@
 import { auth, signOut } from "@/../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Zap, BookOpen, Crown, CheckCircle2, Award, Flame, Target, TrendingUp, ChevronRight } from "lucide-react";
+import { Zap, BookOpen, Crown, CheckCircle2, Award, Flame, Target, TrendingUp, ChevronRight, Mail } from "lucide-react";
 import { db } from "@/lib/db";
 import { OverallMasteryGauge, MasteryHeatmap, WeakestThemeCard } from "@/components/dashboard/DashboardCharts";
 import { RecentHistory } from "@/components/dashboard/RecentHistory";
@@ -139,6 +139,30 @@ export default async function DashboardPage() {
         </header>
 
         <PushManager />
+
+        {/* Email Recovery Alert */}
+        {!user.email && (
+          <div className="bg-orange-600 rounded-[32px] p-6 sm:p-8 text-white relative overflow-hidden shadow-xl shadow-orange-950/20 animate-in fade-in slide-in-from-top-4 duration-700">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                   <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                      <Mail className="w-6 h-6" />
+                   </div>
+                   <div>
+                      <h3 className="text-lg font-black tracking-tight leading-tight">Безопасность вашего аккаунта</h3>
+                      <p className="text-white/80 text-sm font-bold">Привяжите Email для восстановления пароля в случае его утраты.</p>
+                   </div>
+                </div>
+                <Link 
+                  href="/dashboard/profile"
+                  className="w-full sm:w-auto bg-white text-orange-600 px-8 py-3 rounded-xl font-black text-sm hover:bg-zinc-100 transition-all text-center"
+                >
+                  Привязать Email
+                </Link>
+             </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
            <OverallMasteryGauge mastery={overallMastery} />

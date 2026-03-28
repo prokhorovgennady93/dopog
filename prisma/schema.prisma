@@ -25,6 +25,35 @@ model User {
   progress      UserProgress[]
   ownedCodes    PromoCode[]    @relation("OrgCodes")
   redeemedCodes PromoCode[]    @relation("RedeemedCodes")
+  sessions      Session[]
+  orgProfile    OrganizationProfile?
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  userAgent    String?
+  ipAddress    String?
+  lastUsedAt   DateTime @default(now())
+  expiresAt    DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OrganizationProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  inn           String?
+  kpp           String?
+  ogrn          String?
+  address       String?
+  bankName      String?
+  bankAccount   String?
+  corrAccount   String?
+  bik           String?
+  phone         String?
+  email         String?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PromoCode {
