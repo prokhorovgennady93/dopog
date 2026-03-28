@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, UserCheck, ShieldCheck, GraduationCap, Gavel, HelpCircle, Target, Award, Globe, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { ArrowLeft, UserCheck, ShieldCheck, GraduationCap, Gavel, HelpCircle, Target, Award, Globe, Clock, AlertTriangle, ChevronRight, Truck } from "lucide-react";
 import Image from "next/image";
 
 export default function DriverCertPage() {

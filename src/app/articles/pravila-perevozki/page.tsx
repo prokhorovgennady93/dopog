@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, FileText, Info, ShieldCheck, HelpCircle, FileDigit, Truck, CheckCircle2, ChevronRight } from "lucide-react";
+import { ArrowLeft, FileText, Info, ShieldCheck, HelpCircle, FileDigit, Truck, CheckCircle2, ChevronRight, Award } from "lucide-react";
 import Image from "next/image";
 
 export default function RulesPage() {
