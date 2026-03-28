@@ -3,11 +3,7 @@ const ASSETS_TO_CACHE = [
   '/',
   '/dashboard',
   '/manifest.json',
-  '/icon.png',
-  '/_next/static/css/app/layout.css',
-  '/images/articles/hero.png',
-  '/images/articles/marking.png',
-  '/images/articles/rules.png'
+  '/icon.png'
 ];
 
 // Force immediate activation

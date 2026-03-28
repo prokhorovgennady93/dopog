@@ -11,23 +11,35 @@ export function OfflineIndicator() {
 
   useEffect(() => {
     const updateStats = async () => {
-      // SW Status
+      // SW Status check
       if ("serviceWorker" in navigator) {
-        const reg = await navigator.serviceWorker.getRegistration();
-        if (reg) {
-          if (reg.active) setSwStatus("Активен");
-          else if (reg.installing) setSwStatus("Установка...");
-          else if (reg.waiting) setSwStatus("Ожидание...");
+        if (navigator.serviceWorker.controller) {
+          setSwStatus("Активен");
         } else {
-          setSwStatus("Не зарегистрирован");
+          // Check if it's there but not yet controlling
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg) {
+            if (reg.installing) setSwStatus("Установка...");
+            else if (reg.waiting) setSwStatus("Обновление...");
+            else if (reg.active) setSwStatus("Готов (перезагрузите)");
+            else setSwStatus("Зарегистрирован");
+          } else {
+            setSwStatus("Не зарегистрирован");
+          }
         }
+      } else {
+        setSwStatus("Не поддерживается");
       }
 
       // Cache Count
       if ("caches" in window) {
-        const cache = await caches.open("dopog-cache-v1");
-        const keys = await cache.keys();
-        setCacheCount(keys.length);
+        try {
+          const cache = await caches.open("dopog-cache-v1");
+          const keys = await cache.keys();
+          setCacheCount(keys.length);
+        } catch (e) {
+          console.warn("Cache access error:", e);
+        }
       }
     };
 
@@ -61,7 +73,7 @@ export function OfflineIndicator() {
           </div>
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest leading-none">{isOffline ? 'Работаем офлайн' : 'Система ДОПОГ'}</h4>
-            <p className="text-[10px] font-bold opacity-80 mt-0.5">
+            <p className="text-[10px] font-bold opacity-80 mt-0.5 whitespace-nowrap">
               {swStatus} • {cacheCount} файлов в памяти
             </p>
           </div>
