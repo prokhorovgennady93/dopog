@@ -5,11 +5,11 @@ import { notFound } from "next/navigation";
 import { BookOpen, Play, CheckCircle, Lock, CloudDownload } from "lucide-react";
 import { DownloadTopicButton } from "@/components/DownloadTopicButton";
 
-export default async function CoursePage({ params }: { params: { slug: string } }) {
+export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const session = await auth();
 
-  const course = await db.course.findUnique({
+  const course = await (db.course as any).findUnique({
     where: { slug },
     include: {
       themes: {

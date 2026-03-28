@@ -8,15 +8,15 @@ export default async function StudyPage({
   params,
   searchParams
 }: {
-  params: { courseId: string };
-  searchParams: { topicId?: string };
+  params: Promise<{ courseId: string }>;
+  searchParams: Promise<{ topicId?: string }>;
 }) {
   const { courseId } = await params;
   const { topicId } = await searchParams;
   const session = await auth();
   const isLoggedIn = !!session;
 
-  const course = await db.course.findUnique({
+  const course = await (db.course as any).findUnique({
     where: { id: courseId },
     include: {
       themes: {
