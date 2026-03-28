@@ -10,19 +10,15 @@ export function YandexMetrica() {
   // ==========================================
   // ВСТАВЬТЕ ВАШ ID СЧЕТЧИКА НИЖЕ
   // ==========================================
-  const COUNTER_ID = 0; 
+  const COUNTER_ID = 108283904; 
 
   useEffect(() => {
-    if (COUNTER_ID === 0) return;
-    
     // @ts-ignore
     if (typeof window.ym !== 'undefined') {
         // @ts-ignore
         window.ym(COUNTER_ID, 'hit', pathname + searchParams.toString());
     }
   }, [pathname, searchParams]);
-
-  if (COUNTER_ID === 0) return null;
 
   return (
     <>
@@ -33,13 +29,15 @@ export function YandexMetrica() {
             m[i].l=1*new Date();
             for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
             k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=${COUNTER_ID}", "ym");
 
             ym(${COUNTER_ID}, "init", {
                  clickmap:true,
                  trackLinks:true,
                  accurateTrackBounce:true,
-                 webvisor:true
+                 webvisor:true,
+                 ecommerce:"dataLayer",
+                 ssr:true
             });
           `,
         }}
