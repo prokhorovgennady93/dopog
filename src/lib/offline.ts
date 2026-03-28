@@ -68,15 +68,18 @@ export async function downloadCourse(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // 1. Cache the Course Landing Page itself
+  // 1. Cache the Course Landing Page AND Home/Dashboard
   if ("caches" in window) {
     const cache = await caches.open("dopog-cache-v1");
-    const courseUrl = `/course/${slug}`;
-    try {
-      await cache.add(courseUrl);
-      console.log(`Cached course route: ${courseUrl}`);
-    } catch (e) {
-      console.warn(`Failed to cache course route: ${courseUrl}`, e);
+    const routesToCache = [`/course/${slug}`, "/", "/dashboard"];
+    
+    for (const route of routesToCache) {
+      try {
+        await cache.add(route);
+        console.log(`Cached route: ${route}`);
+      } catch (e) {
+        console.warn(`Failed to cache route: ${route}`, e);
+      }
     }
   }
 
