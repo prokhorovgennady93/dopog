@@ -69,28 +69,27 @@ export async function downloadCourse(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // 1. Deep Shell Sync (Fetch HTML and RSC Data for navigation)
+  // 1. Static Content Snapshots (HTML + Navigation Data)
   if ("caches" in window) {
     const cache = await caches.open("dopog-cache-v1");
-    // Standard URLs + RSC Data fetching to prime the Next.js internal cache
-    const shellRoutes = [
-      `/course/${slug}`,
+    // We only snapshot the Home and the current Course
+    const snapshots = [
       "/",
-      "/dashboard"
+      `/course/${slug}`
     ];
     
-    for (const route of shellRoutes) {
+    for (const route of snapshots) {
       try {
-        // Fetch HTML
+        // Fetch raw HTML
         const htmlRes = await fetch(route);
         if (htmlRes.ok) await cache.put(route, htmlRes);
 
-        // Fetch RSC Payload (Next.js transition data)
+        // Fetch RSC Navigation Data
         const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
         const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
         if (rscRes.ok) await cache.put(rscUrl, rscRes);
       } catch (e) {
-        console.warn(`[DeepSync] Failed to cache shell route: ${route}`, e);
+        console.warn(`[Snapshot] Failed to capture: ${route}`, e);
       }
     }
   }

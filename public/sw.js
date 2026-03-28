@@ -1,83 +1,67 @@
 const CACHE_NAME = 'dopog-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
-  '/dashboard',
   '/manifest.json',
   '/icon.png'
 ];
 
-// Force immediate activation
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-caching core assets');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    Promise.all([
-      self.clients.claim(),
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-    ])
-  );
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
 
-  // 1. Navigation Requests: Network-first, fallback to cache, then to '/'
+  // 1. Navigation (HTML Snapshots): Network-first, then Static Cache Fallback
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return caches.match(event.request).then(cached => {
-            return cached || caches.match('/');
-          });
-        })
-    );
-    return;
-  }
-
-  // 2. Master Interceptor: Use Cache-First for all same-origin GET requests
-  // This captures all JS, CSS, Images, and Next.js internal data (RSC)
-  if (event.request.method === 'GET' && isSameOrigin) {
-    if (url.pathname.startsWith('/api/auth')) return;
-
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        // Return from cache immediately if available, but also update in background
-        const fetchPromise = fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
-            });
-          }
-          return networkResponse;
-        }).catch(() => null);
-
-        // For .json, .js, and next.js internal data, we prefer cache-first for speed
-        if (cachedResponse) return cachedResponse;
-        return fetchPromise;
+      fetch(event.request).catch(async () => {
+        // Look for the specific HTML snapshot of this page
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        
+        // If it's a course sub-page or home, and we don't have the specific link,
+        // try to find any course-related shell or root.
+        if (url.pathname.startsWith('/course/')) {
+           return caches.match(url.pathname) || caches.match('/');
+        }
+        
+        return caches.match('/');
       })
     );
     return;
   }
 
-  // 3. Fallback for everything else (Cross-origin icons, etc.)
+  // 2. Master Asset Interceptor (Cache-First)
+  if (event.request.method === 'GET' && isSameOrigin) {
+    if (url.pathname.startsWith('/api/auth')) return;
+
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        const fetchPromise = fetch(event.request).then((res) => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return res;
+        }).catch(() => null);
+
+        // Always return cache first for speed and offline stability
+        return cached || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // 3. Fallback
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
