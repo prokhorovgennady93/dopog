@@ -9,6 +9,7 @@ const RegisterSchema = z.object({
   email: z.string().email("Неверный формат email").optional().or(z.literal('')),
   phone: z.string().min(10, "Введите корректный номер телефона"),
   password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+  isOrganization: z.boolean().optional(),
 });
 
 export async function registerUser(formData: FormData) {
@@ -16,8 +17,9 @@ export async function registerUser(formData: FormData) {
   const email = (formData.get("email") as string) || "";
   const phone = formData.get("phone") as string;
   const password = formData.get("password") as string;
+  const isOrganization = formData.get("isOrganization") === "true";
 
-  const validatedFields = RegisterSchema.safeParse({ name, email, phone, password });
+  const validatedFields = RegisterSchema.safeParse({ name, email, phone, password, isOrganization });
 
   if (!validatedFields.success) {
     return { error: validatedFields.error.issues[0].message };
@@ -48,8 +50,9 @@ export async function registerUser(formData: FormData) {
         email: email || null,
         phone,
         password: hashedPassword,
+        isOrganization,
       },
-    });
+    } as any);
 
     return { success: true };
   } catch (error) {

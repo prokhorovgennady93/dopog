@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -20,11 +21,38 @@ model User {
   fullAccessExpiresAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  
+  // Relations
+  organizationId String?       @unique
+  organization  OrganizationCard? @relation(fields: [organizationId], references: [id])
+  
   examAttempts  ExamAttempt[]
   purchases     Purchase[]
   progress      UserProgress[]
   ownedCodes    PromoCode[]    @relation("OrgCodes")
   redeemedCodes PromoCode[]    @relation("RedeemedCodes")
+}
+
+model OrganizationCard {
+  id               String   @id @default(cuid())
+  legalName        String
+  inn              String   @unique
+  kpp              String?
+  ogrn             String?
+  address          String?
+  contactPerson    String?
+  phone            String?
+  email            String?
+  
+  // Banking
+  bankName         String?
+  bik             String?
+  accountNumber    String?
+  corrAccountNumber String?
+  
+  user             User?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model PromoCode {

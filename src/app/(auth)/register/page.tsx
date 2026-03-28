@@ -24,6 +24,7 @@ export default function RegisterPage() {
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
+    formData.append("isOrganization", isOrganization.toString());
 
     try {
       const result = await registerUser(formData);
@@ -34,10 +35,12 @@ export default function RegisterPage() {
         router.push("/login?success=true");
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError("Произошла непредвиденная ошибка");
       setLoading(false);
     }
   };
+
+  const [isOrganization, setIsOrganization] = useState(false);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans">
@@ -57,14 +60,29 @@ export default function RegisterPage() {
             </div>
           )}
 
+          <div className="flex items-center gap-3 p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-xl mb-2">
+            <input
+              type="checkbox"
+              id="isOrg"
+              checked={isOrganization}
+              onChange={(e) => setIsOrganization(e.target.checked)}
+              className="w-5 h-5 accent-yellow-500 cursor-pointer"
+            />
+            <label htmlFor="isOrg" className="text-sm font-bold text-white cursor-pointer select-none">
+              Регистрация для организации <span className="text-yellow-500/60 block text-[10px] font-medium leading-none mt-1">Автошколы, ТК, Юрлица</span>
+            </label>
+          </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300 ml-1">ФИО</label>
+            <label className="text-sm font-medium text-zinc-300 ml-1">
+              {isOrganization ? "Название организации / ФИО" : "ФИО"}
+            </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all shadow-inner"
-              placeholder="Иванов Иван Иванович"
+              placeholder={isOrganization ? "ООО 'Авто Мир' / Петров И.И." : "Иванов Иван Иванович"}
               required
             />
           </div>
@@ -107,7 +125,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full ${loading ? 'opacity-50 cursor-not-allowed bg-zinc-700 text-zinc-400' : 'bg-yellow-500 hover:bg-yellow-400 text-black active:scale-[0.98]'} font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-all transform`}
+            className={`w-full ${loading ? 'opacity-50 cursor-not-allowed bg-zinc-700 text-zinc-400' : 'bg-yellow-500 hover:bg-yellow-400 text-black active:scale-[0.98]'} font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-all transform uppercase tracking-wider text-xs`}
           >
             {loading ? "Создание..." : "Зарегистрироваться"}
           </button>
