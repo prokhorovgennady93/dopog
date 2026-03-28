@@ -8,7 +8,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   Settings2,
-  Flag
+  Flag,
+  HelpCircle
 } from "lucide-react";
 
 interface Option {
@@ -138,37 +139,53 @@ export function ExamSimulation({
     <div className="flex-1 flex flex-col bg-zinc-50 dark:bg-zinc-950 font-sans">
       {/* Top Navigation / Info */}
       <nav className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-16 z-40">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono font-bold ${timeLeft < 300 ? 'bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400' : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white'}`}>
-                <Timer className="w-4 h-4" />
-                {formatTime(timeLeft)}
+        <div className="max-w-5xl mx-auto px-4 py-2 flex flex-col gap-2">
+          {/* Row 1: Timer and Finish */}
+          <div className="flex items-center justify-between h-10 w-full">
+             <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono font-bold ${timeLeft < 300 ? 'bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400' : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white'}`}>
+                   <Timer className="w-4 h-4" />
+                   {formatTime(timeLeft)}
+                </div>
+                <h1 className="text-[10px] font-black uppercase text-zinc-400 tracking-tighter hidden sm:block truncate max-w-[150px]">{courseTitle}</h1>
              </div>
-             <h1 className="text-sm font-bold hidden sm:block truncate max-w-[200px]">{courseTitle}</h1>
+
+             <button 
+               onClick={() => handleFinish()}
+               className="bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap"
+             >
+               Завершить экзамен
+               <Flag className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+             </button>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+          {/* Row 2: Toggles and Help */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 border-t border-zinc-50 dark:border-zinc-800 pt-2">
+            <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
                 <button 
                   onClick={() => setAutoTransition(false)}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${!autoTransition ? 'bg-white dark:bg-zinc-700 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+                  className={`px-3 py-1 text-[10px] font-black uppercase rounded-lg transition-all ${!autoTransition ? 'bg-white dark:bg-zinc-700 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
                 >
                   Подтверждение
                 </button>
                 <button 
                   onClick={() => setAutoTransition(true)}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${autoTransition ? 'bg-white dark:bg-zinc-700 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+                  className={`px-3 py-1 text-[10px] font-black uppercase rounded-lg transition-all ${autoTransition ? 'bg-white dark:bg-zinc-700 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
                 >
                   Автопереход
                 </button>
             </div>
-            <button 
-              onClick={() => handleFinish()}
-              className="bg-zinc-900 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors"
-            >
-              Завершить
-              <Flag className="w-3.5 h-3.5 text-yellow-500" />
-            </button>
+            
+            <div className="group relative">
+               <HelpCircle className="w-5 h-5 text-zinc-400 hover:text-yellow-500 transition-colors cursor-help" />
+               <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all z-50 border border-zinc-800">
+                  <p className="font-bold mb-1 text-yellow-500">Режимы ответов:</p>
+                  <p className="text-zinc-400 leading-relaxed font-medium">
+                    <span className="text-white">Подтверждение</span> — вы выбираете вариант и нажимаете кнопку для перехода к следующему вопросу.<br/><br/>
+                    <span className="text-white">Автопереход</span> — следующий вопрос появится автоматически сразу после выбора варианта.
+                  </p>
+               </div>
+            </div>
           </div>
         </div>
       </nav>

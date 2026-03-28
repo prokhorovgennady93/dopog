@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown } from "lucide-react";
 import { PremiumModal } from "./PremiumModal";
 import { useSession } from "next-auth/react";
 
@@ -494,7 +494,9 @@ export function QuestionView({
               {showAnswer && currentQuestion.explanation && (
                 <details className="group bg-yellow-50 dark:bg-yellow-500/5 border border-yellow-200 dark:border-yellow-500/20 rounded-2xl p-4 sm:p-5 animate-in slide-in-from-top-4 duration-500 cursor-pointer hover:bg-yellow-100/50 dark:hover:bg-yellow-500/10 transition-colors">
                   <summary className="flex items-center gap-3 list-none marker:hidden outline-none">
-                    <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xl pb-[2px] font-black text-black shrink-0 shadow-sm transition-transform group-open:rotate-180">▿</div>
+                    <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-black shrink-0 shadow-sm transition-transform group-open:rotate-180">
+                      <ChevronDown className="w-3.5 h-3.5" strokeWidth={3} />
+                    </div>
                     <h4 className="text-sm font-black text-yellow-700 dark:text-yellow-500 uppercase tracking-widest flex-1">Показать объяснение</h4>
                   </summary>
                   <div className="mt-4 pt-4 border-t border-yellow-200/50 dark:border-yellow-500/20">
