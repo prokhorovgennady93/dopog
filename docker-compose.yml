@@ -2,8 +2,8 @@ services:
   app:
     build: .
     container_name: adr-platform
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - ./data:/app/prisma/data
     environment:
@@ -13,5 +13,20 @@ services:
       - AUTH_TRUST_HOST=true
     restart: always
 
-# Для работы SQLite на сервере мы создаем папку ./data и монтируем ее внутрь контейнера.
-# Все данные будут храниться в файле ./data/prod.db на вашем VPS.
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:
