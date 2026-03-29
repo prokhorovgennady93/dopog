@@ -85,6 +85,84 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section with Schema.org Microdata */}
+      <section className="py-20 bg-white dark:bg-zinc-950">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-black text-center mb-12">Часто задаваемые вопросы</h2>
+          <div className="space-y-6">
+            <div className="p-6 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+              <h3 className="font-bold text-lg mb-2">Что такое ДОПОГ (ADR)?</h3>
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                ДОПОГ — это европейское соглашение о международной дорожной перевозке опасных грузов. Для работы водителем в этой сфере необходимо иметь специальное свидетельство, которое выдается после успешной сдачи экзамена.
+              </p>
+            </div>
+            <div className="p-6 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+              <h3 className="font-bold text-lg mb-2">Как проходит подготовка на платформе?</h3>
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                Мы предоставляем актуальную базу вопросов 2026 года, структурированную по темам. Вы можете учиться в режиме «Тренировка» или пройти симуляцию реального экзамена с ограничением по времени и количеству ошибок.
+              </p>
+            </div>
+            <div className="p-6 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+              <h3 className="font-bold text-lg mb-2">Можно ли учиться без интернета?</h3>
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                Да! Наша платформа является PWA-приложением. После скачивания курса в личном кабинете или на странице курса, вы сможете проходить тесты полностью офлайн.
+              </p>
+            </div>
+            <div className="p-6 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+              <h3 className="font-bold text-lg mb-2">Сколько вопросов в реальном экзамене?</h3>
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                В базовом курсе обычно 25 вопросов, на которые дается 45 минут. Допускается не более 2 ошибок. Для специализированных курсов (цистерны, 1 класс, 7 класс) количество вопросов — 15.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* JSON-LD Schema for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Что такое ДОПОГ (ADR)?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "ДОПОГ — это европейское соглашение о международной дорожной перевозке опасных грузов. Для работы водителем необходимо специальное свидетельство."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Как проходит подготовка на платформе?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Мы предоставляем актуальную базу вопросов 2026 года, режимы тренировки и симуляции экзамена."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Можно ли учиться без интернета?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Да, наше приложение поддерживает офлайн-режим через PWA."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Сколько вопросов в реальном экзамене?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "В базовом курсе 25 вопросов, для спецкурсов — 15 вопросов."
+                  }
+                }
+              ]
+            })
+          }}
+        />
+      </section>
     </div>
   );
 }

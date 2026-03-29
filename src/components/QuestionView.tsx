@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck, Play, Share2 } from "lucide-react";
 import { PremiumModal } from "./PremiumModal";
 import { useSession } from "next-auth/react";
 
@@ -175,6 +175,24 @@ export function QuestionView({
       router.push(`/study/${courseId}?topicId=${nextTheme.id}`);
     } else {
       setPhase('FINAL');
+    }
+  };
+
+  const shareResult = () => {
+    const score = Object.values(answers).filter(a => a.isCorrect).length;
+    const total = localQuestions.length;
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shareUrl = `${baseUrl}/share?s=${score}&t=${total}&c=${encodeURIComponent(courseTitle)}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Мой результат по ${courseTitle}`,
+        text: `Я прошел тест на ADR Platform с результатом ${score}/${total}!`,
+        url: shareUrl,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      alert('Ссылка на результат скопирована в буфер обмена!');
     }
   };
 
@@ -377,6 +395,14 @@ export function QuestionView({
                  >
                    На главную
                  </Link>
+                 
+                 <button
+                   onClick={shareResult}
+                   className="mt-4 w-full border-2 border-zinc-200 dark:border-zinc-800 hover:border-yellow-500/50 text-zinc-500 dark:text-zinc-400 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                 >
+                   <Share2 className="w-4 h-4" />
+                   Поделиться результатом
+                 </button>
                </div>
              </div>
           ) : isGuestRestricted ? (
