@@ -26,7 +26,11 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Неверный номер телефона или пароль");
+        if (result.error.includes("DeviceLimitExceeded")) {
+          setError("Превышен лимит устройств, обратитесь к администратору");
+        } else {
+          setError("Неверный номер телефона или пароль");
+        }
         setLoading(false);
       } else {
         router.push("/dashboard");

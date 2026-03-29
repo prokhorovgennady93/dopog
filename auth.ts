@@ -30,8 +30,20 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           
           const passwordsMatch = await bcrypt.compare(password, user.password || "");
           console.log(`Authorize: Password match for ${phone}: ${passwordsMatch}`);
+          
+          if (passwordsMatch) {
+            // STRICT LIMIT: 2 devices. Check session table before proceeding.
+            const sessionCount = await (db as any).session.count({
+               where: { userId: user.id } 
+            });
 
-          if (passwordsMatch) return user;
+            if (sessionCount >= 2) {
+               console.log(`Authorize: Device limit exceeded for user ${phone} (Count: ${sessionCount})`);
+               throw new Error("DeviceLimitExceeded");
+            }
+
+            return user;
+          }
         }
 
         console.log("Invalid credentials or parsing failed");
