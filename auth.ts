@@ -41,17 +41,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      // LOOSENED: We only block if there's absolutely no sub. 
-      // JTI validation failure is logged but doesn't revoke the WHOLE session immediately
-      // to avoid deployment-transition loops.
       if (!token.sub) {
         console.log("Session blocked: no sub in token");
         return { ...session, expires: session.expires, error: "NoSub" } as any;
-      }
-
-      if (token.isRevoked) {
-        console.warn(`Session warning: JTI ${token.jti} was marked as missing from DB, but allowing session fallback.`);
-        // Note: You can re-enable strict revocation by returning NoSession here later.
       }
       
       if (session.user) {
@@ -64,59 +56,53 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return session;
     },
     async jwt({ token, user, account }) {
-      // 1. Initial login handler
-      if (user && user.id) {
-        console.log(`JWT Initial Login Flow for user: ${user.id}`);
-        
-        // Priority: Use existing JTI or force generate a new UUID immediately
-        if (!token.jti) {
-           token.jti = require('crypto').randomUUID();
-           console.log(`Forced UUID generation for new session: ${token.jti}`);
-        }
-        
-        const jti = token.jti as string;
-        
-        try {
-          // Cleanup expired entries asynchronously or pre-emptively
-          await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
-
-          const activeSessions = await (db as any).session.findMany({
-            where: { userId: user.id },
-            orderBy: { lastUsedAt: 'asc' }
-          });
-          
-          if (activeSessions.length >= 3) {
-            await (db as any).session.delete({ where: { id: activeSessions[0].id } });
-          }
-          
-          await (db as any).session.create({
-            data: {
-              userId: user.id,
-              token: jti,
-              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            }
-          });
-          console.log(`Database session RECORDED with JTI: ${jti}`);
-        } catch (e) {
-          console.error("Non-blocking JWT Session persistent error:", e);
-        }
+      // 1. Context Logging
+      if (user) {
+        console.log(`JWT Init: User ${user.id} signing in.`);
       }
 
-      // 2. Continuous validation logic
-      if (!user && token.jti) {
+      // 2. Auto-Healing & Session Management
+      if (token.sub && token.jti) {
+        const jti = token.jti as string;
+        const userId = token.sub as string;
+
         try {
-           const dbSession = await (db as any).session.findUnique({ where: { token: token.jti as string } });
-           if (!dbSession) {
-             console.log(`Session Sync Warning: JTI ${token.jti} not in DB. Marking as potentially revoked.`);
-             token.isRevoked = true;
-           } else {
-             // Successfully found in DB
-             if (Math.random() < 0.1) {
-                await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
-             }
-           }
+          const dbSession = await (db as any).session.findUnique({ where: { token: jti } });
+          
+          if (!dbSession) {
+            console.log(`Auto-Healing: JTI ${jti} not in DB. Registering new session for user ${userId}.`);
+            
+            // Cleanup expired
+            await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
+
+            // Device limit enforcement
+            const activeSessions = await (db as any).session.findMany({
+              where: { userId: userId },
+              orderBy: { lastUsedAt: 'asc' }
+            });
+            
+            if (activeSessions.length >= 3) {
+              console.log(`Limit reached for user ${userId}. Evicting oldest session: ${activeSessions[0].token}`);
+              await (db as any).session.delete({ where: { id: activeSessions[0].id } }).catch(() => {});
+            }
+            
+            // Create new record
+            await (db as any).session.create({
+              data: {
+                userId: userId,
+                token: jti,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+              }
+            });
+            console.log(`Session Auto-Healed: JTI ${jti} now synchronized.`);
+          } else {
+            // Existing session - keep it alive
+            if (Math.random() < 0.05) {
+               await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
+            }
+          }
         } catch (e) {
-           // Silently ignore DB connectivity issues during high-load periods
+           console.error("Auto-healing check failed (non-blocking):", e);
         }
       }
 
