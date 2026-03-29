@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck } from "lucide-react";
 import { PremiumModal } from "./PremiumModal";
 import { useSession } from "next-auth/react";
 
@@ -128,6 +128,9 @@ export function QuestionView({
     }
   }, [currentIndex, phase]);
 
+  const [answeredSessionCount, setAnsweredSessionCount] = useState(0);
+  const [isEmailReminderOpen, setIsEmailReminderOpen] = useState(false);
+
   const handleOptionSelect = (optionId: string) => {
     if (showAnswer || isGuestRestricted) return;
 
@@ -137,6 +140,14 @@ export function QuestionView({
       ...prev,
       [currentIndex]: { selectedId: optionId, isCorrect }
     }));
+
+    // Every 100 questions, if NO email, show reminder
+    const newCount = answeredSessionCount + 1;
+    setAnsweredSessionCount(newCount);
+    
+    if (newCount % 100 === 0 && !user?.email) {
+      setIsEmailReminderOpen(true);
+    }
   };
 
   const isLastQuestion = currentIndex === localQuestions.length - 1;
@@ -144,8 +155,6 @@ export function QuestionView({
   const handleNextStep = () => {
     if (isLastQuestion) {
       if (currentTopicId && themes.length > 0) {
-        const currentThemeIndex = themes.findIndex(t => t.id === currentTopicId);
-        // If it's the absolute last theme, we can just go straight to FINAL, but let's show INTERMEDIATE first
         setPhase('INTERMEDIATE');
       } else {
         setPhase('FINAL');
@@ -159,7 +168,6 @@ export function QuestionView({
     const currentThemeIndex = themes.findIndex(t => t.id === currentTopicId);
     if (currentThemeIndex !== -1 && currentThemeIndex < themes.length - 1) {
       const nextTheme = themes[currentThemeIndex + 1];
-      // Reset state for new questions
       setPhase('QUESTION');
       setCurrentIndex(0);
       setAnswers({});
@@ -225,118 +233,38 @@ export function QuestionView({
   const correctPerc = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
   const incorrectPerc = totalQuestions > 0 ? (incorrectCount / totalQuestions) * 100 : 0;
 
-  if (phase === 'INTERMEDIATE') {
-    const currentTheme = themes.find(t => t.id === currentTopicId);
-
-    // Calculate skipped
-    const skippedCount = totalQuestions - answeredCount;
-
-    return (
-      <div className="flex-1 flex flex-col p-4 max-w-2xl mx-auto w-full font-sans justify-center">
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-500 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none">
-          <div className="w-24 h-24 bg-yellow-100 dark:bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 border border-yellow-200 dark:border-yellow-500/20">
-            <CheckCircle2 className="w-12 h-12 text-yellow-600 dark:text-yellow-500" />
-          </div>
-          <h2 className="text-3xl font-black mb-2">Тема завершена!</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-medium">{currentTheme?.title || "Все вопросы отвечены"} • {Math.round((answeredCount / totalQuestions) * 100)}% пройдено</p>
-
-          <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 sm:p-8 flex gap-6 sm:gap-8 mb-10 w-full justify-center flex-wrap">
-            <div className="flex flex-col items-center">
-              <span className="text-3xl sm:text-4xl font-black text-green-500/80 dark:text-green-500 mb-1">{correctCount}</span>
-              <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Верных</span>
-            </div>
-            <div className="w-px bg-zinc-200 dark:bg-zinc-800" />
-            <div className="flex flex-col items-center">
-              <span className="text-3xl sm:text-4xl font-black text-red-500/80 dark:text-red-500 mb-1">{incorrectCount}</span>
-              <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Ошибок</span>
-            </div>
-            {skippedCount > 0 && (
-              <>
-                <div className="w-px bg-zinc-200 dark:bg-zinc-800" />
-                <div className="flex flex-col items-center">
-                  <span className="text-3xl sm:text-4xl font-black text-zinc-400 mb-1">{skippedCount}</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Пропущено</span>
-                </div>
-              </>
-            )}
-          </div>
-
-          <button
-            onClick={handleNextTheme}
-            className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-2xl transition-all shadow-xl shadow-yellow-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            Перейти к следующей теме <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (phase === 'FINAL') {
-    const correctDeg = totalQuestions > 0 ? (correctCount / totalQuestions) * 360 : 0;
-
-    // Find the topic with the most errors
-    const errorsByTopic: Record<string, number> = {};
-    Object.entries(answers).forEach(([idx, ans]) => {
-      if (!ans.isCorrect) {
-        const topicName = localQuestions[Number(idx)]?.topic;
-        if (topicName) {
-          errorsByTopic[topicName] = (errorsByTopic[topicName] || 0) + 1;
-        }
-      }
-    });
-
-    let worstTopic = null;
-    let maxTopicErrors = 0;
-    for (const [t, count] of Object.entries(errorsByTopic)) {
-      if (count > maxTopicErrors) {
-        maxTopicErrors = count;
-        worstTopic = t;
-      }
-    }
-
-    return (
-      <div className="flex-1 flex flex-col p-4 max-w-2xl mx-auto w-full font-sans justify-center">
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-500 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none">
-          <h2 className="text-4xl font-black mb-2">Отличная работа!</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8">Вы завершили прохождение модуля.</p>
-
-          <div className="relative w-48 h-48 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-green-500/10"
-            style={{ background: `conic-gradient(#22c55e ${correctDeg}deg, #fb7185 ${correctDeg}deg 360deg)` }}>
-            <div className="w-36 h-36 bg-white dark:bg-zinc-900 rounded-full flex flex-col items-center justify-center shadow-inner">
-              <span className="text-4xl font-black text-zinc-900 dark:text-white">{Math.round((correctCount / totalQuestions) * 100)}%</span>
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Точность</span>
-            </div>
-          </div>
-
-          {worstTopic && (
-            <div className="mb-10 p-4 bg-red-50 dark:bg-red-500/5 rounded-2xl border border-red-100 dark:border-red-500/10 max-w-md w-full">
-              <span className="text-[10px] font-bold text-red-500/80 uppercase tracking-wider block mb-1">Где больше всего ошибок</span>
-              <p className="text-sm text-red-900 dark:text-red-400 font-medium leading-snug">«{worstTopic}» ({maxTopicErrors} ош.)</p>
-            </div>
-          )}
-
-          <div className="flex gap-4 w-full">
-            <button
-              onClick={restart}
-              className="flex-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-750 text-zinc-900 dark:text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
-            <Link
-              href="/"
-              className="flex-[3] bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-2xl transition-all shadow-xl shadow-yellow-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              Завершить курс <CheckCircle2 className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 flex flex-col p-2 sm:p-4 max-w-3xl mx-auto w-full font-sans">
+      
+      {/* Email Reminder Modal */}
+      {isEmailReminderOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 sm:p-10 max-w-sm w-full border border-zinc-200 dark:border-zinc-800 shadow-2xl scale-in-center animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-yellow-500 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-yellow-500/20 rotate-3 mx-auto">
+              <ShieldCheck className="w-10 h-10 text-black" />
+            </div>
+            <h3 className="text-2xl font-black text-center mb-2 tracking-tight">Защитите прогресс!</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-center text-sm font-bold mb-8 leading-relaxed">
+              Вы ответили уже на 100 вопросов. Добавьте email в личном кабинете, чтобы иметь возможность восстановить пароль.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/dashboard#profile-section"
+                className="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl text-sm uppercase tracking-widest text-center hover:bg-yellow-400 transition-all active:scale-[0.98]"
+              >
+                Перейти в профиль
+              </Link>
+              <button
+                onClick={() => setIsEmailReminderOpen(false)}
+                className="w-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 font-bold py-2 text-xs uppercase tracking-widest transition-colors"
+              >
+                Продолжить позже
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-4 w-full">
         {/* Main: Question Section */}
         <div className="flex-1 flex flex-col gap-3">

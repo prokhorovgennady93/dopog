@@ -11,24 +11,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     Credentials({
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ login: z.string().min(3), password: z.string().min(6) })
+          .object({ phone: z.string().min(10), password: z.string().min(6) })
           .safeParse(credentials);
 
         if (parsedCredentials.success) {
-          const { login, password } = parsedCredentials.data;
-          console.log(`Authorize: attempting login for ${login}`);
+          const { phone, password } = parsedCredentials.data;
+          console.log(`Authorize: attempting login for ${phone}`);
           
           const user = await db.user.findFirst({ 
-            where: { 
-              OR: [
-                { email: login },
-                { phone: login }
-              ]
-            } 
+            where: { phone } 
           });
           
           if (!user) {
-            console.log(`Authorize: User not found for ${login}`);
+            console.log(`Authorize: User not found for ${phone}`);
             return null;
           }
           

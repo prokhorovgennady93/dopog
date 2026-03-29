@@ -1,12 +1,13 @@
 import { auth, signOut } from "@/../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Zap, BookOpen, Crown, CheckCircle2, Award, Flame, Target, TrendingUp, ChevronRight } from "lucide-react";
+import { Zap, BookOpen, Crown, CheckCircle2, Award, Flame, Target, TrendingUp, ChevronRight, AlertTriangle, ShieldCheck } from "lucide-react";
 import { db } from "@/lib/db";
 import { OverallMasteryGauge, MasteryHeatmap, WeakestThemeCard } from "@/components/dashboard/DashboardCharts";
 import { RecentHistory } from "@/components/dashboard/RecentHistory";
 import { AchievementGrid, DailyStreakCard } from "@/components/dashboard/Achievements";
 import { PushManager } from "@/components/PushManager";
+import { ProfileForm } from "@/components/dashboard/ProfileForm";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -15,7 +16,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Use as any to bypass potentially stale local Prisma types since we can't run prisma generate
+  // Use as any to bypass potentially stale local Prisma types
   const user = await db.user.findUnique({
     where: { id: session.user.id },
     include: {
@@ -57,11 +58,7 @@ export default async function DashboardPage() {
   const myCourses = hasFullAccess ? allCourses : allCourses.filter(c => purchasedCourseIds.includes(c.id));
 
   // --- ANALYTICS CALCULATIONS ---
-  
-  // 1. Mastery Calculation
   const topicStatsMap = new Map();
-  
-  // Initialize with all topics in my courses
   myCourses.forEach(course => {
     course.themes.forEach((theme: any) => {
       topicStatsMap.set(theme.id, {
@@ -74,31 +71,24 @@ export default async function DashboardPage() {
     });
   });
 
-  // Aggregate user progress
   user.progress.forEach((p: any) => {
-    if (p.isCorrect && topicStatsMap.has(p.question.topicId)) {
+    if (p.isCorrect && p.question?.topicId && topicStatsMap.has(p.question.topicId)) {
       const stats = topicStatsMap.get(p.question.topicId);
       stats.correctAnswers += 1;
     }
   });
 
-  // Finalize mastery
   const topicMastery = Array.from(topicStatsMap.values()).map(stats => ({
     ...stats,
     mastery: stats.totalQuestions > 0 ? Math.round((stats.correctAnswers / stats.totalQuestions) * 100) : 0
   })).sort((a, b) => b.mastery - a.mastery);
 
   const weakestTheme = topicMastery.length > 0 ? [...topicMastery].sort((a, b) => a.mastery - b.mastery)[0] : null;
-
-  // 2. Overall Course Mastery %
   const totalQuestionsPool = myCourses.reduce((sum, c) => sum + c._count.questions, 0);
   const totalCorrectAnswers = Array.from(topicStatsMap.values()).reduce((sum, s) => sum + s.correctAnswers, 0);
   const overallMastery = totalQuestionsPool > 0 ? Math.round((totalCorrectAnswers / totalQuestionsPool) * 100) : 0;
-
-  // 3. Streak Calculation (Mock/Basic for now based on last activity)
   const streak = user.examAttempts.length > 0 ? 3 : 1; 
 
-  // 4. Mock Achievements
   const achievements = [
     { id: "1", title: "Первый шаг", description: "Начали изучение первого курса", icon: <Target className="w-8 h-8" />, isUnlocked: true, unlockedAt: user.createdAt },
     { id: "2", title: "Марафонец", description: "Ударный режим 3+ дня", icon: <Flame className="w-8 h-8" />, isUnlocked: streak >= 3, unlockedAt: new Date() },
@@ -118,14 +108,33 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-white pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        
+        {/* Security Banner */}
+        {!user.email && (
+          <div className="bg-yellow-500/10 border-2 border-yellow-500/20 rounded-[32px] p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-1000">
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center text-yellow-600 shrink-0">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-black tracking-tight">Защитите свой аккаунт</h3>
+                <p className="text-zinc-500 font-bold">Добавьте email, чтобы восстановить пароль в будущем.</p>
+              </div>
+            </div>
+            <Link href="#profile-section" className="bg-yellow-500 text-black px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-xl shadow-yellow-500/20 whitespace-nowrap">
+              Добавить почту
+            </Link>
+          </div>
+        )}
+
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pt-4">
           <div className="space-y-1">
              <div className="flex items-center gap-3 mb-2">
                 <span className="bg-orange-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Pro Account</span>
                 <span className="text-zinc-400 text-xs font-bold font-mono">ID: {user.id.substring(0, 8).toUpperCase()}</span>
              </div>
              <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-none">
-               Привет, <span className="text-orange-600">{user.name?.split(" ")[0] || "Студент"}</span>! 👋
+               Обучение <span className="text-orange-600">ADR</span> 🚛
              </h1>
              <p className="text-zinc-500 font-bold text-lg">Ваш личный центр управления подготовкой.</p>
           </div>
@@ -140,21 +149,28 @@ export default async function DashboardPage() {
 
         <PushManager />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-           <OverallMasteryGauge mastery={overallMastery} />
-           <DailyStreakCard streak={streak} />
-           <WeakestThemeCard theme={weakestTheme} />
-           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm flex flex-col justify-between">
-              <div>
-                 <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 mb-6">
-                    <TrendingUp className="w-6 h-6" />
-                 </div>
-                 <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Всего попыток</h3>
-                 <p className="text-4xl font-black">{user.examAttempts.length}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 h-full">
+                <OverallMasteryGauge mastery={overallMastery} />
+                <DailyStreakCard streak={streak} />
+                <WeakestThemeCard theme={weakestTheme} />
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm flex flex-col justify-between">
+                   <div>
+                      <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 mb-6">
+                         <TrendingUp className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Всего попыток</h3>
+                      <p className="text-4xl font-black">{user.examAttempts.length}</p>
+                   </div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-4 leading-relaxed">
+                      {user.examAttempts.filter((a: any) => a.isPassed).length} Успешных экзамена
+                   </p>
+                </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-4 leading-relaxed">
-                 {user.examAttempts.filter((a: any) => a.isPassed).length} Успешных экзамена
-              </p>
+           </div>
+           <div id="profile-section" className="lg:col-span-1">
+              <ProfileForm initialName={user.name} initialEmail={user.email} />
            </div>
         </div>
 

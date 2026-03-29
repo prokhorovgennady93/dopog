@@ -3,60 +3,84 @@
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { auth } from "@/../auth";
 
 const RegisterSchema = z.object({
-  name: z.string().min(2, "Имя должно содержать минимум 2 символа"),
-  email: z.string().email("Неверный формат email").optional().or(z.literal('')),
   phone: z.string().min(10, "Введите корректный номер телефона"),
   password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
-  isOrganization: z.boolean().optional(),
+  consent: z.literal(true, {
+    message: "Необходимо согласие на обработку данных",
+  }),
 });
 
 export async function registerUser(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = (formData.get("email") as string) || "";
   const phone = formData.get("phone") as string;
   const password = formData.get("password") as string;
-  const isOrganization = formData.get("isOrganization") === "true";
+  const consent = formData.get("consent") === "true";
 
-  const validatedFields = RegisterSchema.safeParse({ name, email, phone, password, isOrganization });
+  const validatedFields = RegisterSchema.safeParse({ phone, password, consent });
 
   if (!validatedFields.success) {
     return { error: validatedFields.error.issues[0].message };
   }
 
   try {
-    // Check if user already exists
-    const queryConds: any[] = [{ phone }];
-    if (email) queryConds.push({ email });
-
-    const existingUser = await db.user.findFirst({
-      where: {
-        OR: queryConds
-      }
+    const existingUser = await db.user.findUnique({
+      where: { phone }
     });
 
     if (existingUser) {
-      if (existingUser.phone === phone) return { error: "Пользователь с таким номером уже существует" };
-      if (existingUser.email === email) return { error: "Пользователь с таким email уже существует" };
-      return { error: "Пользователь уже существует" };
+      return { error: "Пользователь с таким номером уже существует" };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await db.user.create({
+    await db.user.create({
       data: {
-        name,
-        email: email || null,
         phone,
         password: hashedPassword,
-        isOrganization,
       },
     } as any);
 
     return { success: true };
   } catch (error) {
     console.error("Registration error:", error);
-    return { error: "Failed to create account" };
+    return { error: "Ошибка при создании аккаунта" };
+  }
+}
+
+export async function updateProfile(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Не авторизован" };
+
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+
+  try {
+    // Validate email if provided
+    if (email) {
+      const emailSchema = z.string().email("Неверный формат почты");
+      const validated = emailSchema.safeParse(email);
+      if (!validated.success) return { error: validated.error.issues[0].message };
+
+      // Check if email already exists
+      const existing = await db.user.findFirst({
+        where: { email, NOT: { id: session.user.id } }
+      });
+      if (existing) return { error: "Этот email уже используется" };
+    }
+
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { 
+        name: name || undefined, 
+        email: email || undefined 
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return { error: "Не удалось обновить профиль" };
   }
 }

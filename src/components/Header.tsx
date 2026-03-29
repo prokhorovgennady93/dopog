@@ -36,7 +36,6 @@ export function Header({ session }: HeaderProps) {
 
   const navLinks = [
     { name: "Курсы", href: "/", icon: GraduationCap },
-    { name: "Для организаций", href: "/organizations", icon: Building2 },
     { name: "База знаний", href: "/articles", icon: BookMarked },
     { name: "Тарифы", href: "/pricing", icon: CreditCard },
   ];
