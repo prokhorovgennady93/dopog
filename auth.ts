@@ -28,7 +28,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           }
           
           const passwordsMatch = await bcrypt.compare(password, user.password || "");
-          console.log(`Authorize: Password match for ${login}: ${passwordsMatch}`);
+          console.log(`Authorize: Password match for ${phone}: ${passwordsMatch}`);
 
           if (passwordsMatch) return user;
         }
@@ -40,8 +40,18 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      if (token?.sub && session.user) {
-        session.user.id = token.sub;
+      if (token.sub && session.user) {
+        (session.user as any).id = token.sub;
+      }
+      if (session.user) {
+        const user = await db.user.findUnique({
+          where: { id: (session.user as any).id }
+        }) as any;
+        
+        if (user) {
+          (session.user as any).isAdmin = user.isAdmin;
+          (session.user as any).isPremium = user.isPremium;
+        }
       }
       if (typeof token.hasFullAccess === "boolean" && session.user) {
         (session.user as any).hasFullAccess = token.hasFullAccess;
