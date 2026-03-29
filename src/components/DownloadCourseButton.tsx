@@ -60,6 +60,11 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
         setProgress(Math.round((downloadedCount / themeIds.length) * 100));
       }
       setStatus("downloaded");
+      
+      // Notify all Topic Buttons to synchronize their status
+      window.dispatchEvent(new CustomEvent('offline-status-changed', {
+        detail: { courseId, themeIds }
+      }));
     } catch (error) {
       console.error("Course download failed:", error);
       setStatus("error");

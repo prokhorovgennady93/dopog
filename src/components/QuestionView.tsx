@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck, Play } from "lucide-react";
 import { PremiumModal } from "./PremiumModal";
 import { useSession } from "next-auth/react";
 
@@ -110,8 +110,9 @@ export function QuestionView({
   const purchaseExpiry = coursePurchase?.expiresAt ? new Date(coursePurchase.expiresAt) : null;
   const isPurchaseActive = !!coursePurchase && (!purchaseExpiry || purchaseExpiry > new Date());
 
-  const hasValidAccess = isFullAccessActive || isPurchaseActive;
-  const isGuestRestricted = !hasValidAccess && currentIndex >= GUEST_LIMIT;
+  const isOfflineData = typeof window !== 'undefined' && currentTopicId && !!localStorage.getItem(`topic_${currentTopicId}_data`);
+  const hasValidAccess = isFullAccessActive || isPurchaseActive || !!isOfflineData;
+  const isGuestRestricted = (!hasValidAccess && !isOfflineData) && currentIndex >= GUEST_LIMIT;
   const currentQuestion = localQuestions[currentIndex] || null;
 
   const hasAnsweredCurrentInfo = answers[currentIndex];
@@ -326,7 +327,59 @@ export function QuestionView({
           )}
 
 
-          {isGuestRestricted ? (
+          {phase === 'INTERMEDIATE' ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-12 bg-green-50 dark:bg-green-900/10 rounded-3xl border-2 border-dashed border-green-200 dark:border-green-800 animate-in fade-in zoom-in duration-500">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-green-500/20">
+                <CheckCircle2 className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black mb-4">Тема завершена!</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 max-w-md mb-8 leading-relaxed font-medium">
+                Отлично! Вы прошли все вопросы в этом модуле. Продолжим обучение?
+              </p>
+
+              <div className="flex flex-col gap-3 w-full max-w-xs">
+                <button
+                  onClick={handleNextTheme}
+                  className="w-full bg-zinc-900 dark:bg-yellow-500 text-white dark:text-black font-black py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                  Следующая тема
+                </button>
+                <button
+                  onClick={restart}
+                  className="w-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 font-bold py-2 text-sm flex items-center justify-center gap-2 transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" /> Повторить эту тему
+                </button>
+              </div>
+            </div>
+          ) : phase === 'FINAL' ? (
+             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-12 bg-yellow-50 dark:bg-yellow-900/10 rounded-3xl border-2 border-dashed border-yellow-200 dark:border-yellow-800 animate-in fade-in zoom-in duration-500">
+               <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-yellow-500/20">
+                 <CheckCircle2 className="w-10 h-10 text-black" />
+               </div>
+               <h2 className="text-2xl sm:text-3xl font-black mb-4">Курс пройден!</h2>
+               <p className="text-zinc-600 dark:text-zinc-400 max-w-md mb-8 leading-relaxed font-medium">
+                 Поздравляем! Вы успешно завершили изучение всех тем данного курса. Теперь вы полностью готовы к экзамену!
+               </p>
+
+               <div className="flex flex-col gap-3 w-full max-w-xs">
+                 <Link
+                   href={`/exam/${courseId}`}
+                   className="w-full bg-zinc-900 dark:bg-yellow-500 text-white dark:text-black font-black py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
+                 >
+                   <Play className="w-5 h-5" />
+                   Перейти к экзамену
+                 </Link>
+                 <Link
+                   href="/"
+                   className="w-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 font-bold py-2 text-sm flex items-center justify-center gap-2 transition-colors"
+                 >
+                   На главную
+                 </Link>
+               </div>
+             </div>
+          ) : isGuestRestricted ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-12 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 animate-in fade-in zoom-in duration-500">
               <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-yellow-500/20">
                 <Lock className="w-10 h-10 text-black" />
@@ -384,7 +437,7 @@ export function QuestionView({
                 <RotateCcw className="w-4 h-4" /> Начать заново
               </button>
             </div>
-          ) : (currentQuestion && (
+          ) : (phase === 'QUESTION' && currentQuestion && (
             <div className="flex-1 flex flex-col gap-4 animate-in slide-in-from-bottom-4 duration-500">
               <div className="bg-white dark:bg-zinc-900/40 p-5 sm:p-6 rounded-r-3xl rounded-l-none border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500" />

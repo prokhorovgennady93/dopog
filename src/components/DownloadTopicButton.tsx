@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CloudDownload, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { checkTopicDownloaded, downloadTopic } from "@/lib/offline";
 
@@ -15,19 +15,28 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
   const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "error" | "locked">("idle");
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    if (!hasAccess) {
-      setStatus("locked");
-      return;
-    }
-    
-    const checkStatus = async () => {
+    const checkStatus = useCallback(async () => {
       const isDownloaded = await checkTopicDownloaded(topicId);
       if (isDownloaded) setStatus("downloaded");
       else setStatus("idle");
-    };
-    checkStatus();
-  }, [topicId, hasAccess]);
+    }, [topicId]);
+
+    useEffect(() => {
+      if (!hasAccess) {
+        setStatus("locked");
+        return;
+      }
+      checkStatus();
+    }, [hasAccess, checkStatus]);
+
+    // Handle global offline status updates
+    useEffect(() => {
+      const handleGlobalUpdate = () => {
+        checkStatus();
+      };
+      window.addEventListener('offline-status-changed', handleGlobalUpdate);
+      return () => window.removeEventListener('offline-status-changed', handleGlobalUpdate);
+    }, [checkStatus]);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,6 +57,11 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
         setProgress(p);
       });
       setStatus("downloaded");
+      
+      // Notify other components (like the course download button) to refresh their status
+      window.dispatchEvent(new CustomEvent('offline-status-changed', {
+        detail: { topicId, courseId }
+      }));
     } catch (error) {
       console.error("Download failed:", error);
       setStatus("error");
