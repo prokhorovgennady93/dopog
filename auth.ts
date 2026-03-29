@@ -75,7 +75,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           
           await db.session.create({
             data: {
-              userId: user.id,
+              userId: user.id as string,
               token: jti,
               expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             }
