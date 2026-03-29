@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { 
   Menu, 
   X, 
@@ -18,7 +19,9 @@ interface HeaderProps {
   session: any;
 }
 
-export function Header({ session }: HeaderProps) {
+export function Header({ session: initialSession }: HeaderProps) {
+  const { data: session } = useSession();
+  const currentSession = session || initialSession;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -82,7 +85,7 @@ export function Header({ session }: HeaderProps) {
         {/* Auth Actions / Profile */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2">
-            {!session ? (
+            {!currentSession ? (
               <>
                 <Link
                   href="/login"
@@ -169,7 +172,7 @@ export function Header({ session }: HeaderProps) {
           </nav>
 
           <div className="mt-auto pt-10 flex flex-col gap-3">
-             {session ? (
+             {currentSession ? (
                <Link 
                  href="/dashboard"
                  className="flex items-center justify-center gap-2 w-full bg-yellow-500 text-black py-4 rounded-2xl font-black shadow-lg shadow-yellow-500/20"

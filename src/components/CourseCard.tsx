@@ -103,7 +103,7 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
               </>
             ) : status === "locked" ? (
               <>
-                <Lock className="w-3 h-3" />
+                <CloudDownload className="w-3 h-3" />
                 <span className="opacity-50">Premium</span>
               </>
             ) : (

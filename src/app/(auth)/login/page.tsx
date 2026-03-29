@@ -29,6 +29,7 @@ export default function LoginPage() {
         setError("Неверный номер телефона или пароль");
         setLoading(false);
       } else {
+        router.refresh();
         router.push("/dashboard");
       }
     } catch (err) {
