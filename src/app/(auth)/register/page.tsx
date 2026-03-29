@@ -54,8 +54,8 @@ export default function RegisterPage() {
             <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-yellow-500/20 rotate-3 transition-transform hover:rotate-0 duration-500">
               <span className="text-black font-black text-2xl tracking-tighter">ADR</span>
             </div>
-            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Вход в систему</h1>
-            <p className="text-zinc-500 text-sm font-medium">Для начала обучения введите номер</p>
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Регистрация</h1>
+            <p className="text-zinc-500 text-sm font-medium">Создайте профиль для начала обучения</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
