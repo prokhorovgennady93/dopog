@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs"; 
 import { z } from "zod";
+import crypto from "crypto";
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
@@ -53,17 +54,14 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      // LOOSENED: We only block if there's absolutely no sub. 
-      // JTI validation failure is logged but doesn't revoke the WHOLE session immediately
-      // to avoid deployment-transition loops.
       if (!token.sub) {
         console.log("Session blocked: no sub in token");
         return { ...session, expires: session.expires, error: "NoSub" } as any;
       }
 
       if (token.isRevoked) {
-        console.warn(`Session warning: JTI ${token.jti} was marked as missing from DB, but allowing session fallback.`);
-        // Note: You can re-enable strict revocation by returning NoSession here later.
+        console.warn(`Enforcing revocation for JTI: ${token.jti}`);
+        return null; // Force sign-out
       }
       
       if (session.user) {
@@ -80,36 +78,35 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (user && user.id) {
         console.log(`JWT Initial Login for user: ${user.id}`);
         
-        // Priority: Use whatever JTI Auth.js gave us.
-        const jti = token.jti;
+        // CRITICAL FIX: Ensure JTI is always present.
+        // If Auth.js didn't provide one, force-generate a UUID.
+        let jti = token.jti as string;
+        if (!jti) {
+           jti = crypto.randomUUID();
+           token.jti = jti;
+           console.log(`Generated manual UUID for session: ${jti}`);
+        }
         
-        if (jti) {
-          try {
-            // Cleanup expired entries asynchronously or pre-emptively
-            await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
-
-            const activeSessions = await (db as any).session.findMany({
-              where: { userId: user.id },
-              orderBy: { lastUsedAt: 'asc' }
-            });
-            
-            if (activeSessions.length >= 3) {
-              await (db as any).session.delete({ where: { id: activeSessions[0].id } });
-            }
-            
-            await (db as any).session.create({
-              data: {
-                userId: user.id,
-                token: jti,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-              }
-            });
-            console.log(`Database session registered with JTI: ${jti}`);
-          } catch (e) {
-            console.error("Non-blocking JWT Session persistent error:", e);
+        try {
+          // Double check the count here too (just in case)
+          const sessionCount = await (db as any).session.count({ where: { userId: user.id } });
+          if (sessionCount >= 2) {
+             console.log(`JWT: Device limit reached for ${user.id}. Blocking registration.`);
+             token.isRevoked = true;
+             return token;
           }
-        } else {
-          console.warn("No JTI found in initial login token. Bypassing session limit tracking.");
+
+          // Register session
+          await (db as any).session.create({
+            data: {
+              userId: user.id,
+              token: jti,
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            }
+          });
+          console.log(`Database session registered successfully with JTI: ${jti}`);
+        } catch (e) {
+          console.error("JWT Session persistent error:", e);
         }
       }
 
@@ -118,13 +115,13 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         try {
            const dbSession = await (db as any).session.findUnique({ where: { token: token.jti as string } });
            if (!dbSession) {
-             console.log(`Session Sync Warning: JTI ${token.jti} not in DB. Marking as potentially revoked.`);
+             console.log(`Revoking Session: JTI ${token.jti} no longer in DB.`);
              token.isRevoked = true;
            } else if (Math.random() < 0.1) {
              await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
            }
         } catch (e) {
-           // Silently ignore DB connectivity issues during high-load periods
+           // Skip if DB is down
         }
       }
 
