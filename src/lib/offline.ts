@@ -4,7 +4,23 @@
 
 export async function checkTopicDownloaded(topicId: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem(`topic_${topicId}_offline`) === "true";
+  
+  // 1. Check logical flag
+  const isFlagged = localStorage.getItem(`topic_${topicId}_offline`) === "true";
+  if (!isFlagged) return false;
+
+  // 2. Physical Cache Verification (Source of Truth)
+  if ("caches" in window) {
+    try {
+      const cache = await caches.open("dopog-cache-v1");
+      const match = await cache.match(`/api/topics/${topicId}/questions`);
+      return !!match;
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  return true;
 }
 
 export async function downloadTopic(
