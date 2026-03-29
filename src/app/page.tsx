@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { CourseCard } from "@/components/CourseCard";
 import Link from "next/link";
-import { Sparkles, CheckCircle2 } from "lucide-react";
+import { Sparkles, CheckCircle2, Download, BookOpen, ShieldCheck, BarChart3, Clock, Zap } from "lucide-react";
 import { auth } from "@/../auth";
 
 export default async function Home() {
@@ -48,6 +48,74 @@ export default async function Home() {
               >
                 Смотреть курсы
               </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="bg-zinc-900 border-y border-white/5 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-2xl sm:text-3xl font-black text-yellow-500">5000+</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 uppercase tracking-widest font-bold">Тестов в сутки</span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-2xl sm:text-3xl font-black text-white">100%</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 uppercase tracking-widest font-bold">Актуальность 2026</span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-2xl sm:text-3xl font-black text-white">4.9/5</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 uppercase tracking-widest font-bold">Рейтинг водителей</span>
+            </div>
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="text-2xl sm:text-3xl font-black text-yellow-500">Offline</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 uppercase tracking-widest font-bold">Работает без сети</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-24 bg-white dark:bg-zinc-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Почему выбирают нас</h2>
+            <p className="text-zinc-500 dark:text-zinc-400">Современный подход к обучению водителей международного класса</p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/30 transition-all group">
+              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-6 h-6 text-yellow-600 dark:text-yellow-500" />
+              </div>
+              <h3 className="text-lg font-bold mb-3">Официальная база</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Вопросы полностью соответствуют программе экзаменов ДОПОГ 2026 года.</p>
+            </div>
+
+            <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/30 transition-all group">
+              <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Download className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
+              </div>
+              <h3 className="text-lg font-bold mb-3">Офлайн доступ</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Учитесь в пути или на стоянке через PWA-приложение без интернета.</p>
+            </div>
+
+            <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/30 transition-all group">
+              <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <BookOpen className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
+              </div>
+              <h3 className="text-lg font-bold mb-3">Объяснения</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Подробные комментарии к каждому ответу помогут не просто зазубрить, а понять.</p>
+            </div>
+
+            <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-100 dark:border-zinc-800 hover:border-yellow-500/30 transition-all group">
+              <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <BarChart3 className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
+              </div>
+              <h3 className="text-lg font-bold mb-3">Аналитика</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Отслеживайте свои слабые темы и повышайте шансы на успешную сдачу.</p>
             </div>
           </div>
         </div>
@@ -118,7 +186,6 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* JSON-LD Schema for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -162,6 +229,81 @@ export default async function Home() {
             })
           }}
         />
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 bg-zinc-50 dark:bg-zinc-900/30 border-t border-zinc-100 dark:border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Выберите свой доступ</h2>
+            <p className="text-zinc-500 dark:text-zinc-400">Начните бесплатно и переходите на премиум, когда будете готовы</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Tier */}
+            <div className="bg-white dark:bg-zinc-950 p-8 sm:p-10 rounded-3xl border border-zinc-100 dark:border-zinc-800 relative overflow-hidden group">
+              <div className="mb-8">
+                <h3 className="text-xl font-bold mb-2">Начальный</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black">0 ₽</span>
+                  <span className="text-zinc-400">/ навсегда</span>
+                </div>
+              </div>
+              <ul className="space-y-4 mb-10">
+                <li className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  25 обучающих вопросов
+                </li>
+                <li className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  Поддержка PWA приложения
+                </li>
+                <li className="flex items-center gap-3 text-sm text-zinc-400 opacity-50">
+                  <Clock className="w-5 h-5" />
+                  Без режима экзамена
+                </li>
+              </ul>
+              <Link 
+                href="/register" 
+                className="w-full py-4 rounded-xl border-2 border-zinc-100 dark:border-zinc-800 font-bold block text-center hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+              >
+                Начать бесплатно
+              </Link>
+            </div>
+
+            {/* Premium Tier */}
+            <div className="bg-zinc-900 dark:bg-zinc-900 p-8 sm:p-10 rounded-3xl border-2 border-yellow-500 relative overflow-hidden group shadow-2xl shadow-yellow-500/5">
+              <div className="absolute top-4 right-4 bg-yellow-500 text-black text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter">Популярно</div>
+              <div className="mb-8">
+                <h3 className="text-xl font-bold mb-2 text-white">Премиум Доступ</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white">990 ₽</span>
+                  <span className="text-zinc-500">/ 1 курс</span>
+                </div>
+              </div>
+              <ul className="space-y-4 mb-10">
+                <li className="flex items-center gap-3 text-sm text-zinc-300">
+                  <Zap className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                   Полная база (более 800 вопросов)
+                </li>
+                <li className="flex items-center gap-3 text-sm text-zinc-300">
+                  <CheckCircle2 className="w-5 h-5 text-yellow-500" />
+                  Неограниченно офлайн обучение
+                </li>
+                <li className="flex items-center gap-3 text-sm text-zinc-300">
+                  <CheckCircle2 className="w-5 h-5 text-yellow-500" />
+                  Симуляция реального экзамена
+                </li>
+              </ul>
+              <Link 
+                href="/register" 
+                className="w-full py-4 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-black block text-center shadow-lg shadow-yellow-500/20 transition-all active:scale-[0.98]"
+              >
+                Получить доступ
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );
