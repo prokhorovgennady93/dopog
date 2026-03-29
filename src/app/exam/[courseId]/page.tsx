@@ -3,7 +3,7 @@ import { auth } from "@/../auth";
 import { redirect, notFound } from "next/navigation";
 import { ExamSimulation } from "@/components/ExamSimulation";
 
-export default async function ExamPage({ params }: { params: { courseId: string } }) {
+export default async function ExamPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const session = await auth();
 

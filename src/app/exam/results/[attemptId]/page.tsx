@@ -4,7 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Timer, Award, ArrowLeft, RefreshCw } from "lucide-react";
 
-export default async function ResultsPage({ params }: { params: { attemptId: string } }) {
+export default async function ResultsPage({ params }: { params: Promise<{ attemptId: string }> }) {
   const { attemptId } = await params;
   const session = await auth();
 

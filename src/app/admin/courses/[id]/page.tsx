@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { QuestionEditForm } from "@/components/admin/QuestionEditForm";
 
-export default async function AdminCoursePage({ params }: { params: { id: string } }) {
+export default async function AdminCoursePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
 
