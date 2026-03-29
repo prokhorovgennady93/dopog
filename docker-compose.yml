@@ -8,8 +8,8 @@ services:
       - ./data:/app/prisma/data
     environment:
       - DATABASE_URL=file:/app/prisma/data/prod.db
-      - AUTH_SECRET=${AUTH_SECRET}
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - AUTH_SECRET=${AUTH_SECRET:-9f8e7d6c5b4a32109f8e7d6c5b4a3210}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
       - AUTH_TRUST_HOST=true
     restart: always
 
