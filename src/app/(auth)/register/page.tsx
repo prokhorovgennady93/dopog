@@ -31,7 +31,7 @@ export default function RegisterPage() {
     try {
       const result = await registerUser(formData);
       if (result?.error) {
-        setError(result.error);
+        setError(String(result.error));
         setLoading(false);
       } else {
         router.push("/login?success=true");

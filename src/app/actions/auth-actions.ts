@@ -43,7 +43,6 @@ export async function registerUser(formData: FormData) {
     });
 
     return { 
-      error: false, 
       success: true, 
       id: user.id 
     };
