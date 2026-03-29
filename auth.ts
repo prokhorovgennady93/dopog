@@ -50,26 +50,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         
         if (user) {
           (session.user as any).isAdmin = user.isAdmin;
-          (session.user as any).isPremium = user.isPremium;
+          (session.user as any).hasFullAccess = user.hasFullAccess;
+          (session.user as any).fullAccessExpiresAt = user.fullAccessExpiresAt;
+          (session.user as any).purchases = user.purchases;
         }
-      }
-      if (typeof token.hasFullAccess === "boolean" && session.user) {
-        (session.user as any).hasFullAccess = token.hasFullAccess;
-      }
-      if (token.fullAccessExpiresAt && session.user) {
-        (session.user as any).fullAccessExpiresAt = token.fullAccessExpiresAt;
-      }
-      if (Array.isArray(token.purchases) && session.user) {
-        (session.user as any).purchases = token.purchases;
-      }
-      if (typeof token.isAdmin === "boolean" && session.user) {
-        (session.user as any).isAdmin = token.isAdmin;
-      }
-      if (typeof token.isOrganization === "boolean" && session.user) {
-        (session.user as any).isOrganization = token.isOrganization;
-      }
-      if (typeof token.orgName === "string" && session.user) {
-        (session.user as any).orgName = token.orgName;
       }
       return session;
     },
@@ -84,8 +68,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.fullAccessExpiresAt = user.fullAccessExpiresAt;
         token.purchases = user.purchases;
         token.isAdmin = user.isAdmin;
-        token.isOrganization = (user as any).isOrganization;
-        token.orgName = (user as any).orgName;
       }
       return token;
     },

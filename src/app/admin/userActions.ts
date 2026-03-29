@@ -7,10 +7,10 @@ import bcrypt from "bcryptjs";
 
 async function checkAdmin() {
   const session = await auth();
-  if (!session?.user?.email) return false;
+  if (!session?.user?.id) return false;
   
   const user = await db.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
     select: { isAdmin: true }
   });
   
@@ -56,7 +56,7 @@ export async function toggleAdmin(userId: string, currentStatus: boolean) {
   // Prevent removing your own admin status or check session
   const session = await auth();
   const targetUser = await db.user.findUnique({ where: { id: userId } });
-  if (targetUser?.email === session?.user?.email) {
+  if (targetUser?.id === session?.user?.id) {
       throw new Error("You cannot remove your own admin status.");
   }
 
@@ -68,23 +68,13 @@ export async function toggleAdmin(userId: string, currentStatus: boolean) {
   revalidatePath("/admin");
 }
 
-export async function toggleOrganization(userId: string, currentStatus: boolean) {
-  if (!(await checkAdmin())) throw new Error("Unauthorized");
-
-  await db.user.update({
-    where: { id: userId },
-    data: { isOrganization: !currentStatus }
-  });
-
-  revalidatePath("/admin");
-}
 
 export async function deleteUser(userId: string) {
   if (!(await checkAdmin())) throw new Error("Unauthorized");
 
   const session = await auth();
   const targetUser = await db.user.findUnique({ where: { id: userId } });
-  if (targetUser?.email === session?.user?.email) {
+  if (targetUser?.id === session?.user?.id) {
       throw new Error("You cannot delete yourself.");
   }
 

@@ -26,25 +26,23 @@ export const metadata = {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: { search?: string };
+  searchParams: Promise<{ search?: string }>;
 }) {
   const { search } = await searchParams;
   const session = await auth();
 
   // Redirect if not logged in
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  // Check isAdmin — either from JWT session or direct DB lookup (for stale tokens)
-  let isAdmin = (session.user as any)?.isAdmin ?? false;
-  if (!isAdmin) {
-    const dbUser = await db.user.findUnique({
-      where: { email: session.user.email },
-      select: { isAdmin: true },
-    });
-    isAdmin = dbUser?.isAdmin ?? false;
-  }
+  // Check isAdmin — using ID lookup for reliability
+  const dbUser = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { isAdmin: true, name: true, email: true, phone: true },
+  });
+  
+  const isAdmin = dbUser?.isAdmin ?? false;
 
   if (!isAdmin) {
     redirect("/");
@@ -57,6 +55,7 @@ export default async function AdminPage({
         OR: [
           { name: { contains: search } },
           { email: { contains: search } },
+          { phone: { contains: search } },
         ],
       } : undefined,
       orderBy: { createdAt: "desc" },
@@ -67,9 +66,6 @@ export default async function AdminPage({
         },
         purchases: {
           include: { course: { select: { title: true } } }
-        },
-        ownedCodes: {
-          select: { id: true, usedCount: true, maxUses: true }
         },
         _count: { select: { progress: true } },
       },
@@ -113,7 +109,7 @@ export default async function AdminPage({
           <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg">
             <Crown className="w-4 h-4 text-yellow-600" />
             <span className="text-xs font-bold text-yellow-700">
-              {session.user?.name || session.user?.email}
+              {dbUser?.name || dbUser?.phone || dbUser?.email || "Админ"}
             </span>
           </div>
         </div>
@@ -173,7 +169,7 @@ export default async function AdminPage({
                   <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                     Попыток экзамена
                   </th>
-                  <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
+                  <th className="text-right px-6 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                     Действия
                   </th>
                 </tr>
@@ -199,7 +195,7 @@ export default async function AdminPage({
                         {course._count.examAttempts}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-6 py-4 text-right">
                       <Link
                         href={`/admin/courses/${course.id}`}
                         className="text-xs font-bold text-yellow-600 hover:text-yellow-700 transition-colors"
@@ -227,7 +223,7 @@ export default async function AdminPage({
                 type="text" 
                 name="search"
                 defaultValue={search}
-                placeholder="Поиск по имени или email..." 
+                placeholder="Имя, телефон или email..." 
                 className="pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all w-full sm:w-64"
               />
             </form>
@@ -244,26 +240,18 @@ export default async function AdminPage({
                       Доступ / Роль
                     </th>
                     <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
-                      Лицензии
-                    </th>
-                    <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                       Ответов
                     </th>
                     <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                       Дата регистрации
                     </th>
-                    <th className="text-center px-4 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
+                    <th className="text-right px-6 py-4 font-bold text-zinc-500 text-xs uppercase tracking-wider">
                       Действия
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
                   {users.map((user: any) => {
-                    const uniqueCourses = [
-                      ...new Map(
-                        user.examAttempts.map((a: any) => [a.courseId, a.course])
-                      ).values(),
-                    ];
                     return (
                       <tr key={user.id} className="hover:bg-zinc-50 transition-colors">
                         <td className="px-6 py-4">
@@ -271,8 +259,8 @@ export default async function AdminPage({
                             <p className="font-semibold text-zinc-900">
                               {user.name || "—"}
                             </p>
-                            <p className="text-xs text-zinc-400 mt-0.5">
-                              {user.email}
+                            <p className="text-xs text-zinc-400 mt-0.5 font-mono">
+                              {user.phone || user.email}
                             </p>
                           </div>
                         </td>
@@ -305,23 +293,6 @@ export default async function AdminPage({
                               Admin
                             </span>
                           )}
-                          {user.isOrganization && (
-                            <span className="mt-1 inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-full">
-                              <Building2 className="w-3 h-3" /> Орг: {user.orgName || "—"}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-center">
-                          {user.isOrganization ? (
-                            <div className="flex flex-col items-center">
-                              <span className="font-bold text-zinc-700">
-                                {user.ownedCodes.reduce((sum: number, c: any) => sum + c.usedCount, 0)} / {user.ownedCodes.reduce((sum: number, c: any) => sum + c.maxUses, 0)}
-                              </span>
-                              <span className="text-[10px] text-zinc-400 font-medium">кодов</span>
-                            </div>
-                          ) : (
-                            <span className="text-zinc-300">—</span>
-                          )}
                         </td>
                         <td className="px-4 py-4 text-center">
                           <span className="font-bold text-zinc-700">
@@ -334,14 +305,13 @@ export default async function AdminPage({
                              {new Date(user.createdAt).toLocaleDateString("ru-RU")}
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-center">
+                        <td className="px-6 py-4 text-right">
                           <UserActionsCell 
                             userId={user.id} 
                             hasFullAccess={user.hasFullAccess} 
                             isAdmin={user.isAdmin} 
-                            isOrganization={user.isOrganization}
-                            userEmail={user.email} 
-                            currentUserEmail={session.user?.email} 
+                            userEmail={user.phone || user.email} 
+                            currentUserEmail={dbUser?.phone || dbUser?.email} 
                           />
                         </td>
                       </tr>
