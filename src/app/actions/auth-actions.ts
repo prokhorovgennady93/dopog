@@ -18,7 +18,7 @@ export async function registerUser(formData: FormData) {
   const rawPhone = (formData.get("phone") || "") as string;
   const password = (formData.get("password") || "") as string;
   const rawConsent = formData.get("consent");
-  const consent = rawConsent === "true" || rawConsent === true;
+  const consent = rawConsent === "true";
 
   const phone = rawPhone.replace(/\D/g, ""); // Remove all non-digits
   
