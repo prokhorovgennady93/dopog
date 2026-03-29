@@ -14,7 +14,8 @@ const RegisterSchema = z.object({
 });
 
 export async function registerUser(formData: FormData) {
-  const phone = formData.get("phone") as string;
+  const rawPhone = formData.get("phone") as string;
+  const phone = rawPhone.replace(/\D/g, ""); // Remove all non-digits
   const password = formData.get("password") as string;
   const consent = formData.get("consent") === "true";
 
@@ -66,7 +67,7 @@ export async function redeemPromoCode(formData: FormData) {
   }
 
   try {
-    const promo = await db.promoCode.findUnique({
+    const promo = await (db as any).promoCode.findUnique({
       where: { code }
     });
 
@@ -80,11 +81,11 @@ export async function redeemPromoCode(formData: FormData) {
 
     // Mark user as premium and link promo to user
     await db.$transaction([
-      db.user.update({
+      (db as any).user.update({
         where: { id: session.user.id },
         data: { hasFullAccess: true, isPremium: true }
       }),
-      db.promoCode.update({
+      (db as any).promoCode.update({
         where: { id: promo.id },
         data: {
           usedCount: { increment: 1 },

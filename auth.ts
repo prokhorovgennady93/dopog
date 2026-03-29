@@ -15,8 +15,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           .safeParse(credentials);
 
         if (parsedCredentials.success) {
-          const { phone, password } = parsedCredentials.data;
-          console.log(`Authorize: attempting login for ${phone}`);
+          const { phone: rawPhone, password } = parsedCredentials.data;
+          const phone = rawPhone.replace(/\D/g, ""); // NORMALIZE
+          console.log(`Authorize: attempting login for cleaned phone: ${phone}`);
           
           const user = await db.user.findFirst({ 
             where: { phone } 
@@ -33,7 +34,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           if (passwordsMatch) return user;
         }
 
-        console.log("Invalid credentials");
+        console.log("Invalid credentials or parsing failed");
         return null;
       },
     }),
@@ -41,7 +42,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (!token.sub || token.isRevoked) {
-        return { expires: session.expires, error: "SessionRevoked" } as any;
+        console.log("Session blocked: token revoked or no sub");
+        return { ...session, expires: session.expires, error: "SessionRevoked" } as any;
       }
       
       if (session.user) {
@@ -53,49 +55,52 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       }
       return session;
     },
-    async jwt({ token, user }) {
-      // 1. On initial login, register the token JTI as an active device session
-      if (user && token.sub) {
-        const jti = token.jti as string || Math.random().toString(36).substring(7);
+    async jwt({ token, user, account }) {
+      // 1. Initial login
+      if (user && user.id) {
+        console.log(`JWT Initial Login for user: ${user.id}`);
+        const jti = token.jti || Math.random().toString(36).substring(7);
         token.jti = jti;
         
         try {
-          // Cleanup expired sessions first
-          await db.session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+          // Cleanup old sessions
+          await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
 
-          const activeSessions = await db.session.findMany({
+          const activeSessions = await (db as any).session.findMany({
             where: { userId: user.id },
             orderBy: { lastUsedAt: 'asc' }
           });
           
           if (activeSessions.length >= 3) {
-            // Delete the oldest session to limit concurrent devices to 3
-            await db.session.delete({ where: { id: activeSessions[0].id } });
+            await (db as any).session.delete({ where: { id: activeSessions[0].id } });
           }
           
-          await db.session.create({
+          await (db as any).session.create({
             data: {
-              userId: user.id as string,
+              userId: user.id,
               token: jti,
               expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             }
           });
+          console.log(`Session created in DB with JTI: ${jti}`);
         } catch (e) {
-           console.error("Session limit enforcement error:", e);
+           console.error("JWT Session creation error:", e);
         }
       }
 
-      // 2. Validate token against active sessions on subsequent requests
+      // 2. Validate session on every request
       if (!user && token.jti) {
         try {
-           const dbSession = await db.session.findUnique({ where: { token: token.jti as string } });
+           const dbSession = await (db as any).session.findUnique({ where: { token: token.jti as string } });
            if (!dbSession) {
+             console.log(`Revoking JWT: JTI ${token.jti} not found in DB`);
              token.isRevoked = true;
-           } else if (Math.random() < 0.05) {
-             await db.session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } });
+           } else if (Math.random() < 0.1) {
+             // Occasionally update lastUsedAt
+             await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } });
            }
         } catch (e) {
-           // Fallback silently if DB is temporarily unreachable
+           // DB is down? Let it pass to avoid total lockout
         }
       }
 
