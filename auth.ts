@@ -30,7 +30,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           
           const passwordsMatch = await bcrypt.compare(password, user.password || "");
           console.log(`Authorize: Password match for ${phone}: ${passwordsMatch}`);
-          
+
           if (passwordsMatch) return user;
         }
 
@@ -41,6 +41,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
+      // LOOSENED: We only block if there's absolutely no sub. 
+      // JTI validation failure is logged but doesn't revoke the WHOLE session immediately
+      // to avoid deployment-transition loops.
       if (!token.sub) {
         console.log("Session blocked: no sub in token");
         return { ...session, expires: session.expires, error: "NoSub" } as any;
@@ -48,6 +51,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
       if (token.isRevoked) {
         console.warn(`Session warning: JTI ${token.jti} was marked as missing from DB, but allowing session fallback.`);
+        // Note: You can re-enable strict revocation by returning NoSession here later.
       }
       
       if (session.user) {
@@ -62,24 +66,39 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     async jwt({ token, user, account }) {
       // 1. Initial login handler
       if (user && user.id) {
-        console.log(`JWT Initial Login for user: ${user.id}`);
-        const jti = token.jti;
+        console.log(`JWT Initial Login Flow for user: ${user.id}`);
         
-        if (jti) {
-          try {
-            await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
-            
-            await (db as any).session.create({
-              data: {
-                userId: user.id,
-                token: jti,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-              }
-            });
-            console.log(`Database session registered with JTI: ${jti}`);
-          } catch (e) {
-            console.error("Non-blocking JWT Session persistent error:", e);
+        // Priority: Use existing JTI or force generate a new UUID immediately
+        if (!token.jti) {
+           token.jti = require('crypto').randomUUID();
+           console.log(`Forced UUID generation for new session: ${token.jti}`);
+        }
+        
+        const jti = token.jti as string;
+        
+        try {
+          // Cleanup expired entries asynchronously or pre-emptively
+          await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
+
+          const activeSessions = await (db as any).session.findMany({
+            where: { userId: user.id },
+            orderBy: { lastUsedAt: 'asc' }
+          });
+          
+          if (activeSessions.length >= 3) {
+            await (db as any).session.delete({ where: { id: activeSessions[0].id } });
           }
+          
+          await (db as any).session.create({
+            data: {
+              userId: user.id,
+              token: jti,
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            }
+          });
+          console.log(`Database session RECORDED with JTI: ${jti}`);
+        } catch (e) {
+          console.error("Non-blocking JWT Session persistent error:", e);
         }
       }
 
@@ -90,16 +109,20 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
            if (!dbSession) {
              console.log(`Session Sync Warning: JTI ${token.jti} not in DB. Marking as potentially revoked.`);
              token.isRevoked = true;
-           } else if (Math.random() < 0.1) {
-             await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
+           } else {
+             // Successfully found in DB
+             if (Math.random() < 0.1) {
+                await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
+             }
            }
         } catch (e) {
-           // Skip if DB is down
+           // Silently ignore DB connectivity issues during high-load periods
         }
       }
 
       if (!token.sub) return token;
       
+      // Sync permissions natively
       const dbUser = await db.user.findUnique({ 
         where: { id: token.sub },
         include: { purchases: { select: { courseId: true, expiresAt: true } } }
