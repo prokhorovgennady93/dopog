@@ -4,7 +4,6 @@ import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs"; 
 import { z } from "zod";
-import crypto from "crypto";
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
@@ -32,19 +31,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           const passwordsMatch = await bcrypt.compare(password, user.password || "");
           console.log(`Authorize: Password match for ${phone}: ${passwordsMatch}`);
           
-          if (passwordsMatch) {
-            // STRICT LIMIT: 2 devices. Check session table before proceeding.
-            const sessionCount = await (db as any).session.count({
-               where: { userId: user.id } 
-            });
-
-            if (sessionCount >= 2) {
-               console.log(`Authorize: Device limit exceeded for user ${phone} (Count: ${sessionCount})`);
-               throw new Error("DeviceLimitExceeded");
-            }
-
-            return user;
-          }
+          if (passwordsMatch) return user;
         }
 
         console.log("Invalid credentials or parsing failed");
@@ -60,8 +47,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       }
 
       if (token.isRevoked) {
-        console.warn(`Enforcing revocation for JTI: ${token.jti}`);
-        return null; // Force sign-out
+        console.warn(`Session warning: JTI ${token.jti} was marked as missing from DB, but allowing session fallback.`);
       }
       
       if (session.user) {
@@ -77,36 +63,23 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       // 1. Initial login handler
       if (user && user.id) {
         console.log(`JWT Initial Login for user: ${user.id}`);
+        const jti = token.jti;
         
-        // CRITICAL FIX: Ensure JTI is always present.
-        // If Auth.js didn't provide one, force-generate a UUID.
-        let jti = token.jti as string;
-        if (!jti) {
-           jti = crypto.randomUUID();
-           token.jti = jti;
-           console.log(`Generated manual UUID for session: ${jti}`);
-        }
-        
-        try {
-          // Double check the count here too (just in case)
-          const sessionCount = await (db as any).session.count({ where: { userId: user.id } });
-          if (sessionCount >= 2) {
-             console.log(`JWT: Device limit reached for ${user.id}. Blocking registration.`);
-             token.isRevoked = true;
-             return token;
+        if (jti) {
+          try {
+            await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
+            
+            await (db as any).session.create({
+              data: {
+                userId: user.id,
+                token: jti,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+              }
+            });
+            console.log(`Database session registered with JTI: ${jti}`);
+          } catch (e) {
+            console.error("Non-blocking JWT Session persistent error:", e);
           }
-
-          // Register session
-          await (db as any).session.create({
-            data: {
-              userId: user.id,
-              token: jti,
-              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            }
-          });
-          console.log(`Database session registered successfully with JTI: ${jti}`);
-        } catch (e) {
-          console.error("JWT Session persistent error:", e);
         }
       }
 
@@ -115,7 +88,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         try {
            const dbSession = await (db as any).session.findUnique({ where: { token: token.jti as string } });
            if (!dbSession) {
-             console.log(`Revoking Session: JTI ${token.jti} no longer in DB.`);
+             console.log(`Session Sync Warning: JTI ${token.jti} not in DB. Marking as potentially revoked.`);
              token.isRevoked = true;
            } else if (Math.random() < 0.1) {
              await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
@@ -127,7 +100,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
       if (!token.sub) return token;
       
-      // Sync permissions natively
       const dbUser = await db.user.findUnique({ 
         where: { id: token.sub },
         include: { purchases: { select: { courseId: true, expiresAt: true } } }

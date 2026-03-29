@@ -88,13 +88,3 @@ export async function deleteUser(userId: string) {
 
   revalidatePath("/admin");
 }
- 
-export async function clearUserSessions(userId: string) {
-  if (!(await checkAdmin())) throw new Error("Unauthorized");
-  
-  await (db as any).session.deleteMany({
-    where: { userId }
-  });
- 
-  revalidatePath("/admin");
-}

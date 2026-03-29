@@ -1,8 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
-import { toggleFullAccess, toggleAdmin, deleteUser, generateNewPassword, clearUserSessions } from "@/app/admin/userActions";
-import { Crown, Shield, Trash2, Key, Loader2, RefreshCw } from "lucide-react";
+import { toggleFullAccess, toggleAdmin, deleteUser, generateNewPassword } from "@/app/admin/userActions";
+import { Crown, Shield, Trash2, Key, Loader2 } from "lucide-react";
 
 interface UserActionsCellProps {
   userId: string;
@@ -37,12 +37,6 @@ export function UserActionsCell({
           alert("Ошибка при создании пароля.");
         }
       });
-    }
-  };
-
-  const handleClearSessions = () => {
-    if (confirm(`Сбросить все активные сессии для ${userEmail}? Это позволит пользователю заново войти с новых устройств.`)) {
-      startTransition(() => clearUserSessions(userId));
     }
   };
 
@@ -85,14 +79,6 @@ export function UserActionsCell({
             className="p-1.5 rounded-lg bg-zinc-100 text-zinc-400 hover:bg-blue-100 hover:text-blue-600 transition-colors"
           >
             <Key className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={handleClearSessions}
-            title="Сбросить лимит устройств (очистить сессии)"
-            className="p-1.5 rounded-lg bg-zinc-100 text-zinc-400 hover:bg-orange-100 hover:text-orange-600 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
           </button>
           
           <button
