@@ -277,7 +277,7 @@ export default async function Home() {
               <div className="mb-8">
                 <h3 className="text-xl font-bold mb-2 text-white">Премиум Доступ</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">990 ₽</span>
+                  <span className="text-4xl font-black text-white">99 ₽</span>
                   <span className="text-zinc-500">/ 1 курс</span>
                 </div>
               </div>
