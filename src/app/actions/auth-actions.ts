@@ -14,7 +14,6 @@ const RegisterSchema = z.object({
 });
 
 export async function registerUser(formData: FormData) {
-  console.log("--- RegisterUser Start ---");
   const rawPhone = (formData.get("phone") || "") as string;
   const password = (formData.get("password") || "") as string;
   const rawConsent = formData.get("consent");
@@ -22,17 +21,11 @@ export async function registerUser(formData: FormData) {
 
   const phone = rawPhone.replace(/\D/g, ""); // Remove all non-digits
   
-  console.log(`Input: rawPhone="${rawPhone}", normalized="${phone}", consent=${consent}`);
-
   const validatedFields = RegisterSchema.safeParse({ phone, password, consent });
 
   if (!validatedFields.success) {
-    const errorMsg = validatedFields.error.issues[0].message;
-    console.log(`Validation Failed: ${errorMsg}`);
-    return { error: errorMsg };
+    return { error: validatedFields.error.issues[0].message };
   }
-
-  console.log("Validation Success. Checking for existing user...");
 
   try {
     const existingUser = await db.user.findUnique({
@@ -52,20 +45,15 @@ export async function registerUser(formData: FormData) {
       },
     });
 
-    console.log(`User created successfully: ID=${user.id}`);
-
     return { 
       success: true, 
       id: user.id 
     };
   } catch (err: any) {
-    console.error("CRITICAL ERROR during registration:", err);
     if (err?.code === "P2002") {
       return { error: "Этот номер телефона уже зарегистрирован" };
     }
     return { error: `Ошибка при регистрации: ${err.message || "Неизвестная ошибка"}` };
-  } finally {
-    console.log("--- RegisterUser End ---");
   }
 }
 

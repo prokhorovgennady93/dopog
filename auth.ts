@@ -41,12 +41,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      if (!token.sub) {
-        console.log("Session blocked: no sub in token");
-        return { ...session, expires: session.expires, error: "NoSub" } as any;
-      }
-      
-      if (session.user) {
+      if (session.user && token.sub) {
         (session.user as any).id = token.sub;
         (session.user as any).isAdmin = token.isAdmin;
         (session.user as any).hasFullAccess = token.hasFullAccess;
@@ -55,71 +50,30 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       }
       return session;
     },
-    async jwt({ token, user, account }) {
-      // 1. Context Logging
+    async jwt({ token, user }) {
       if (user) {
-        console.log(`JWT Init: User ${user.id} signing in.`);
+        token.sub = user.id;
       }
-
-      // 2. Auto-Healing & Session Management
-      if (token.sub && token.jti) {
-        const jti = token.jti as string;
-        const userId = token.sub as string;
-
-        try {
-          const dbSession = await (db as any).session.findUnique({ where: { token: jti } });
-          
-          if (!dbSession) {
-            console.log(`Auto-Healing: JTI ${jti} not in DB. Registering new session for user ${userId}.`);
-            
-            // Cleanup expired
-            await (db as any).session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
-
-            // Device limit enforcement
-            const activeSessions = await (db as any).session.findMany({
-              where: { userId: userId },
-              orderBy: { lastUsedAt: 'asc' }
-            });
-            
-            if (activeSessions.length >= 3) {
-              console.log(`Limit reached for user ${userId}. Evicting oldest session: ${activeSessions[0].token}`);
-              await (db as any).session.delete({ where: { id: activeSessions[0].id } }).catch(() => {});
-            }
-            
-            // Create new record
-            await (db as any).session.create({
-              data: {
-                userId: userId,
-                token: jti,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-              }
-            });
-            console.log(`Session Auto-Healed: JTI ${jti} now synchronized.`);
-          } else {
-            // Existing session - keep it alive
-            if (Math.random() < 0.05) {
-               await (db as any).session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } }).catch(() => {});
-            }
-          }
-        } catch (e) {
-           console.error("Auto-healing check failed (non-blocking):", e);
-        }
-      }
-
+      
       if (!token.sub) return token;
       
-      // Sync permissions natively
-      const dbUser = await db.user.findUnique({ 
-        where: { id: token.sub },
-        include: { purchases: { select: { courseId: true, expiresAt: true } } }
-      });
-      
-      if (dbUser) {
-        token.hasFullAccess = dbUser.hasFullAccess;
-        token.fullAccessExpiresAt = dbUser.fullAccessExpiresAt;
-        token.purchases = dbUser.purchases;
-        token.isAdmin = dbUser.isAdmin;
+      try {
+        // Sync permissions natively on every request
+        const dbUser = await db.user.findUnique({ 
+          where: { id: token.sub as string },
+          include: { purchases: { select: { courseId: true, expiresAt: true } } }
+        });
+        
+        if (dbUser) {
+          token.hasFullAccess = dbUser.hasFullAccess;
+          token.fullAccessExpiresAt = dbUser.fullAccessExpiresAt;
+          token.purchases = dbUser.purchases;
+          token.isAdmin = dbUser.isAdmin;
+        }
+      } catch (error) {
+        console.error("JWT sync error (non-blocking):", error);
       }
+      
       return token;
     },
   },
