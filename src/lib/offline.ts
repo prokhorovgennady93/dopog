@@ -40,6 +40,14 @@ export async function downloadTopic(
     if ("caches" in window) {
       const cache = await caches.open("dopog-cache-v1");
       
+      // Cache the API response itself for physical verification by checkTopicDownloaded
+      await cache.put(
+        `/api/topics/${topicId}/questions`,
+        new Response(JSON.stringify(questions), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      );
+      
       // Robust individual asset caching
       const studyUrl = `/study/${courseId}?topicId=${topicId}`;
       const assets = [

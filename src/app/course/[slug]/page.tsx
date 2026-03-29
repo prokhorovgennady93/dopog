@@ -2,9 +2,10 @@ import { db } from "@/lib/db";
 import { auth } from "@/../auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookOpen, Play, CheckCircle, Lock, CloudDownload, HelpCircle } from "lucide-react";
+import { BookOpen, Play, CheckCircle, Lock, CloudDownload } from "lucide-react";
 import { DownloadTopicButton } from "@/components/DownloadTopicButton";
 import { DownloadCourseButton } from "@/components/DownloadCourseButton";
+import { HelpTooltip } from "@/components/HelpTooltip";
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -72,14 +73,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   Темы обучения
                 </h2>
                 <div className="flex items-center gap-4 sm:gap-6 pr-4 sm:pr-8">
-                  <div className="flex items-center gap-1.5 group/help relative -ml-8 sm:ml-0 cursor-help">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 whitespace-nowrap">Скачать</span>
-                    <HelpCircle className="w-3.5 h-3.5 text-zinc-300 group-hover/help:text-yellow-500 transition-colors" />
-                    <div className="absolute bottom-full right-0 mb-3 w-64 p-4 bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] font-medium leading-relaxed rounded-2xl opacity-0 group-hover/help:opacity-100 transition-all pointer-events-none z-50 shadow-2xl border border-white/10 translate-y-2 group-hover/help:translate-y-0">
-                      <div className="font-black text-yellow-500 mb-1 uppercase tracking-tighter text-[10px]">Инфо о загрузке</div>
-                      При нажатии скачивается конкретная тема. Для доступа ко всему курсу нажмите «Скачать весь курс» внизу страницы или на главной.
-                    </div>
-                  </div>
+                  <HelpTooltip />
                   <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest w-12 sm:w-16 text-center">вопросов</span>
                 </div>
               </div>
