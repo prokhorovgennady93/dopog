@@ -1,10 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaNodeSQLite } from "prisma-adapter-node-sqlite";
+import { DatabaseSync } from "node:sqlite";
 
-const adapter = new PrismaNodeSQLite({ url: "file:./prisma/dev.db" });
-const prisma = new PrismaClient({ adapter });
-
-async function main() {
+function main() {
   const args = process.argv.slice(2);
   const phoneIdx = args.indexOf('--phone');
   const emailIdx = args.indexOf('--email');
@@ -26,28 +22,23 @@ async function main() {
   console.log(`--- Назначение прав АДМИНИСТРАТОРА для ${userIdentifier} ---`);
 
   try {
-    const user = await (prisma as any).user.findUnique({
-      where: { [field]: userIdentifier },
-    });
+    const dbPath = process.env.DATABASE_URL ? process.env.DATABASE_URL.replace('file:', '') : "prisma/data/prod.db";
+    const db = new DatabaseSync(dbPath);
+
+    const checkStmt = db.prepare(`SELECT id FROM User WHERE ${field} = ?`);
+    const user = checkStmt.get(userIdentifier);
 
     if (!user) {
-      console.error(`Ошибка: Пользователь ${userIdentifier} не найден.`);
+      console.error(`Ошибка: Пользователь ${userIdentifier} не найден в БД: ${dbPath}`);
       return;
     }
 
-    await (prisma as any).user.update({
-      where: { [field]: userIdentifier },
-      data: {
-        isAdmin: true,
-        hasFullAccess: true
-      },
-    });
+    const updateStmt = db.prepare(`UPDATE User SET isAdmin = 1, hasFullAccess = 1 WHERE ${field} = ?`);
+    updateStmt.run(userIdentifier);
 
     console.log(`Успех: Пользователь ${userIdentifier} теперь АДМИНИСТРАТОР.`);
   } catch (error) {
-    console.error("Ошибка при обновлении:", error);
-  } finally {
-    await prisma.$disconnect();
+    console.error("Ошибка при обновлении (возможно неверный путь к БД):", error);
   }
 }
 
