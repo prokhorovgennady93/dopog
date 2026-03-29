@@ -74,9 +74,19 @@ export default function LoginPage() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^\d]/g, '');
+                    if (!val) { setPhone(''); return; }
+                    let formatted = '+7';
+                    if (val.length > 1) formatted += ` (${val.substring(1, 4)}`;
+                    if (val.length >= 5) formatted += `) ${val.substring(4, 7)}`;
+                    if (val.length >= 8) formatted += `-${val.substring(7, 9)}`;
+                    if (val.length >= 10) formatted += `-${val.substring(9, 11)}`;
+                    setPhone(formatted);
+                  }}
                   className="w-full bg-zinc-800/30 border border-zinc-700/50 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500/50 transition-all font-bold tracking-wide"
                   placeholder="+7 (999) 000-00-00"
+                  maxLength={18}
                   required
                 />
               </div>

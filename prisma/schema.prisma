@@ -16,6 +16,8 @@ model User {
   image         String?
   hasFullAccess Boolean        @default(false)
   isAdmin       Boolean        @default(false)
+  isPremium     Boolean        @default(false)
+  isOrganization Boolean       @default(false)
   fullAccessExpiresAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -23,6 +25,53 @@ model User {
   examAttempts  ExamAttempt[]
   purchases     Purchase[]
   progress      UserProgress[]
+  ownedCodes    PromoCode[]    @relation("OrgCodes")
+  redeemedCodes PromoCode[]    @relation("RedeemedCodes")
+  sessions      Session[]
+  orgProfile    OrganizationProfile?
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  userAgent    String?
+  ipAddress    String?
+  lastUsedAt   DateTime @default(now())
+  expiresAt    DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OrganizationProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  inn           String?
+  kpp           String?
+  ogrn          String?
+  address       String?
+  bankName      String?
+  bankAccount   String?
+  corrAccount   String?
+  bik           String?
+  phone         String?
+  email         String?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PromoCode {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  type           String   @default("FULL") // FULL or COURSE_ID
+  courseId       String?
+  organizationId String
+  usedByUserId   String?  @unique
+  maxUses        Int      @default(1)
+  usedCount      Int      @default(0)
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime?
+  
+  organization   User     @relation("OrgCodes", fields: [organizationId], references: [id])
+  usedByUser     User?    @relation("RedeemedCodes", fields: [usedByUserId], references: [id])
 }
 
 model Course {

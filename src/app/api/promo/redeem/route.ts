@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Find the promo code
-    const promo = await (db as any).promoCode.findUnique({
+    const promo = await db.promoCode.findUnique({
       where: { code: code.toUpperCase() },
       include: {
         usedByUser: true
@@ -40,20 +40,21 @@ export async function POST(req: Request) {
     }
 
     // 3. Apply the logic based on type
-    const userId = session.user.id;
+    const userId = session.user.id as string;
 
     if (promo.type === "FULL") {
         // Grant full access
-        await (db as any).user.update({
+        await db.user.update({
           where: { id: userId },
           data: {
             hasFullAccess: true,
+            isPremium: true,
             fullAccessExpiresAt: promo.expiresAt || null
           }
         });
     } else if (promo.type === "COURSE" && promo.courseId) {
         // Create a specific purchase
-        await (db as any).purchase.create({
+        await db.purchase.create({
            data: {
              userId,
              courseId: promo.courseId,
@@ -63,7 +64,7 @@ export async function POST(req: Request) {
     }
 
     // 4. Record redemption
-    await (db as any).promoCode.update({
+    await db.promoCode.update({
       where: { id: promo.id },
       data: {
         usedByUserId: userId,

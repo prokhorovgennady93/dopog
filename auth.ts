@@ -40,34 +40,78 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
-      if (token.sub && session.user) {
-        (session.user as any).id = token.sub;
+      if (!token.sub || token.isRevoked) {
+        return { expires: session.expires, error: "SessionRevoked" } as any;
       }
+      
       if (session.user) {
-        const user = await db.user.findUnique({
-          where: { id: (session.user as any).id }
-        }) as any;
-        
-        if (user) {
-          (session.user as any).isAdmin = user.isAdmin;
-          (session.user as any).hasFullAccess = user.hasFullAccess;
-          (session.user as any).fullAccessExpiresAt = user.fullAccessExpiresAt;
-          (session.user as any).purchases = user.purchases;
-        }
+        (session.user as any).id = token.sub;
+        (session.user as any).isAdmin = token.isAdmin;
+        (session.user as any).hasFullAccess = token.hasFullAccess;
+        (session.user as any).fullAccessExpiresAt = token.fullAccessExpiresAt;
+        (session.user as any).purchases = token.purchases || [];
       }
       return session;
     },
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      // 1. On initial login, register the token JTI as an active device session
+      if (user && token.sub) {
+        const jti = token.jti as string || Math.random().toString(36).substring(7);
+        token.jti = jti;
+        
+        try {
+          // Cleanup expired sessions first
+          await db.session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+
+          const activeSessions = await db.session.findMany({
+            where: { userId: user.id },
+            orderBy: { lastUsedAt: 'asc' }
+          });
+          
+          if (activeSessions.length >= 3) {
+            // Delete the oldest session to limit concurrent devices to 3
+            await db.session.delete({ where: { id: activeSessions[0].id } });
+          }
+          
+          await db.session.create({
+            data: {
+              userId: user.id,
+              token: jti,
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            }
+          });
+        } catch (e) {
+           console.error("Session limit enforcement error:", e);
+        }
+      }
+
+      // 2. Validate token against active sessions on subsequent requests
+      if (!user && token.jti) {
+        try {
+           const dbSession = await db.session.findUnique({ where: { token: token.jti as string } });
+           if (!dbSession) {
+             token.isRevoked = true;
+           } else if (Math.random() < 0.05) {
+             await db.session.update({ where: { id: dbSession.id }, data: { lastUsedAt: new Date() } });
+           }
+        } catch (e) {
+           // Fallback silently if DB is temporarily unreachable
+        }
+      }
+
       if (!token.sub) return token;
-      const user = await db.user.findUnique({ 
+      
+      // Sync permissions natively
+      const dbUser = await db.user.findUnique({ 
         where: { id: token.sub },
         include: { purchases: { select: { courseId: true, expiresAt: true } } }
       });
-      if (user) {
-        token.hasFullAccess = user.hasFullAccess;
-        token.fullAccessExpiresAt = user.fullAccessExpiresAt;
-        token.purchases = user.purchases;
-        token.isAdmin = user.isAdmin;
+      
+      if (dbUser) {
+        token.hasFullAccess = dbUser.hasFullAccess;
+        token.fullAccessExpiresAt = dbUser.fullAccessExpiresAt;
+        token.purchases = dbUser.purchases;
+        token.isAdmin = dbUser.isAdmin;
       }
       return token;
     },

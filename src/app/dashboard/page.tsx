@@ -55,7 +55,7 @@ export default async function DashboardPage() {
     }
   }) as any[];
 
-  const myCourses = hasFullAccess ? allCourses : allCourses.filter(c => purchasedCourseIds.includes(c.id));
+  const myCourses = allCourses;
 
   // --- ANALYTICS CALCULATIONS ---
   const topicStatsMap = new Map();
@@ -235,10 +235,10 @@ export default async function DashboardPage() {
              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                 <div className="flex-1 text-center md:text-left">
                   <span className="inline-block px-4 py-1.5 bg-white text-orange-600 text-xs font-black uppercase tracking-widest rounded-full mb-6">
-                     Ограниченное предложение!
+                     Офлайн-режим и скачивание
                   </span>
-                  <h2 className="text-5xl sm:text-7xl font-black mb-8 leading-[0.95] tracking-tighter">Все курсы за <br /><span className="text-black/30">199 ₽</span></h2>
-                  <p className="text-white/80 font-bold mb-12 text-xl max-w-xl">Получите безлимитный доступ к базе обучения, всем статьям и неограниченным экзаменам навсегда.</p>
+                  <h2 className="text-5xl sm:text-7xl font-black mb-8 leading-[0.95] tracking-tighter">Обучение <br /><span className="text-black/30">без интернета</span></h2>
+                  <p className="text-white/80 font-bold mb-12 text-xl max-w-xl">Все тесты онлайн доступны бесплатно. Учитесь в дороге, в лесу или за границей без ограничений связи! Скачайте приложение и всю базу курсов навсегда за 199 ₽.</p>
                   
                   <Link href="/pricing" className="inline-flex bg-white text-orange-600 px-16 py-6 rounded-3xl font-black text-2xl hover:bg-zinc-100 active:scale-95 transition-all shadow-2xl">
                     Активировать доступ

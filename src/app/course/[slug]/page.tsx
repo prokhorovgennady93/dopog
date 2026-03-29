@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookOpen, Play, CheckCircle, Lock, CloudDownload } from "lucide-react";
 import { DownloadTopicButton } from "@/components/DownloadTopicButton";
+import { DownloadCourseButton } from "@/components/DownloadCourseButton";
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -141,13 +142,21 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 </Link>
 
                 {isLoggedIn && (
-                  <Link
-                    href={`/exam/${course.id}`}
-                    className="w-full bg-zinc-900 dark:bg-yellow-500 hover:bg-zinc-800 dark:hover:bg-yellow-400 text-white dark:text-black font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
-                  >
-                    <CheckCircle className="w-5 h-5" />
-                    Начать экзамен
-                  </Link>
+                  <>
+                    <Link
+                      href={`/exam/${course.id}`}
+                      className="w-full bg-zinc-900 dark:bg-yellow-500 hover:bg-zinc-800 dark:hover:bg-yellow-400 text-white dark:text-black font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
+                    >
+                      <CheckCircle className="w-5 h-5" />
+                      Начать экзамен
+                    </Link>
+                    
+                    <DownloadCourseButton 
+                      courseId={course.id}
+                      themeIds={(course as any).themes.map((t: any) => t.id)}
+                      hasAccess={hasAccess}
+                    />
+                  </>
                 )}
                 
                 {!isLoggedIn && (

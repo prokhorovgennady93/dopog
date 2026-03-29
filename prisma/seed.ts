@@ -43,7 +43,7 @@ async function main() {
     },
   });
 
-  // 3. Create / update Admin user
+  // 3. Create / update Admin users
   const adminHash = await bcrypt.hash("3ghZ3Z32", 10);
   await prisma.user.upsert({
     where: { email: "grevelien@yandex.ru" },
@@ -52,6 +52,19 @@ async function main() {
       email: "grevelien@yandex.ru",
       name: "Администратор",
       password: adminHash,
+      hasFullAccess: true,
+      isAdmin: true,
+    },
+  });
+
+  const phoneAdminHash = await bcrypt.hash("admin123", 10);
+  await prisma.user.upsert({
+    where: { phone: "89613002646" },
+    update: { isAdmin: true, hasFullAccess: true },
+    create: {
+      phone: "89613002646",
+      name: "Главный Админ",
+      password: phoneAdminHash,
       hasFullAccess: true,
       isAdmin: true,
     },

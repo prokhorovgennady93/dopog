@@ -35,17 +35,69 @@ export async function registerUser(formData: FormData) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.user.create({
+    const user = await db.user.create({
       data: {
         phone,
         password: hashedPassword,
       },
-    } as any);
+    });
+
+    return { 
+      error: false, 
+      success: true, 
+      id: user.id 
+    };
+  } catch (err: any) {
+    if (err?.code === "P2002") {
+      return { error: "Этот номер телефона уже зарегистрирован" };
+    }
+    return { error: "Ошибка при регистрации" };
+  }
+}
+
+export async function redeemPromoCode(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: "Пожалуйста, войдите в систему" };
+  }
+
+  const code = formData.get("code")?.toString().trim();
+  if (!code) {
+    return { error: "Введите промокод" };
+  }
+
+  try {
+    const promo = await db.promoCode.findUnique({
+      where: { code }
+    });
+
+    if (!promo) {
+      return { error: "Промокод не найден" };
+    }
+
+    if (promo.usedCount >= promo.maxUses) {
+      return { error: "Этот промокод уже был использован" };
+    }
+
+    // Mark user as premium and link promo to user
+    await db.$transaction([
+      db.user.update({
+        where: { id: session.user.id },
+        data: { hasFullAccess: true, isPremium: true }
+      }),
+      db.promoCode.update({
+        where: { id: promo.id },
+        data: {
+          usedCount: { increment: 1 },
+          usedByUserId: session.user.id
+        }
+      })
+    ]);
 
     return { success: true };
   } catch (error) {
-    console.error("Registration error:", error);
-    return { error: "Ошибка при создании аккаунта" };
+    console.error("Promo code error:", error);
+    return { error: "Сбой при активации промокода" };
   }
 }
 
