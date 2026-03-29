@@ -1,6 +1,6 @@
 {
   "name": "dopog-tmp",
-  "version": "1.0.2A",
+  "version": "1.0.2B",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
