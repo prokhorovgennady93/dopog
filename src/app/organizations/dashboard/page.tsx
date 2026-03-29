@@ -28,8 +28,8 @@ export default async function B2BDashboardPage() {
     redirect("/login");
   }
 
-  const org = user.orgProfile || {};
-  const isProfileComplete = org.inn && org.kpp && org.address && org.bankAccount;
+  const org = user.orgProfile;
+  const isProfileComplete = org?.inn && org?.kpp && org?.address && org?.bankAccount;
 
   // Aggregate Promo Codes
   const totalCodes = user.ownedCodes.length;
