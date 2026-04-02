@@ -49,6 +49,7 @@ export function QuestionView({
   const storageKey = `study_${courseId}_${currentTopicId || 'all'}`;
 
   const [phase, setPhase] = useState<Phase>('QUESTION');
+  const [isProgressExpanded, setIsProgressExpanded] = useState(false);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [currentIndex, setCurrentIndex] = useState<number>(() => {
@@ -284,10 +285,24 @@ export function QuestionView({
         </div>
       )}
 
-      <div className="flex flex-col gap-4 w-full">
-        {/* Main: Question Section */}
-        <div className="flex-1 flex flex-col gap-3">
+      <div className="flex flex-col w-full">
+        {/* Mobile Progress Shutter Toggle */}
+        <div className="sm:hidden flex justify-center mb-1">
+          <button 
+            onClick={() => setIsProgressExpanded(!isProgressExpanded)}
+            className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all font-bold group"
+          >
+            <span className="text-xs font-bold">Прогресс</span>
+            {isProgressExpanded ? (
+              <ChevronDown className="w-4 h-4 rotate-180 transition-transform duration-300" />
+            ) : (
+              <ChevronDown className="w-4 h-4 transition-transform duration-300" />
+            )}
+          </button>
+        </div>
 
+        {/* Shutter Content: Progress and Nav */}
+        <div className={`flex flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out ${isProgressExpanded ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-0 sm:max-h-none opacity-0 sm:opacity-100 invisible sm:visible'}`}>
           {/* Progress Bar Header */}
           <div className="w-full bg-white dark:bg-zinc-900/40 p-3 sm:p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm animate-in fade-in duration-500">
             <div className="flex justify-between items-end mb-2">
@@ -333,7 +348,10 @@ export function QuestionView({
                     <button
                       key={q.id || idx}
                       id={`nav-btn-${idx}`}
-                      onClick={() => setCurrentIndex(idx)}
+                      onClick={() => {
+                        setCurrentIndex(idx);
+                        setIsProgressExpanded(false); // Auto-close on mobile
+                      }}
                       className={`min-w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 relative z-40 select-none touch-manipulation cursor-pointer transition-all duration-200 ${btnClass} active:opacity-50 active:scale-95`}
                     >
                       {idx + 1}
@@ -343,6 +361,10 @@ export function QuestionView({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Main Section */}
+        <div className="flex-1 flex flex-col gap-3">
 
 
           {phase === 'INTERMEDIATE' ? (
