@@ -26,14 +26,15 @@ export function Footer() {
              <Link href="/terms" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Пользовательское соглашение</Link>
              <Link href="/privacy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Политика конфиденциальности</Link>
              <Link href="/data-policy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Обработка персональных данных</Link>
+             <Link href="/requisites" className="text-sm font-black text-orange-600 hover:text-orange-500 transition-colors pt-2 uppercase tracking-tighter">Реквизиты организации</Link>
           </div>
 
           {/* Owner Section */}
           <div className="flex flex-col gap-3">
              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Контакты</h4>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold">ИП Карманович Алексей Сергеевич</p>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold">ИНН 611405438968</p>
-             <a href="mailto:grevelien@yandex.ru" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">grevelien@yandex.ru</a>
+             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold leading-tight">ООО «Учебный центр Технологии Знаний»</p>
+             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold">ИНН 6166132362</p>
+             <a href="mailto:znania.group@gmail.com" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">znania.group@gmail.com</a>
           </div>
         </div>
 

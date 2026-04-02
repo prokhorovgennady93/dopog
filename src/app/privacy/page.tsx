@@ -25,7 +25,7 @@ export default function PrivacyPage() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                    <h3 className="font-bold text-zinc-900 dark:text-white mb-2">Администрация сайта</h3>
-                   <p className="text-sm">Уполномоченные лица на управление Сайтом, действующие от имени ИП Карманович А.С., организующие обработку данных.</p>
+                   <p className="text-sm">Уполномоченные лица на управление Сайтом, действующие от имени ООО «УЦ Технологии Знаний», организующие обработку данных.</p>
                 </div>
                 <div className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                    <h3 className="font-bold text-zinc-900 dark:text-white mb-2">Персональные данные</h3>
@@ -94,9 +94,9 @@ export default function PrivacyPage() {
              </h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm leading-relaxed">
                 <div>
-                   <p className="font-bold text-zinc-200">ИП Карманович Алексей Сергеевич</p>
-                   <p>ИНН 611405438968</p>
-                   <p>Email: <a href="mailto:grevelien@yandex.ru" className="text-orange-600 hover:underline">grevelien@yandex.ru</a></p>
+                   <p className="font-bold text-zinc-200">ООО «Учебный центр Технологии Знаний»</p>
+                   <p>ИНН 6166132362</p>
+                   <p>Email: <a href="mailto:znania.group@gmail.com" className="text-orange-600 hover:underline">znania.group@gmail.com</a></p>
                 </div>
                 <div className="flex items-center">
                    <p className="text-[10px] uppercase font-black tracking-widest text-zinc-600 opacity-50">Prodopog.ru © 2026. Все права защищены.</p>

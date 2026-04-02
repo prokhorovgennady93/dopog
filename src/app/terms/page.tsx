@@ -15,7 +15,7 @@ export default function TermsPage() {
 
         <div className="prose prose-zinc dark:prose-invert max-w-none space-y-12 font-medium">
           <section className="bg-zinc-50 dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 italic text-sm">
-             Настоящее Соглашение является публичной офертой и регулирует отношения между ИП Карманович Алексей Сергеевич (далее — «Администрация») и любым физическим лицом (далее — «Пользователь»), использующим Сайт prodopog.ru.
+             Настоящее Соглашение является публичной офертой и регулирует отношения между ООО «Учебный центр Технологии Знаний» (далее — «Администрация») и любым физическим лицом (далее — «Пользователь»), использующим Сайт prodopog.ru.
           </section>
 
           <section>
@@ -83,13 +83,13 @@ export default function TermsPage() {
              </h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm leading-relaxed">
                 <div>
-                   <p className="font-bold text-zinc-200">ИП Карманович Алексей Сергеевич</p>
-                   <p>ИНН 611405438968</p>
-                   <p>ОГРНИП 319619600122291</p>
+                   <p className="font-bold text-zinc-200">ООО «Учебный центр Технологии Знаний»</p>
+                   <p>ИНН 6166132362 / КПП 616601001</p>
+                   <p>ОГРН 1256100004654</p>
                 </div>
                 <div>
                    <p className="font-bold text-zinc-200 text-lg mb-2">Техническая поддержка:</p>
-                   <p className="text-xl font-black text-orange-600">grevelien@yandex.ru</p>
+                   <p className="text-xl font-black text-orange-600">znania.group@gmail.com</p>
                 </div>
              </div>
              <p className="mt-12 text-[10px] uppercase font-black tracking-widest text-zinc-600 pt-8 border-t border-zinc-800">Все права защищены © 2026 prodopog.ru</p>
