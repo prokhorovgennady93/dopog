@@ -27,6 +27,7 @@ import {
 import Link from "next/link";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
+import { AdminNotifyManager } from "@/components/admin/AdminNotifyManager";
 
 type Order = {
   id: string;
@@ -144,6 +145,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
+      <AdminNotifyManager />
       <div className="max-w-5xl mx-auto">
         {/* Header Actions */}
         <div className="flex items-center justify-between mb-8">

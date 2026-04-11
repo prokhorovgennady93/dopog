@@ -18,6 +18,7 @@ import {
   Building2
 } from "lucide-react";
 import { UserActionsCell } from "@/components/admin/UserActionsCell";
+import { AdminNotifyManager } from "@/components/admin/AdminNotifyManager";
 
 export const metadata = {
   title: "Панель администратора — ДОПОГ Экзамен",
@@ -90,6 +91,7 @@ export default async function AdminPage({
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
+      <AdminNotifyManager />
       {/* Header */}
       <div className="bg-white border-b border-zinc-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
