@@ -33,6 +33,7 @@ export async function GET(req: Request) {
 
   try {
     const orders = await db.order.findMany({
+      where,
       include: {
         user: {
           select: {

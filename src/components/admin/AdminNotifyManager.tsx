@@ -21,12 +21,16 @@ export function AdminNotifyManager() {
     link: string;
   } | null>(null);
   
+  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const lastOrderIdRef = useRef<string | null>(null);
   const lastPaymentIdRef = useRef<string | null>(null);
   const initRef = useRef(false);
 
   useEffect(() => {
-    // Load last seen from localStorage to avoid spam on initial load
+    // Load state
+    const savedAudio = localStorage.getItem("admin_audio_enabled") === "true";
+    setIsAudioEnabled(savedAudio);
+
     lastOrderIdRef.current = localStorage.getItem("admin_last_order_id");
     lastPaymentIdRef.current = localStorage.getItem("admin_last_payment_id");
 
@@ -47,7 +51,7 @@ export function AdminNotifyManager() {
 
         // 2. Check for NEW ORDER
         if (data.latestOrder && data.latestOrder.id !== lastOrderIdRef.current) {
-          if (initRef.current) { // Don't notify on first load
+          if (initRef.current) { 
             triggerNotification(
               data.latestOrder.id,
               "ORDER",
@@ -84,10 +88,16 @@ export function AdminNotifyManager() {
     const triggerNotification = (id: string, type: "ORDER" | "PAYMENT", title: string, message: string, link: string) => {
       setActiveToast({ id, type, title, message, link });
       
-      // Play Sound
-      const audio = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
-      audio.volume = 0.5;
-      audio.play().catch(e => console.warn("Audio play blocked by browser. Interact with page first."));
+      // Play Sound only if enabled and unlocked
+      if (localStorage.getItem("admin_audio_enabled") === "true") {
+        const audio = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
+        audio.volume = 0.5;
+        audio.play().catch(e => {
+          console.warn("Audio play blocked by browser. User interaction required.");
+          setIsAudioEnabled(false);
+          localStorage.setItem("admin_audio_enabled", "false");
+        });
+      }
 
       // Auto hide after 10 seconds
       setTimeout(() => {
@@ -98,54 +108,75 @@ export function AdminNotifyManager() {
     // Initial check
     checkNotifications();
 
-    // Set interval (30 seconds)
     const interval = setInterval(checkNotifications, 30000);
-
     return () => clearInterval(interval);
   }, []);
 
-  if (!activeToast) return null;
+  const enableAudio = () => {
+    // Unlock audio context for Safari
+    const audio = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
+    audio.volume = 0; // Silent play to unlock
+    audio.play().then(() => {
+      setIsAudioEnabled(true);
+      localStorage.setItem("admin_audio_enabled", "true");
+    }).catch(console.error);
+  };
 
   return (
-    <div className="fixed top-24 right-4 sm:right-8 z-[100] animate-in slide-in-from-right-8 duration-500">
-      <div className="relative group overflow-hidden bg-white dark:bg-zinc-900 border-2 border-orange-500 shadow-2xl rounded-3xl p-5 w-[320px]">
-        {/* Glow effect */}
-        <div className="absolute top-0 left-0 w-2 h-full bg-orange-500" />
-        
-        <button 
-          onClick={() => setActiveToast(null)}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-orange-500 transition-colors"
+    <>
+      {/* Audio Unlock Button for iOS */}
+      {!isAudioEnabled && (
+        <button
+          onClick={enableAudio}
+          className="fixed bottom-6 right-6 z-[1001] flex items-center gap-2 bg-orange-600 text-white px-4 py-3 rounded-2xl font-black text-xs shadow-2xl animate-bounce"
         >
-          <X className="w-4 h-4" />
+          <Bell className="w-4 h-4" />
+          Включить звук уведомлений
         </button>
+      )}
 
-        <div className="flex gap-4">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-            activeToast.type === "ORDER" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
-          }`}>
-            {activeToast.type === "ORDER" ? <Package className="w-6 h-6" /> : <CreditCard className="w-6 h-6" />}
-          </div>
-          <div className="flex-1 pr-4">
-            <h4 className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-1">
-              Админ-уведомление
-            </h4>
-            <h3 className="text-base font-black text-zinc-900 dark:text-white leading-tight mb-1">
-              {activeToast.title}
-            </h3>
-            <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400 mb-4">
-              {activeToast.message}
-            </p>
+      {activeToast && (
+        <div className="fixed top-4 right-4 sm:right-8 z-[1000] animate-in slide-in-from-top-8 sm:slide-in-from-right-8 duration-500 w-full max-w-[calc(100%-2rem)] sm:w-[320px]">
+          <div className="relative group overflow-hidden bg-white dark:bg-zinc-900 border-2 border-orange-500 shadow-2xl rounded-3xl p-5">
+            {/* Glow effect */}
+            <div className="absolute top-0 left-0 w-2 h-full bg-orange-500" />
             
-            <Link 
-              href={activeToast.link}
+            <button 
               onClick={() => setActiveToast(null)}
-              className="inline-flex items-center gap-2 text-xs font-black text-orange-600 hover:gap-3 transition-all"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-orange-500 transition-colors"
             >
-              Открыть детали <Bell className="w-3 h-3" />
-            </Link>
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex gap-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                activeToast.type === "ORDER" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
+              }`}>
+                {activeToast.type === "ORDER" ? <Package className="w-6 h-6" /> : <CreditCard className="w-6 h-6" />}
+              </div>
+              <div className="flex-1 pr-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+                  Админ-уведомление
+                </h4>
+                <h3 className="text-sm font-black text-zinc-900 dark:text-white leading-tight mb-1">
+                  {activeToast.title}
+                </h3>
+                <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-4">
+                  {activeToast.message}
+                </p>
+                
+                <Link 
+                  href={activeToast.link}
+                  onClick={() => setActiveToast(null)}
+                  className="inline-flex items-center gap-2 text-xs font-black text-orange-600 hover:gap-3 transition-all"
+                >
+                  Открыть детали <Bell className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
