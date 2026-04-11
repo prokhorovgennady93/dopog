@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { YandexMetrica } from "@/components/YandexMetrica";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { OfflineSync } from "@/components/OfflineSync";
 import { Header } from "@/components/Header";
 
 const geistSans = Geist({
@@ -60,6 +61,7 @@ export default async function RootLayout({
         <ServiceWorkerRegistration />
         <Providers>
           <OfflineIndicator />
+          <OfflineSync />
           <Header session={session} />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />

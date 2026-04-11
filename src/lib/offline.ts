@@ -36,6 +36,7 @@ export async function downloadTopic(
     const questions = await response.json();
 
     localStorage.setItem(`topic_${topicId}_data`, JSON.stringify(questions));
+    localStorage.setItem(`topic_${topicId}_course`, courseId); // Keep track of parent course for re-sync
 
     if ("caches" in window) {
       const cache = await caches.open("dopog-cache-v1");
@@ -123,5 +124,48 @@ export async function downloadCourse(
     await downloadTopic(topicId, courseId, (p) => {
       if (onProgress) onProgress(topicId, p);
     });
+  }
+}
+
+let isSyncing = false;
+
+/**
+ * Automagically verify all flagged topics and re-download if cache is missing.
+ * Runs in background.
+ */
+export async function syncAllOfflineData(): Promise<void> {
+  if (typeof window === "undefined" || !navigator.onLine || isSyncing) return;
+
+  const offlineTopics: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith("topic_") && key?.endsWith("_offline")) {
+      const topicId = key.replace("topic_", "").replace("_offline", "");
+      offlineTopics.push(topicId);
+    }
+  }
+
+  if (offlineTopics.length === 0) return;
+
+  isSyncing = true;
+  console.log(`[Sync] Checking ${offlineTopics.length} offline topics...`);
+
+  try {
+    for (const topicId of offlineTopics) {
+      const isActuallyDownloaded = await checkTopicDownloaded(topicId);
+      
+      if (!isActuallyDownloaded) {
+        const courseId = localStorage.getItem(`topic_${topicId}_course`) || "base";
+        console.log(`[Sync] Restoring missing cache for topic ${topicId}...`);
+        try {
+          await downloadTopic(topicId, courseId);
+        } catch (e) {
+          console.error(`[Sync] Failed to restore topic ${topicId}`, e);
+        }
+      }
+    }
+  } finally {
+    isSyncing = false;
+    console.log(`[Sync] Finished background check.`);
   }
 }
