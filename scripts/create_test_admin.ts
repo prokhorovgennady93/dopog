@@ -2,8 +2,9 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaNodeSQLite } from "prisma-adapter-node-sqlite"
 import bcrypt from 'bcryptjs'
 
-const adapter = new PrismaNodeSQLite({ url: "file:./dev.db" })
-const prisma = new PrismaClient({ adapter })
+const dbUrl = process.env.DATABASE_URL?.startsWith('file:') ? process.env.DATABASE_URL : `file:${process.env.DATABASE_URL || './prisma/dev.db'}`;
+const adapter = new PrismaNodeSQLite({ url: dbUrl });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const phone = '79613002646'

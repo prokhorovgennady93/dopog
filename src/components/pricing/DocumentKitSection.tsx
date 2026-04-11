@@ -94,7 +94,7 @@ export function DocumentKitSection() {
 
   return (
     <>
-      <section id="documents-kit" className="mt-12 scroll-mt-24 group relative bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-10 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 shadow-2xl">
+      <section id="documents-kit" className="mt-12 scroll-mt-24 group relative bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 shadow-2xl">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-yellow-500/5 to-transparent pointer-events-none" />
         
         <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-center">
@@ -148,7 +148,7 @@ export function DocumentKitSection() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-3 bg-zinc-900 border-2 border-zinc-700 rounded-3xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute top-full left-0 right-0 mt-3 bg-zinc-900 border-2 border-zinc-700 rounded-3xl shadow-2xl z-50 max-h-64 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
                     {Object.entries(courseNames).map(([id, name]) => {
                       const isActive = selectedCourse === id;
                       return (
