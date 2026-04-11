@@ -12,11 +12,19 @@ import {
   Building2, 
   BookMarked, 
   CreditCard, 
-  UserCircle 
+  UserCircle,
+  ClipboardList
 } from "lucide-react";
 
 interface HeaderProps {
   session: any;
+}
+
+interface NavLink {
+  name: string;
+  href: string;
+  icon: any;
+  badge?: number | string;
 }
 
 export function Header({ session: initialSession }: HeaderProps) {
@@ -37,11 +45,32 @@ export function Header({ session: initialSession }: HeaderProps) {
     setIsMenuOpen(false);
   }, [pathname]);
 
-  const navLinks = [
+  const [ordersCount, setOrdersCount] = useState(0);
+
+  useEffect(() => {
+    if (currentSession?.user?.isAdmin) {
+      fetch("/api/orders/count")
+        .then(r => r.json())
+        .then(data => setOrdersCount(data.count))
+        .catch(console.error);
+    }
+  }, [currentSession]);
+
+  const navLinks: NavLink[] = [
     { name: "Курсы", href: "/", icon: GraduationCap },
     { name: "База знаний", href: "/articles", icon: BookMarked },
     { name: "Тарифы", href: "/pricing", icon: CreditCard },
   ];
+
+  if (currentSession?.user?.isAdmin) {
+    navLinks.push({ 
+      name: "Заявки", 
+      href: "/admin/orders", 
+      icon: ClipboardList,
+      badge: ordersCount > 0 ? ordersCount : undefined
+    });
+    navLinks.push({ name: "Админ", href: "/admin", icon: Building2 });
+  }
 
   return (
     <header 
@@ -70,13 +99,18 @@ export function Header({ session: initialSession }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                className={`relative px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
                   isActive 
                     ? "text-orange-600 bg-orange-50 dark:bg-orange-500/10" 
                     : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
                 }`}
               >
                 {link.name}
+                {link.badge !== undefined && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white animate-pulse">
+                    {link.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -165,7 +199,14 @@ export function Header({ session: initialSession }: HeaderProps) {
                     </div>
                     <span className="font-bold">{link.name}</span>
                   </div>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "translate-x-1" : "opacity-0"}`} />
+                  <div className="flex items-center gap-2">
+                    {link.badge !== undefined && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white">
+                        {link.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? "translate-x-1" : "opacity-0"}`} />
+                  </div>
                 </Link>
               );
             })}

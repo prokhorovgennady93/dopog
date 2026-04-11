@@ -26,15 +26,30 @@ export function Footer() {
              <Link href="/terms" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Пользовательское соглашение</Link>
              <Link href="/privacy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Политика конфиденциальности</Link>
              <Link href="/data-policy" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Обработка персональных данных</Link>
-             <Link href="/requisites" className="text-sm font-black text-orange-600 hover:text-orange-500 transition-colors pt-2 uppercase tracking-tighter">Реквизиты организации</Link>
+             <Link href="/copyright" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">Авторские права</Link>
           </div>
 
           {/* Owner Section */}
           <div className="flex flex-col gap-3">
              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Контакты</h4>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold leading-tight">ООО «Учебный центр Технологии Знаний»</p>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold">ИНН 6166132362</p>
-             <a href="mailto:znania.group@gmail.com" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">znania.group@gmail.com</a>
+             <div className="space-y-2">
+               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold leading-tight uppercase tracking-tighter">ООО «УЦ Технологии Знаний»</p>
+               <p className="text-[13px] text-zinc-400 dark:text-zinc-500 leading-relaxed">
+                 344029, г. Ростов-на-Дону, ул. 1-й Конной Армии, зд. 15, ком. 2а
+               </p>
+               <div className="flex flex-col gap-1 text-[13px] text-zinc-400 uppercase tracking-tighter">
+                 <span>ИНН: 6166132362</span>
+                 <span>КПП: 616601001</span>
+                 <span>ОГРН: 1256100004654</span>
+               </div>
+               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold text-wrap max-w-xs leading-snug">
+                 Лицензия № Л035-01276-61/02274118 выдана министерством образования Ростовской области, бессрочно.
+               </p>
+               <div className="flex flex-col gap-1 pt-2">
+                 <a href="tel:+79934520505" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">+7 993 452 05 05</a>
+                 <a href="mailto:znania.group@gmail.com" className="text-sm text-zinc-500 hover:text-yellow-600 transition-colors font-bold">znania.group@gmail.com</a>
+               </div>
+             </div>
           </div>
         </div>
 

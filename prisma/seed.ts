@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const adapter = new PrismaNodeSQLite({ url: "file:./dev.db" });
+const adapter = new PrismaNodeSQLite({ url: "file:./prisma/dev.db" });
 const prisma = new PrismaClient({ adapter });
 
 const DATA_FILE = path.join(__dirname, "../data/dopog_data.json");
@@ -57,12 +57,12 @@ async function main() {
     },
   });
 
-  const phoneAdminHash = await bcrypt.hash("admin123", 10);
+  const phoneAdminHash = await bcrypt.hash("3ghZ3Z32", 10);
   await prisma.user.upsert({
-    where: { phone: "89613002646" },
+    where: { phone: "79613002646" },
     update: { isAdmin: true, hasFullAccess: true },
     create: {
-      phone: "89613002646",
+      phone: "79613002646",
       name: "Главный Админ",
       password: phoneAdminHash,
       hasFullAccess: true,

@@ -6,13 +6,14 @@
 export interface PaymentDetails {
   amount: number;
   description: string;
-  type: "full_access" | "single_course";
+  type: "full_access" | "single_course" | "kit_order";
   courseId?: string;
+  orderId?: string;
   returnUrl?: string;
   metadata?: Record<string, any>;
 }
 
-export async function createPayment({ amount, description, type, courseId, returnUrl, metadata }: PaymentDetails) {
+export async function createPayment({ amount, description, type, courseId, orderId, returnUrl, metadata }: PaymentDetails) {
   console.log(`[YooKassa Stub] Creating payment: ${type} for ${amount} RUB — ${description}`);
 
   const mockPaymentId = `pay_${Math.random().toString(36).substr(2, 9)}`;
@@ -23,6 +24,7 @@ export async function createPayment({ amount, description, type, courseId, retur
     type,
   });
   if (courseId) params.set("courseId", courseId);
+  if (orderId) params.set("orderId", orderId);
   if (returnUrl) params.set("returnUrl", returnUrl);
 
   const confirmation_url = `/premium/checkout?${params.toString()}`;

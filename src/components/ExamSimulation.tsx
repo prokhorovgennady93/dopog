@@ -9,7 +9,8 @@ import {
   AlertCircle,
   Settings2,
   Flag,
-  HelpCircle
+  HelpCircle,
+  Loader2 // Added Loader2
 } from "lucide-react";
 
 interface Option {
@@ -92,6 +93,7 @@ export function ExamSimulation({
   };
 
   const handleFinish = async (finalAnswers = answers) => {
+    if (isSubmitting) return;
     setIsFinished(true);
     setIsSubmitting(true);
     
@@ -101,6 +103,7 @@ export function ExamSimulation({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           courseId,
+          questionIds: questions.map(q => q.id),
           answers: finalAnswers,
           timeTaken: (timeLimitMinutes * 60) - timeLeft,
         }),
@@ -108,12 +111,17 @@ export function ExamSimulation({
 
       if (response.ok) {
         const { attemptId } = await response.json();
-        router.push(`/exam/results/${attemptId}`);
+        // Force replace to prevent back navigation to "Processing..." state
+        window.location.href = `/exam/results/${attemptId}`;
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Submission failed");
       }
     } catch (error) {
       console.error("Failed to submit exam:", error);
-    } finally {
+      alert("Ошибка при сохранении результатов. Пожалуйста, попробуйте еще раз.");
       setIsSubmitting(false);
+      setIsFinished(false);
     }
   };
 
@@ -152,11 +160,27 @@ export function ExamSimulation({
              </div>
 
              <button 
-               onClick={() => handleFinish()}
-               className="bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap"
+               onClick={() => {
+                 const finalAnswers = { ...answers };
+                 if (selectedOptionId) {
+                   finalAnswers[questions[currentIndex].id] = selectedOptionId;
+                 }
+                 handleFinish(finalAnswers);
+               }}
+               disabled={isSubmitting}
+               className="bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:active:scale-100"
              >
-               Завершить экзамен
-               <Flag className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+               {isSubmitting ? (
+                 <>
+                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                   Сохранение...
+                 </>
+               ) : (
+                 <>
+                   Завершить экзамен
+                   <Flag className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+                 </>
+               )}
              </button>
           </div>
 
@@ -210,10 +234,7 @@ export function ExamSimulation({
         <div className="flex-1 flex flex-col gap-6">
            {/* Question Card */}
            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-[10px] font-black text-yellow-600 dark:text-yellow-500 uppercase tracking-widest bg-yellow-50 dark:bg-yellow-500/10 px-2 py-1 rounded">
-                  {currentQuestion.topic}
-                </span>
+              <div className="flex items-center justify-end mb-6">
                 <span className="text-xs font-bold text-zinc-400">
                   Вопрос {currentIndex + 1} из {questions.length}
                 </span>

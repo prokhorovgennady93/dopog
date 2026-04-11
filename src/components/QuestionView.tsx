@@ -350,7 +350,6 @@ export function QuestionView({
                       id={`nav-btn-${idx}`}
                       onClick={() => {
                         setCurrentIndex(idx);
-                        setIsProgressExpanded(false); // Auto-close on mobile
                       }}
                       className={`min-w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 relative z-40 select-none touch-manipulation cursor-pointer transition-all duration-200 ${btnClass} active:opacity-50 active:scale-95`}
                     >

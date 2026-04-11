@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/../auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, XCircle, Timer, Award, ArrowLeft, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Timer, Award, ArrowLeft, RefreshCw, ChevronDown } from "lucide-react";
 
 export default async function ResultsPage({ params }: { params: Promise<{ attemptId: string }> }) {
   const { attemptId } = await params;
@@ -59,6 +59,101 @@ export default async function ResultsPage({ params }: { params: Promise<{ attemp
               <span className="text-xs text-zinc-500 mt-2">Завершено {new Date(attempt.finishedAt || "").toLocaleDateString()}</span>
            </div>
         </div>
+
+        {/* Mistakes Section (Collapsible "Cut") */}
+        {(attempt as any).details && (
+          <details className="w-full mt-8 mb-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden group shadow-sm [&_summary::-webkit-details-marker]:hidden">
+             <summary className="flex items-center justify-between p-6 sm:p-8 cursor-pointer select-none transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center">
+                   <CheckCircle2 className="w-6 h-6 text-orange-500" />
+                 </div>
+                 <div>
+                   <h2 className="text-xl sm:text-2xl font-black">Работа над ошибками</h2>
+                   <p className="text-sm text-zinc-500 font-medium mt-1">Нажмите, чтобы посмотреть разбор по темам</p>
+                 </div>
+               </div>
+               <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-open:-rotate-180 flex-shrink-0">
+                 <ChevronDown className="w-5 h-5 text-zinc-500" />
+               </div>
+             </summary>
+             
+             <div className="p-6 sm:p-8 pt-0 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50">
+             {(() => {
+               try {
+                 const detailsData = JSON.parse((attempt as any).details);
+                 const mistakes = detailsData.filter((d: any) => !d.isCorrect);
+                 
+                 if (mistakes.length === 0) {
+                   return (
+                     <div className="mt-8 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 p-6 rounded-2xl text-green-700 dark:text-green-400 font-bold text-center">
+                       Отлично! У вас нет ни одной ошибки.
+                     </div>
+                   );
+                 }
+
+                 // Group by topic
+                 const groupedMistakes = mistakes.reduce((acc: any, mistake: any) => {
+                   const theme = mistake.topicTitle || "Без темы";
+                   if (!acc[theme]) acc[theme] = [];
+                   acc[theme].push(mistake);
+                   return acc;
+                 }, {});
+
+                 return (
+                   <div className="space-y-4 mt-6">
+                     {Object.entries(groupedMistakes).map(([theme, items]: [string, any], groupIdx) => (
+                       <details key={groupIdx} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden group/theme shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                         <summary className="flex items-center justify-between p-4 sm:p-5 cursor-pointer select-none transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                           <div className="flex items-center gap-3">
+                             <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center font-bold text-red-500 text-sm">
+                               {items.length}
+                             </div>
+                             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex-1">{theme}</h3>
+                           </div>
+                           <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-open/theme:-rotate-180 flex-shrink-0">
+                             <ChevronDown className="w-4 h-4 text-zinc-500" />
+                           </div>
+                         </summary>
+                         
+                         <div className="p-4 sm:p-5 pt-0 border-t border-zinc-100 dark:border-zinc-800 space-y-4 mt-4">
+                           {items.map((mistake: any, idx: number) => {
+                             const correctOpt = mistake.options.find((o: any) => o.isCorrect);
+                             const userOpt = mistake.options.find((o: any) => o.id === mistake.userAnswerId);
+                             return (
+                               <div key={idx} className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 sm:p-6 rounded-2xl">
+                                 <h4 className="font-bold text-lg mb-4 leading-relaxed">{mistake.text}</h4>
+                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                   <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm font-medium">
+                                     <span className="block text-[10px] font-black uppercase tracking-widest opacity-60 mb-1.5 flex items-center gap-1"><XCircle className="w-3 h-3"/> Ваш ответ</span>
+                                     {userOpt?.text || "Не отвечено"}
+                                   </div>
+                                   <div className="p-4 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-100 dark:border-green-500/20 text-green-700 dark:text-green-400 text-sm font-medium">
+                                     <span className="block text-[10px] font-black uppercase tracking-widest opacity-60 mb-1.5 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Правильный вариант</span>
+                                     {correctOpt?.text || "Неизвестно"}
+                                   </div>
+                                 </div>
+                                 {mistake.explanation && (
+                                   <p className="text-sm text-zinc-600 dark:text-zinc-400 bg-white dark:bg-black/20 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/50 leading-relaxed">
+                                     <span className="font-bold text-zinc-900 dark:text-zinc-300 mr-2">Пояснение:</span>
+                                     {mistake.explanation}
+                                   </p>
+                                 )}
+                               </div>
+                             );
+                           })}
+                         </div>
+                       </details>
+                     ))}
+                   </div>
+                 );
+               } catch (e) {
+                 return <p className="text-red-500 text-center font-medium mt-6">Ошибка загрузки деталей тестирования</p>;
+               }
+             })()}
+             </div>
+          </details>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 w-full">

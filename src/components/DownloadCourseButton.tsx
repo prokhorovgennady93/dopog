@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CloudDownload, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { checkTopicDownloaded, downloadTopic } from "@/lib/offline";
 
@@ -37,12 +38,14 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
     checkAllThemes();
   }, [themeIds, hasAccess]);
 
+  const router = useRouter();
+
   const handleDownloadAll = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!hasAccess) {
-      alert("Офлайн-режим доступен только в Premium-версии.");
+      router.push("/pricing");
       return;
     }
 
@@ -76,36 +79,36 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
     <button
       onClick={handleDownloadAll}
       disabled={status === "downloading"}
-      className={`w-full font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] mt-3 border ${
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest ${
         status === "downloaded"
           ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
           : status === "downloading"
           ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
           : status === "locked"
-          ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 opacity-60"
-          : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-yellow-500 hover:text-yellow-600 shadow-xl"
+          ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-yellow-500 hover:text-yellow-600 active:scale-95 shadow-sm"
       }`}
       title={status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Весь курс доступен офлайн" : "Скачать весь курс для работы без интернета")}
     >
       {status === "downloading" ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Скачивание: {progress}%</span>
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          <span>{progress}%</span>
         </>
       ) : status === "downloaded" ? (
         <>
-          <CheckCircle2 className="w-5 h-5" />
-          <span>Курс сохранен офлайн</span>
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>Скачано</span>
         </>
       ) : status === "locked" ? (
         <>
-          <Lock className="w-5 h-5" />
-          <span>Скачать курс (Premium)</span>
+          <Lock className="w-3.5 h-3.5" />
+          <span>Premium</span>
         </>
       ) : (
         <>
-          <CloudDownload className="w-5 h-5" />
-          <span>Скачать весь курс</span>
+          <CloudDownload className="w-3.5 h-3.5" />
+          <span>Скачать</span>
         </>
       )}
     </button>

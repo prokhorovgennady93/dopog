@@ -5,6 +5,29 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs"; 
 import { z } from "zod";
 
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      phone: string;
+      isAdmin: boolean;
+      hasFullAccess: boolean;
+      fullAccessExpiresAt: Date | null;
+      purchases: any[];
+    } & DefaultSession["user"]
+  }
+
+  interface User {
+    id?: string;
+    phone?: string | null;
+    isAdmin?: boolean;
+    hasFullAccess?: boolean;
+    fullAccessExpiresAt?: Date | null;
+  }
+}
+
+import { DefaultSession } from "next-auth";
+
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
   providers: [
@@ -43,6 +66,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     async session({ session, token }) {
       if (session.user && token.sub) {
         (session.user as any).id = token.sub;
+        (session.user as any).phone = token.phone;
         (session.user as any).isAdmin = token.isAdmin;
         (session.user as any).hasFullAccess = token.hasFullAccess;
         (session.user as any).fullAccessExpiresAt = token.fullAccessExpiresAt;
@@ -69,6 +93,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           token.fullAccessExpiresAt = dbUser.fullAccessExpiresAt;
           token.purchases = dbUser.purchases;
           token.isAdmin = dbUser.isAdmin;
+          token.phone = dbUser.phone;
         }
       } catch (error) {
         console.error("JWT sync error (non-blocking):", error);

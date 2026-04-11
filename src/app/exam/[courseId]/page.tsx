@@ -30,39 +30,49 @@ export default async function ExamPage({ params }: { params: Promise<{ courseId:
 
   // Determine question count and time limit (official rules)
   const isBasic = course.slug === "basic";
-  const targetCount = isBasic ? 25 : 15;
-  const timeLimitMinutes = isBasic ? 45 : 30;
+  const targetCount = 25; // Always 25 as per user request
+  const timeLimitMinutes = 45; // Always 45 minutes as per user request
 
   // BALANCED SELECTION LOGIC
-  // 1. Collect all questions and group them by topic
-  const allQuestionsByTopic = (course as any).themes.map((t: any) => t.questions).filter((q: any) => q.length > 0);
-  const totalTopics = allQuestionsByTopic.length;
+  // 1. Group questions by topic and shuffle each topic pool
+  const topicPools = course.themes
+    .filter((t: any) => t.questions.length > 0)
+    .map((t: any) => ({
+      title: t.title,
+      questions: [...t.questions].sort(() => 0.5 - Math.random())
+    }));
   
-  if (totalTopics === 0) {
-    notFound(); // or handle empty course
+  if (topicPools.length === 0) {
+    notFound(); 
   }
 
   const selectedQuestions: any[] = [];
-  const questionsPerTopic = Math.floor(targetCount / totalTopics);
-  let remainder = targetCount % totalTopics;
-
-  // 2. Pick equal amount from each topic
-  allQuestionsByTopic.forEach((topicQuestions: any) => {
-    const countToPick = questionsPerTopic + (remainder > 0 ? 1 : 0);
-    if (remainder > 0) remainder--;
+  
+  // 2. Pick questions using round-robin to ensure equal representation
+  let poolIdx = 0;
+  while (selectedQuestions.length < targetCount) {
+    const currentPool = topicPools[poolIdx];
     
-    const shuffled = [...topicQuestions].sort(() => 0.5 - Math.random());
-    selectedQuestions.push(...shuffled.slice(0, countToPick));
-  });
+    if (currentPool.questions.length > 0) {
+      const q = currentPool.questions.pop();
+      // Attach topic title correctly for the UI
+      (q as any).topicTitle = currentPool.title;
+      selectedQuestions.push(q);
+    }
+    
+    poolIdx = (poolIdx + 1) % topicPools.length;
+
+    // Safety break if we've exhausted all available questions in the course
+    if (topicPools.every(p => p.questions.length === 0)) break;
+  }
 
   // 3. Final shuffle of the resulting exam set
   const examQuestions = selectedQuestions
     .sort(() => 0.5 - Math.random())
-    .slice(0, targetCount)
     .map((q: any) => ({
       id: q.id,
       text: q.text,
-      topic: q.theme?.title || "Без темы",
+      topic: q.topicTitle || "Без темы",
       imageUrl: q.imageUrl,
       options: q.options.map((o: any) => ({
         id: o.id,

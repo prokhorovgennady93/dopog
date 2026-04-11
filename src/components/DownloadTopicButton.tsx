@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { CloudDownload, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { checkTopicDownloaded, downloadTopic } from "@/lib/offline";
 
@@ -38,12 +39,14 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
       return () => window.removeEventListener('offline-status-changed', handleGlobalUpdate);
     }, [checkStatus]);
 
+  const router = useRouter();
+
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!hasAccess) {
-      alert("Функция скачивания доступна только в Premium-версии.");
+      router.push("/pricing");
       return;
     }
 

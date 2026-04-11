@@ -9,13 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^9.7.2",
     "@prisma/client": "^7.5.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/react-input-mask": "^3.0.6",
-    "@ducanh2912/next-pwa": "^9.7.2",
     "axios-cookiejar-support": "^6.0.5",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
+    "date-fns": "^4.1.0",
     "is-even": "^1.0.0",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",

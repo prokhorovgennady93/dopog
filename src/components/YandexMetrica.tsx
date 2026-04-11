@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import Script from "next/script";
 
 export function YandexMetrica() {
   const pathname = usePathname();
@@ -22,7 +23,9 @@ export function YandexMetrica() {
 
   return (
     <>
-      <script
+      <Script
+        id="yandex-metrica"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
