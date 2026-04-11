@@ -41,6 +41,16 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
     };
     
     checkAllDownloaded();
+
+    // Listen for network and sync events
+    const handleUpdate = () => checkAllDownloaded();
+    window.addEventListener('online', handleUpdate);
+    window.addEventListener('offline-status-changed', handleUpdate);
+    
+    return () => {
+      window.removeEventListener('online', handleUpdate);
+      window.removeEventListener('offline-status-changed', handleUpdate);
+    };
   }, [themeIds.length, hasAccess]);
 
   const handleDownloadAll = async (e: React.MouseEvent) => {

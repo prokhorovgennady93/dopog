@@ -16,6 +16,9 @@ export function OfflineSync() {
     const handleOnline = () => {
       console.log("[Sync] Connection restored, starting background sync...");
       syncAllOfflineData();
+      
+      // Notify UI components to re-check their state (SSG snapshots might be stale)
+      window.dispatchEvent(new CustomEvent('offline-status-changed'));
     };
 
     window.addEventListener("online", handleOnline);

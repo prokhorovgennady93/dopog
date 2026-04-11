@@ -48,6 +48,16 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
       }
     };
     checkAllThemes();
+
+    // Listen for network and sync events
+    const handleUpdate = () => checkAllThemes();
+    window.addEventListener('online', handleUpdate);
+    window.addEventListener('offline-status-changed', handleUpdate);
+    
+    return () => {
+      window.removeEventListener('online', handleUpdate);
+      window.removeEventListener('offline-status-changed', handleUpdate);
+    };
   }, [themeIds, hasAccess]);
 
   const router = useRouter();

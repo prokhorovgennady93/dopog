@@ -4,6 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { Bell, CreditCard, X, Package } from "lucide-react";
 import Link from "next/link";
 
+// Short system beep base64 (MP3)
+const BEEP_SOUND = "data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgerAAAAGNvbnhlbnQtdHlwZTogYXVkaW8vbXBlZwAATGFtZTMuOThyA6kAAAAAEEpBAIAAAYAAAAAIAIB9P66eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uUZAAAA84M0f0AIAAHzho/oAIAAJp30/rkgAAAABp30/rkgAAAAfXp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/L///uUZAAMAAAAfXp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xp/Xo=";
+
 interface NotificationStats {
   unreadCount: number;
   unpaidCount: number;
@@ -28,13 +31,15 @@ export function AdminNotifyManager() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Initialize persistent audio object
-    audioRef.current = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
-    audioRef.current.volume = 0.5;
-
-    // Load state
+    // 1. Load state
     const savedAudio = localStorage.getItem("admin_audio_enabled") === "true";
     setIsAudioEnabled(savedAudio);
+
+    // Initialise audio if previously enabled
+    if (savedAudio) {
+      audioRef.current = new Audio(BEEP_SOUND);
+      audioRef.current.volume = 0.5;
+    }
 
     lastOrderIdRef.current = localStorage.getItem("admin_last_order_id");
     lastPaymentIdRef.current = localStorage.getItem("admin_last_payment_id");
@@ -45,7 +50,7 @@ export function AdminNotifyManager() {
         if (!res.ok) return;
         const data: NotificationStats = await res.json();
 
-        // 1. Update App Badge
+        // Update App Badge
         if ("setAppBadge" in navigator) {
           if (data.unreadCount > 0) {
             (navigator as any).setAppBadge(data.unreadCount);
@@ -54,7 +59,7 @@ export function AdminNotifyManager() {
           }
         }
 
-        // 2. Check for NEW ORDER
+        // New Order
         if (data.latestOrder && data.latestOrder.id !== lastOrderIdRef.current) {
           if (initRef.current) { 
             triggerNotification(
@@ -69,7 +74,7 @@ export function AdminNotifyManager() {
           localStorage.setItem("admin_last_order_id", data.latestOrder.id);
         }
 
-        // 3. Check for NEW PAYMENT
+        // New Payment
         if (data.latestPayment && data.latestPayment.id !== lastPaymentIdRef.current) {
           if (initRef.current) {
             triggerNotification(
@@ -93,23 +98,19 @@ export function AdminNotifyManager() {
     const triggerNotification = (id: string, type: "ORDER" | "PAYMENT" | "SYSTEM", title: string, message: string, link?: string) => {
       setActiveToast({ id, type, title, message, link });
       
-      // Play Sound only if enabled and unlocked
-      if (localStorage.getItem("admin_audio_enabled") === "true" && audioRef.current) {
-        audioRef.current.play().catch(e => {
-          console.warn("Audio play blocked by browser.");
+      // Play Sound only if enabled
+      if (localStorage.getItem("admin_audio_enabled") === "true") {
+        if (!audioRef.current) audioRef.current = new Audio(BEEP_SOUND);
+        audioRef.current.play().catch(() => {
           setIsAudioEnabled(false);
           localStorage.setItem("admin_audio_enabled", "false");
         });
       }
 
-      // Auto hide
       setTimeout(() => {
         setActiveToast(prev => prev?.id === id ? null : prev);
       }, 10000);
     };
-
-    // Store trigger for external use (like test)
-    (window as any).triggerAdminTest = () => triggerNotification("test", "SYSTEM", "Тест уведомления", "Звук и окна работают корректно! ✅");
 
     checkNotifications();
     const interval = setInterval(checkNotifications, 30000);
@@ -117,30 +118,42 @@ export function AdminNotifyManager() {
   }, []);
 
   const enableAudio = () => {
-    if (!audioRef.current) return;
-
-    // Unlock audio context
-    audioRef.current.play().then(() => {
-      setIsAudioEnabled(true);
-      localStorage.setItem("admin_audio_enabled", "true");
+    try {
+      // Logic: Browser MUST see Audio creation inside the event handler
+      const audio = new Audio(BEEP_SOUND);
+      audio.volume = 0.5;
       
-      // Immediate feedback: Trigger test notification
-      setActiveToast({
-        id: "activation-test",
-        type: "SYSTEM",
-        title: "Звук активирован! 🔔",
-        message: "Теперь вы будете получать звуковые уведомления о заказах."
+      audio.play().then(() => {
+        audioRef.current = audio;
+        setIsAudioEnabled(true);
+        localStorage.setItem("admin_audio_enabled", "true");
+        
+        setActiveToast({
+          id: "activation-test",
+          type: "SYSTEM",
+          title: "Звук активирован! 🔔",
+          message: "Теперь вы будете получать звуковые уведомления."
+        });
+        setTimeout(() => setActiveToast(null), 5000);
+      }).catch(e => {
+        console.error("Audio block:", e);
+        // Fallback: If blocked, try to set the state anyway but warn
+        setIsAudioEnabled(true);
+        localStorage.setItem("admin_audio_enabled", "true");
+        setActiveToast({
+          id: "activation-fail",
+          type: "SYSTEM",
+          title: "Звук настроен ⚠️",
+          message: "Браузер может блокировать звук до первого заказа."
+        });
       });
-      setTimeout(() => setActiveToast(null), 5000);
-    }).catch(e => {
-      console.error("Audio unlock failed:", e);
-      alert("Не удалось включить звук. Пожалуйста, убедитесь, что страница не заблокирована браузером.");
-    });
+    } catch (e) {
+      console.error("Audio init error:", e);
+    }
   };
 
   return (
     <>
-      {/* Audio Unlock Button for iOS - High Z-index and safe position */}
       {!isAudioEnabled && (
         <button
           onClick={enableAudio}
@@ -154,7 +167,6 @@ export function AdminNotifyManager() {
       {activeToast && (
         <div className="fixed top-20 right-4 sm:right-8 z-[99999] animate-in slide-in-from-top-8 sm:slide-in-from-right-8 duration-500 w-full max-w-[calc(100%-2rem)] sm:w-[320px]">
           <div className="relative group overflow-hidden bg-white dark:bg-zinc-900 border-2 border-orange-500 shadow-2xl rounded-3xl p-5">
-            {/* Glow effect */}
             <div className="absolute top-0 left-0 w-2 h-full bg-orange-500" />
             
             <button 

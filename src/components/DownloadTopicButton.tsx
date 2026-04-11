@@ -31,13 +31,18 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
       checkStatus();
     }, [hasAccess, checkStatus]);
 
-    // Handle global offline status updates
+    // Handle global offline status updates and network restoration
     useEffect(() => {
       const handleGlobalUpdate = () => {
         checkStatus();
       };
       window.addEventListener('offline-status-changed', handleGlobalUpdate);
-      return () => window.removeEventListener('offline-status-changed', handleGlobalUpdate);
+      window.addEventListener('online', handleGlobalUpdate);
+      
+      return () => {
+        window.removeEventListener('offline-status-changed', handleGlobalUpdate);
+        window.removeEventListener('online', handleGlobalUpdate);
+      };
     }, [checkStatus]);
 
   const router = useRouter();

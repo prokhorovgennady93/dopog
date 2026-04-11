@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dopog-cache-v2';
+const CACHE_NAME = 'dopog-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -13,7 +13,6 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  // Clear old caches
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -28,6 +27,20 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+async function updateCache(request, response) {
+  if (response && response.status === 200 && response.type === 'basic') {
+    const cache = await caches.open(CACHE_NAME);
+    // Strip query params for "static" matching
+    const url = new URL(request.url);
+    url.search = ''; 
+    await cache.put(url.toString(), response.clone());
+    // Also store original if it has params but is important
+    if (request.url !== url.toString()) {
+       await cache.put(request, response.clone());
+    }
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
@@ -37,17 +50,20 @@ self.addEventListener('fetch', (event) => {
   // 1. Navigation (HTML Snapshots)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(async () => {
-        // Try exact match first
+      fetch(event.request).then((response) => {
+        // Online: update cache in background
+        updateCache(event.request, response.clone());
+        return response;
+      }).catch(async () => {
+        // Offline: try cache
         let cached = await caches.match(event.request);
-        // Try match without query params (CRITICAL for static pages on iOS)
         if (!cached) {
           cached = await caches.match(event.request, { ignoreSearch: true });
         }
         
         if (cached) return cached;
         
-        // Final broad fallbacks for courses
+        // Final fallbacks
         if (url.pathname.startsWith('/course/')) {
            const slug = url.pathname.split('/')[2];
            return caches.match(`/course/${slug}`, { ignoreSearch: true }) || caches.match('/');
@@ -59,12 +75,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Next.js RSC Data requests (offline navigation data)
+  // 2. Next.js RSC Data requests (very important for offline navigation)
   const isRSC = url.searchParams.has('_rsc') || event.request.headers.get('RSC') === '1';
   if (isRSC) {
     event.respondWith(
-      fetch(event.request).catch(async () => {
-        // Find RSC data regardless of exact version token
+      fetch(event.request).then((response) => {
+        updateCache(event.request, response.clone());
+        return response;
+      }).catch(async () => {
         return caches.match(event.request, { ignoreSearch: true });
       })
     );
@@ -86,7 +104,6 @@ self.addEventListener('fetch', (event) => {
           return res;
         }).catch(() => null);
 
-        // Always return cache first for offline stability
         return cached || fetchPromise;
       })
     );
