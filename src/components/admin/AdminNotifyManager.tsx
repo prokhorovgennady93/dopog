@@ -124,13 +124,13 @@ export function AdminNotifyManager() {
 
   return (
     <>
-      {/* Audio Unlock Button for iOS */}
+      {/* Audio Unlock Button for iOS - High Z-index and safe position */}
       {!isAudioEnabled && (
         <button
           onClick={enableAudio}
-          className="fixed bottom-6 right-6 z-[1001] flex items-center gap-2 bg-orange-600 text-white px-4 py-3 rounded-2xl font-black text-xs shadow-2xl animate-bounce"
+          className="fixed bottom-24 right-6 z-[99999] flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-6 py-4 rounded-3xl font-black text-sm shadow-[0_20px_50px_rgba(234,88,12,0.3)] animate-bounce active:scale-95 transition-all pointer-events-auto"
         >
-          <Bell className="w-4 h-4" />
+          <Bell className="w-5 h-5" />
           Включить звук уведомлений
         </button>
       )}

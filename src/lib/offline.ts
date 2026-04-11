@@ -12,7 +12,7 @@ export async function checkTopicDownloaded(topicId: string): Promise<boolean> {
   // 2. Physical Cache Verification (Source of Truth)
   if ("caches" in window) {
     try {
-      const cache = await caches.open("dopog-cache-v1");
+      const cache = await caches.open("dopog-cache-v2");
       const match = await cache.match(`/api/topics/${topicId}/questions`);
       return !!match;
     } catch (e) {
@@ -39,7 +39,7 @@ export async function downloadTopic(
     localStorage.setItem(`topic_${topicId}_course`, courseId); // Keep track of parent course for re-sync
 
     if ("caches" in window) {
-      const cache = await caches.open("dopog-cache-v1");
+      const cache = await caches.open("dopog-cache-v2");
       
       // Cache the API response itself for physical verification by checkTopicDownloaded
       await cache.put(
@@ -96,23 +96,37 @@ export async function downloadCourse(
 
   // 1. Static Content Snapshots (HTML + Navigation Data)
   if ("caches" in window) {
-    const cache = await caches.open("dopog-cache-v1");
-    // We only snapshot the Home and the current Course
+    const cache = await caches.open("dopog-cache-v2");
+    
+    // Core routes to snapshot
     const snapshots = [
       "/",
-      `/course/${slug}`
+      `/course/${slug}`,
+      `/study/${courseId}`
     ];
     
-    for (const route of snapshots) {
-      try {
-        // Fetch raw HTML
-        const htmlRes = await fetch(route);
-        if (htmlRes.ok) await cache.put(route, htmlRes);
+    // Add common UI assets that might be missed
+    const extraAssets = [
+      "/manifest.json",
+      "/icon.png",
+      // Important to catch common CSS/JS if possible
+      "/_next/static/css/app/layout.css", 
+    ];
 
-        // Fetch RSC Navigation Data
-        const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
-        const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
-        if (rscRes.ok) await cache.put(rscUrl, rscRes);
+    const allToCache = [...snapshots, ...extraAssets];
+    
+    for (const route of allToCache) {
+      try {
+        // Fetch normally
+        const res = await fetch(route);
+        if (res.ok) await cache.put(route, res);
+
+        // If it's a page, also cache the RSC version
+        if (!route.includes(".") && !route.startsWith("/_next")) {
+          const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
+          const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
+          if (rscRes.ok) await cache.put(rscUrl, rscRes);
+        }
       } catch (e) {
         console.warn(`[Snapshot] Failed to capture: ${route}`, e);
       }
