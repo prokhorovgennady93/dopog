@@ -36,12 +36,17 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
       const handleGlobalUpdate = () => {
         checkStatus();
       };
+      
       window.addEventListener('offline-status-changed', handleGlobalUpdate);
       window.addEventListener('online', handleGlobalUpdate);
+      
+      // Pulse check for iOS staleness (every 5s)
+      const interval = setInterval(checkStatus, 5000);
       
       return () => {
         window.removeEventListener('offline-status-changed', handleGlobalUpdate);
         window.removeEventListener('online', handleGlobalUpdate);
+        clearInterval(interval);
       };
     }, [checkStatus]);
 

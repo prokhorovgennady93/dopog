@@ -54,9 +54,13 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
     window.addEventListener('online', handleUpdate);
     window.addEventListener('offline-status-changed', handleUpdate);
     
+    // Pulse check for iOS staleness (every 5s)
+    const interval = setInterval(checkAllThemes, 5000);
+    
     return () => {
       window.removeEventListener('online', handleUpdate);
       window.removeEventListener('offline-status-changed', handleUpdate);
+      clearInterval(interval);
     };
   }, [themeIds, hasAccess]);
 

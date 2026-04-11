@@ -110,9 +110,9 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Filters Panel */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-6 mb-8 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-5 sm:p-6 mb-8 shadow-sm overflow-hidden">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="col-span-2 sm:col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 block px-1">Статус</label>
               <select 
                 value={filters.status}
@@ -126,7 +126,7 @@ export default function AdminOrdersPage() {
               </select>
             </div>
 
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 block px-1">Оплата</label>
               <select 
                 value={filters.isPaid}
@@ -139,23 +139,23 @@ export default function AdminOrdersPage() {
               </select>
             </div>
 
-            <div>
+            <div className="col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 block px-1">От даты</label>
               <input 
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => setFilters({...filters, startDate: e.target.value})}
-                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20 text-zinc-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-2 xs:px-4 py-2.5 font-bold text-xs xs:text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20 text-zinc-500 min-w-0"
               />
             </div>
 
-            <div>
+            <div className="col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 block px-1">До даты</label>
               <input 
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => setFilters({...filters, endDate: e.target.value})}
-                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20 text-zinc-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-2 xs:px-4 py-2.5 font-bold text-xs xs:text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20 text-zinc-500 min-w-0"
               />
             </div>
           </div>
@@ -184,61 +184,65 @@ export default function AdminOrdersPage() {
                 <div 
                   key={order.id}
                   onClick={() => window.location.href = `/admin/orders/${order.id}`}
-                  className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-5 sm:p-6 transition-all hover:border-orange-500/20 hover:shadow-xl hover:shadow-black/5 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6"
+                  className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-5 sm:p-6 transition-all hover:border-orange-500/20 hover:shadow-xl hover:shadow-black/5 cursor-pointer flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6"
                 >
-                  <div className="flex w-full sm:w-auto items-center justify-between sm:justify-start gap-4">
+                  <div className="flex items-center justify-between sm:justify-start gap-4">
                     <div className={`w-12 h-12 rounded-2xl ${status.color} bg-opacity-10 text-opacity-100 flex items-center justify-center shrink-0`}>
                       <StatusIcon className={`w-6 h-6 text-current`} style={{ color: status.color.replace('bg-', '') }} />
                     </div>
                     
-                    <div className="flex sm:hidden items-center gap-3">
-                      <div className={`px-3 py-1.5 rounded-full ${status.color} bg-opacity-10 text-xs font-black uppercase tracking-wider`}>
+                    <div className="flex sm:hidden items-center gap-2">
+                      <div className={`px-2.5 py-1 rounded-full ${status.color} bg-opacity-10 text-[10px] font-black uppercase tracking-wider`}>
                         {status.label}
                       </div>
-                      <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-orange-600 transition-colors" />
+                      <ChevronRight className="w-4 h-4 text-zinc-300 group-hover:text-orange-600 transition-colors" />
                     </div>
                   </div>
                   
-                  <div className="flex-1 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4 w-full">
-                    <div>
-                      <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Курсант</span>
-                      <p className="font-bold truncate text-sm sm:text-base text-zinc-900 dark:text-white">{order.userName}</p>
-                      <p className="text-xs text-zinc-500 font-medium">{order.userPhone}</p>
+                  <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-2 sm:gap-x-4">
+                    {/* Row 1, Col 1: Student */}
+                    <div className="order-1 sm:order-none">
+                      <span className="text-[9px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Курсант</span>
+                      <p className="font-bold truncate text-sm text-zinc-900 dark:text-white leading-tight">{order.userName}</p>
+                      <p className="text-[11px] text-zinc-500 font-medium">{order.userPhone}</p>
                     </div>
 
-                    <div>
-                      <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Курсы</span>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {ids.length > 0 ? ids.map(id => (
-                          <span key={id} className="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg font-black italic text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50">{courseNames[id] || id}</span>
-                        )) : <span className="text-[10px] text-zinc-400 font-bold uppercase">Не выбраны</span>}
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Сумма / Оплата</span>
-                      <div className="flex items-center gap-2">
-                        <p className="font-bold text-sm sm:text-base text-zinc-900 dark:text-white">{order.totalAmount} ₽</p>
+                    {/* Row 1, Col 2: Payment (Right aligned on mobile) */}
+                    <div className="order-2 sm:order-none text-right sm:text-left">
+                      <span className="text-[9px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Сумма / Оплата</span>
+                      <div className="flex items-center justify-end sm:justify-start gap-1.5">
+                        <p className="font-extrabold text-sm text-zinc-900 dark:text-white">{order.totalAmount} ₽</p>
                         {order.isPaid ? (
-                          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
-                            <Check className="w-2.5 h-2.5 text-white stroke-[4]" />
+                          <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center">
+                            <Check className="w-2 h-2 text-white stroke-[3.5]" />
                           </div>
                         ) : (
-                          <div className="w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-                          </div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                         )}
                       </div>
-                      <span className={`text-[10px] font-black uppercase tracking-tighter ${order.isPaid ? "text-green-500" : "text-amber-500"}`}>
+                      <span className={`text-[9px] font-black uppercase tracking-tighter ${order.isPaid ? "text-green-500" : "text-amber-500"}`}>
                         {order.isPaid ? "Оплачено" : "Ожидает"}
                       </span>
                     </div>
 
-                    <div className="xs:block sm:hidden md:block">
-                      <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Дата</span>
-                      <p className="font-bold text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+                    {/* Row 2, Col 1: Date */}
+                    <div className="order-3 sm:order-none">
+                      <span className="text-[9px] font-black text-zinc-400 uppercase block mb-0.5 tracking-widest">Дата</span>
+                      <p className="font-bold text-[11px] text-zinc-400 dark:text-zinc-500">
                         {format(new Date(order.createdAt), "dd MMM yyyy, HH:mm", { locale: ru })}
                       </p>
+                    </div>
+
+                    {/* Row 2, Col 2: Courses (Right aligned on mobile) */}
+                    <div className="order-4 sm:order-none text-right sm:text-left">
+                      <span className="text-[9px] font-black text-zinc-400 uppercase block mb-1 tracking-widest">Курсы</span>
+                      <div className="flex gap-1 flex-wrap justify-end sm:justify-start">
+                        {ids.length > 0 ? ids.map(id => (
+                          <span key={id} className="text-[8px] sm:text-[9px] bg-zinc-50 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded-md font-black italic text-zinc-500 dark:text-zinc-600 border border-zinc-100 dark:border-zinc-700/50">
+                            {courseNames[id] || id}
+                          </span>
+                        )) : <span className="text-[9px] text-zinc-300 font-bold uppercase italic">Пусто</span>}
+                      </div>
                     </div>
                   </div>
 

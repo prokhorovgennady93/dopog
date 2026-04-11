@@ -47,9 +47,13 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
     window.addEventListener('online', handleUpdate);
     window.addEventListener('offline-status-changed', handleUpdate);
     
+    // Pulse check for iOS staleness (every 5s)
+    const interval = setInterval(checkAllDownloaded, 5000);
+    
     return () => {
       window.removeEventListener('online', handleUpdate);
       window.removeEventListener('offline-status-changed', handleUpdate);
+      clearInterval(interval);
     };
   }, [themeIds.length, hasAccess]);
 

@@ -60,31 +60,29 @@ export function AdminNotifyManager() {
         }
 
         // New Order
-        if (data.latestOrder && data.latestOrder.id !== lastOrderIdRef.current) {
-          if (initRef.current) { 
-            triggerNotification(
-              data.latestOrder.id,
-              "ORDER",
-              "Новая заявка! 🚛",
-              `От: ${data.latestOrder.userName}`,
-              `/admin/orders/${data.latestOrder.id}`
-            );
-          }
+        const savedOrderId = localStorage.getItem("admin_last_order_id");
+        if (data.latestOrder && data.latestOrder.id !== savedOrderId) {
+          triggerNotification(
+            data.latestOrder.id,
+            "ORDER",
+            "Новая заявка! 🚛",
+            `От: ${data.latestOrder.userName}`,
+            `/admin/orders/${data.latestOrder.id}`
+          );
           lastOrderIdRef.current = data.latestOrder.id;
           localStorage.setItem("admin_last_order_id", data.latestOrder.id);
         }
 
         // New Payment
-        if (data.latestPayment && data.latestPayment.id !== lastPaymentIdRef.current) {
-          if (initRef.current) {
-            triggerNotification(
-              data.latestPayment.id,
-              "PAYMENT",
-              "Оплата получена! 💳",
-              `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
-              `/admin/orders/${data.latestPayment.id}`
-            );
-          }
+        const savedPaymentId = localStorage.getItem("admin_last_payment_id");
+        if (data.latestPayment && data.latestPayment.id !== savedPaymentId) {
+          triggerNotification(
+            data.latestPayment.id,
+            "PAYMENT",
+            "Оплата получена! 💳",
+            `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
+            `/admin/orders/${data.latestPayment.id}`
+          );
           lastPaymentIdRef.current = data.latestPayment.id;
           localStorage.setItem("admin_last_payment_id", data.latestPayment.id);
         }
