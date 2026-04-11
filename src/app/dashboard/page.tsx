@@ -31,7 +31,7 @@ import { OrderPaymentButton } from "@/components/dashboard/OrderPaymentButton";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
-function OrderComposition({ courseIds }: { courseIds: string | null }) {
+function OrderComposition({ courseIds, totalAmount }: { courseIds: string | null, totalAmount: number }) {
   const kitPrices: Record<string, number> = {
     "base": 5000,
     "tanks": 1500,
@@ -47,6 +47,9 @@ function OrderComposition({ courseIds }: { courseIds: string | null }) {
 
   try {
     const ids = JSON.parse(courseIds || "[]");
+    const coursesTotal = ids.reduce((sum: number, id: string) => sum + (kitPrices[id] || 1500), 0);
+    const deliveryPrice = Math.max(0, totalAmount - coursesTotal);
+
     return (
       <>
         {ids.map((id: string) => (
@@ -57,7 +60,7 @@ function OrderComposition({ courseIds }: { courseIds: string | null }) {
         ))}
         <div className="flex justify-between items-center text-xs pt-2 border-t border-zinc-200 dark:border-zinc-800">
           <span className="font-bold text-zinc-600 dark:text-zinc-400">Доставка</span>
-          <span className="font-black text-zinc-900 dark:text-white">0 ₽</span>
+          <span className="font-black text-zinc-900 dark:text-white">{deliveryPrice} ₽</span>
         </div>
       </>
     );
@@ -233,7 +236,7 @@ export default async function DashboardPage() {
 
                     <div className="mb-6 space-y-2 bg-zinc-50 dark:bg-zinc-800/30 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800/50">
                       <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Состав заказа</p>
-                      <OrderComposition courseIds={order.courseIds} />
+                      <OrderComposition courseIds={order.courseIds} totalAmount={order.totalAmount} />
                     </div>
 
                     <div className="space-y-3 mb-6">
