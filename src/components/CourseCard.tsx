@@ -17,7 +17,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ id, slug, title, description, icon, questionCount, hasAccess = false, themes = [] }: CourseCardProps) {
-  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "locked">("idle");
+  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "outdated" | "locked">("idle");
   const [progress, setProgress] = useState(0);
   const themeIds = themes.map(t => t.id);
 
@@ -30,9 +30,14 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
     const checkAllDownloaded = async () => {
       if (themeIds.length === 0) return;
       const results = await Promise.all(themeIds.map(checkTopicDownloaded));
-      const allDone = results.every(res => res === true);
-      if (allDone) setStatus("downloaded");
-      else setStatus("idle");
+      const allDone = results.every(res => res === "ok" || res === "outdated");
+      const someOutdated = results.some(res => res === "outdated");
+      
+      if (allDone) {
+        setStatus(someOutdated ? "outdated" : "downloaded");
+      } else {
+        setStatus("idle");
+      }
     };
     
     checkAllDownloaded();
@@ -47,7 +52,7 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
       return;
     }
 
-    if (status === "downloaded" || status === "downloading") return;
+    if (status === "downloading") return;
 
     setStatus("downloading");
     setProgress(0);
@@ -84,6 +89,8 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
             className={`relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all text-[9px] font-black uppercase tracking-wider ${
               status === "downloaded"
                 ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
+                : status === "outdated"
+                ? "bg-orange-500/10 border-orange-500/20 text-orange-600 hover:bg-orange-500/20"
                 : status === "downloading"
                 ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
                 : status === "locked"
@@ -100,6 +107,11 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
               <>
                 <ShieldCheck className="w-3 h-3" />
                 <span>Скачано</span>
+              </>
+            ) : status === "outdated" ? (
+              <>
+                <CloudDownload className="w-3 h-3" />
+                <span>Обновить</span>
               </>
             ) : status === "locked" ? (
               <>

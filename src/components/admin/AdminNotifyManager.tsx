@@ -15,18 +15,23 @@ interface NotificationStats {
 export function AdminNotifyManager() {
   const [activeToast, setActiveToast] = useState<{
     id: string;
-    type: "ORDER" | "PAYMENT";
+    type: "ORDER" | "PAYMENT" | "SYSTEM";
     title: string;
     message: string;
-    link: string;
+    link?: string;
   } | null>(null);
   
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const lastOrderIdRef = useRef<string | null>(null);
   const lastPaymentIdRef = useRef<string | null>(null);
   const initRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    // Initialize persistent audio object
+    audioRef.current = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
+    audioRef.current.volume = 0.5;
+
     // Load state
     const savedAudio = localStorage.getItem("admin_audio_enabled") === "true";
     setIsAudioEnabled(savedAudio);
@@ -85,41 +90,52 @@ export function AdminNotifyManager() {
       }
     };
 
-    const triggerNotification = (id: string, type: "ORDER" | "PAYMENT", title: string, message: string, link: string) => {
+    const triggerNotification = (id: string, type: "ORDER" | "PAYMENT" | "SYSTEM", title: string, message: string, link?: string) => {
       setActiveToast({ id, type, title, message, link });
       
       // Play Sound only if enabled and unlocked
-      if (localStorage.getItem("admin_audio_enabled") === "true") {
-        const audio = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
-        audio.volume = 0.5;
-        audio.play().catch(e => {
-          console.warn("Audio play blocked by browser. User interaction required.");
+      if (localStorage.getItem("admin_audio_enabled") === "true" && audioRef.current) {
+        audioRef.current.play().catch(e => {
+          console.warn("Audio play blocked by browser.");
           setIsAudioEnabled(false);
           localStorage.setItem("admin_audio_enabled", "false");
         });
       }
 
-      // Auto hide after 10 seconds
+      // Auto hide
       setTimeout(() => {
         setActiveToast(prev => prev?.id === id ? null : prev);
       }, 10000);
     };
 
-    // Initial check
-    checkNotifications();
+    // Store trigger for external use (like test)
+    (window as any).triggerAdminTest = () => triggerNotification("test", "SYSTEM", "Тест уведомления", "Звук и окна работают корректно! ✅");
 
+    checkNotifications();
     const interval = setInterval(checkNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const enableAudio = () => {
-    // Unlock audio context for Safari
-    const audio = new Audio("https://www.soundjay.com/buttons/beep-07a.mp3");
-    audio.volume = 0; // Silent play to unlock
-    audio.play().then(() => {
+    if (!audioRef.current) return;
+
+    // Unlock audio context
+    audioRef.current.play().then(() => {
       setIsAudioEnabled(true);
       localStorage.setItem("admin_audio_enabled", "true");
-    }).catch(console.error);
+      
+      // Immediate feedback: Trigger test notification
+      setActiveToast({
+        id: "activation-test",
+        type: "SYSTEM",
+        title: "Звук активирован! 🔔",
+        message: "Теперь вы будете получать звуковые уведомления о заказах."
+      });
+      setTimeout(() => setActiveToast(null), 5000);
+    }).catch(e => {
+      console.error("Audio unlock failed:", e);
+      alert("Не удалось включить звук. Пожалуйста, убедитесь, что страница не заблокирована браузером.");
+    });
   };
 
   return (
@@ -136,7 +152,7 @@ export function AdminNotifyManager() {
       )}
 
       {activeToast && (
-        <div className="fixed top-4 right-4 sm:right-8 z-[1000] animate-in slide-in-from-top-8 sm:slide-in-from-right-8 duration-500 w-full max-w-[calc(100%-2rem)] sm:w-[320px]">
+        <div className="fixed top-20 right-4 sm:right-8 z-[99999] animate-in slide-in-from-top-8 sm:slide-in-from-right-8 duration-500 w-full max-w-[calc(100%-2rem)] sm:w-[320px]">
           <div className="relative group overflow-hidden bg-white dark:bg-zinc-900 border-2 border-orange-500 shadow-2xl rounded-3xl p-5">
             {/* Glow effect */}
             <div className="absolute top-0 left-0 w-2 h-full bg-orange-500" />
@@ -150,9 +166,13 @@ export function AdminNotifyManager() {
 
             <div className="flex gap-4">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                activeToast.type === "ORDER" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
+                activeToast.type === "ORDER" ? "bg-blue-100 text-blue-600" : 
+                activeToast.type === "PAYMENT" ? "bg-green-100 text-green-600" :
+                "bg-orange-100 text-orange-600"
               }`}>
-                {activeToast.type === "ORDER" ? <Package className="w-6 h-6" /> : <CreditCard className="w-6 h-6" />}
+                {activeToast.type === "ORDER" ? <Package className="w-6 h-6" /> : 
+                 activeToast.type === "PAYMENT" ? <CreditCard className="w-6 h-6" /> :
+                 <Bell className="w-6 h-6" />}
               </div>
               <div className="flex-1 pr-4">
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">
@@ -165,13 +185,15 @@ export function AdminNotifyManager() {
                   {activeToast.message}
                 </p>
                 
-                <Link 
-                  href={activeToast.link}
-                  onClick={() => setActiveToast(null)}
-                  className="inline-flex items-center gap-2 text-xs font-black text-orange-600 hover:gap-3 transition-all"
-                >
-                  Открыть детали <Bell className="w-3 h-3" />
-                </Link>
+                {activeToast.link && (
+                  <Link 
+                    href={activeToast.link}
+                    onClick={() => setActiveToast(null)}
+                    className="inline-flex items-center gap-2 text-xs font-black text-orange-600 hover:gap-3 transition-all"
+                  >
+                    Открыть детали <Bell className="w-3 h-3" />
+                  </Link>
+                )}
               </div>
             </div>
           </div>

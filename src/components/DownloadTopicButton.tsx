@@ -13,12 +13,13 @@ interface DownloadTopicButtonProps {
 }
 
 export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }: DownloadTopicButtonProps) {
-  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "error" | "locked">("idle");
+  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "outdated" | "error" | "locked">("idle");
   const [progress, setProgress] = useState(0);
 
     const checkStatus = useCallback(async () => {
-      const isDownloaded = await checkTopicDownloaded(topicId);
-      if (isDownloaded) setStatus("downloaded");
+      const res = await checkTopicDownloaded(topicId);
+      if (res === "ok") setStatus("downloaded");
+      else if (res === "outdated") setStatus("outdated");
       else setStatus("idle");
     }, [topicId]);
 
@@ -50,7 +51,7 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
       return;
     }
 
-    if (status === "downloaded" || status === "downloading") return;
+    if (status === "downloading") return;
 
     setStatus("downloading");
     setProgress(0);
@@ -79,13 +80,15 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest ${
         status === "downloaded"
           ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
+          : status === "outdated"
+          ? "bg-orange-500/10 border-orange-500/20 text-orange-600 hover:bg-orange-500/20"
           : status === "downloading"
           ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
           : status === "locked"
           ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-300 opacity-60"
           : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-orange-500 hover:text-orange-600 active:scale-95 shadow-sm"
       }`}
-      title={status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Доступно офлайн" : "Скачать для работы без интернета")}
+      title={status === "outdated" ? "Обновить данные темы" : (status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Доступно офлайн" : "Скачать для работы без интернета"))}
     >
       {status === "downloading" ? (
         <>
@@ -96,6 +99,11 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
         <>
           <CheckCircle2 className="w-3.5 h-3.5" />
           <span>Скачано</span>
+        </>
+      ) : status === "outdated" ? (
+        <>
+          <CloudDownload className="w-3.5 h-3.5" />
+          <span>Обновить</span>
         </>
       ) : status === "locked" ? (
         <>

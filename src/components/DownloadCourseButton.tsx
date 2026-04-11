@@ -12,7 +12,7 @@ interface DownloadCourseButtonProps {
 }
 
 export function DownloadCourseButton({ courseId, themeIds, hasAccess }: DownloadCourseButtonProps) {
-  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "error" | "locked">("idle");
+  const [status, setStatus] = useState<"idle" | "downloading" | "downloaded" | "outdated" | "error" | "locked">("idle");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -21,19 +21,31 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
       return;
     }
     
-    // Check if ALL themes are downloaded
+    // Check if ALL themes are downloaded and up to date
     const checkAllThemes = async () => {
       let allDownloaded = true;
+      let someOutdated = false;
+      
       for (const tId of themeIds) {
-         const isDownloaded = await checkTopicDownloaded(tId);
-         if (!isDownloaded) {
+         const res = await checkTopicDownloaded(tId);
+         if (res === "missing") {
             allDownloaded = false;
             break;
          }
+         if (res === "outdated") {
+            someOutdated = true;
+         }
       }
       
-      if (themeIds.length > 0 && allDownloaded) setStatus("downloaded");
-      else setStatus("idle");
+      if (themeIds.length > 0) {
+        if (allDownloaded) {
+          setStatus(someOutdated ? "outdated" : "downloaded");
+        } else {
+          setStatus("idle");
+        }
+      } else {
+        setStatus("idle");
+      }
     };
     checkAllThemes();
   }, [themeIds, hasAccess]);
@@ -49,22 +61,21 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
       return;
     }
 
-    if (status === "downloaded" || status === "downloading") return;
+    if (status === "downloading") return;
 
     setStatus("downloading");
     setProgress(0);
 
     try {
+      // Re-download everything to ensure v2 integrity
       let downloadedCount = 0;
       for (const tId of themeIds) {
-        // Download sequentially to avoid aggressive rate limits/memory explosions on low end devices
         await downloadTopic(tId, courseId, () => {});
         downloadedCount++;
         setProgress(Math.round((downloadedCount / themeIds.length) * 100));
       }
       setStatus("downloaded");
       
-      // Notify all Topic Buttons to synchronize their status
       window.dispatchEvent(new CustomEvent('offline-status-changed', {
         detail: { courseId, themeIds }
       }));
@@ -82,13 +93,15 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-black uppercase tracking-widest ${
         status === "downloaded"
           ? "bg-green-500/10 border-green-500/20 text-green-600 cursor-default"
+          : status === "outdated"
+          ? "bg-orange-500/10 border-orange-500/20 text-orange-600 hover:bg-orange-500/20"
           : status === "downloading"
           ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400"
           : status === "locked"
           ? "bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-yellow-500 hover:text-yellow-600 active:scale-95 shadow-sm"
       }`}
-      title={status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Весь курс доступен офлайн" : "Скачать весь курс для работы без интернета")}
+      title={status === "outdated" ? "Обновить оффлайн данные" : (status === "locked" ? "Доступно в Premium" : (status === "downloaded" ? "Весь курс доступен офлайн" : "Скачать весь курс для работы без интернета"))}
     >
       {status === "downloading" ? (
         <>
@@ -99,6 +112,11 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
         <>
           <CheckCircle2 className="w-3.5 h-3.5" />
           <span>Скачано</span>
+        </>
+      ) : status === "outdated" ? (
+        <>
+          <CloudDownload className="w-3.5 h-3.5" />
+          <span>Обновить</span>
         </>
       ) : status === "locked" ? (
         <>
