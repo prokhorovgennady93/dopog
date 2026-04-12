@@ -43,12 +43,7 @@ export function Header({ session: initialSession }: HeaderProps) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
       }
-      if ('serviceWorker' in navigator) {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        for (const reg of registrations) {
-          await reg.unregister();
-        }
-      }
+      // We don't unregister SW here to allow them to re-sync immediately after reload
       setTimeout(() => window.location.reload(), 300);
     } catch (e) {
       console.error('Cache clear failed:', e);
@@ -98,7 +93,7 @@ export function Header({ session: initialSession }: HeaderProps) {
     <header 
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
+          ? "bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
           : "bg-white dark:bg-zinc-950 border-b border-transparent py-4"
       }`}
     >
@@ -178,7 +173,7 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Backdrop */}
       <div 
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-opacity duration-300 lg:hidden ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMenuOpen(false)}
@@ -186,12 +181,11 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Panel */}
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 isolate ${
+        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
-        style={{ willChange: 'transform' }}
       >
-        <div className="flex flex-col h-full p-6 overflow-y-auto">
+        <div className="flex flex-col h-full p-6">
           <div className="flex items-center justify-between mb-10">
             <span className="font-black text-xl uppercase tracking-tighter">Меню</span>
             <button 

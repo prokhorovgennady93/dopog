@@ -62,11 +62,22 @@ export function AdminNotifyManager() {
 
         const isFirstRun = !initRef.current;
 
-        // New Order
+        // 1. Initial Summary Notification (Show once on login/refresh)
+        if (isFirstRun && (data.unreadCount > 0 || data.unpaidCount > 0)) {
+          triggerNotification(
+            "summary-init",
+            "SYSTEM",
+            "Актуальный статус 📊",
+            `Заявок: ${data.unreadCount}, Неоплачено: ${data.unpaidCount}`,
+            "/admin/orders"
+          );
+        }
+
+        // 2. New Order logic
         const savedOrderId = localStorage.getItem("admin_last_order_id");
         if (data.latestOrder && data.latestOrder.id !== savedOrderId) {
+          // Only show single toast for NEW items that appear AFTER first load
           if (!isFirstRun) {
-            // Only notify if this is NOT the first check (prevents old order popup on load)
             triggerNotification(
               data.latestOrder.id,
               "ORDER",
@@ -79,7 +90,7 @@ export function AdminNotifyManager() {
           localStorage.setItem("admin_last_order_id", data.latestOrder.id);
         }
 
-        // New Payment
+        // 3. New Payment logic
         const savedPaymentId = localStorage.getItem("admin_last_payment_id");
         if (data.latestPayment && data.latestPayment.id !== savedPaymentId) {
           if (!isFirstRun) {
