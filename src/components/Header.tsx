@@ -13,7 +13,8 @@ import {
   BookMarked, 
   CreditCard, 
   UserCircle,
-  ClipboardList
+  ClipboardList,
+  RefreshCw
 } from "lucide-react";
 
 interface HeaderProps {
@@ -32,7 +33,28 @@ export function Header({ session: initialSession }: HeaderProps) {
   const currentSession = session || initialSession;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [cacheRefreshing, setCacheRefreshing] = useState(false);
   const pathname = usePathname();
+
+  const handleCacheRefresh = async () => {
+    setCacheRefreshing(true);
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+        }
+      }
+      setTimeout(() => window.location.reload(), 300);
+    } catch (e) {
+      console.error('Cache clear failed:', e);
+      setCacheRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -164,11 +186,12 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Panel */}
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 ${
+        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 isolate ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{ willChange: 'transform' }}
       >
-        <div className="flex flex-col h-full p-6">
+        <div className="flex flex-col h-full p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-10">
             <span className="font-black text-xl uppercase tracking-tighter">Меню</span>
             <button 
@@ -212,7 +235,17 @@ export function Header({ session: initialSession }: HeaderProps) {
             })}
           </nav>
 
-          <div className="mt-auto pt-10 flex flex-col gap-3">
+          <div className="mt-auto pt-6 flex flex-col gap-3">
+             {/* Cache refresh button */}
+             <button
+               onClick={handleCacheRefresh}
+               disabled={cacheRefreshing}
+               className="flex items-center justify-center gap-2 w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 py-3.5 rounded-2xl font-bold border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all text-sm disabled:opacity-60"
+             >
+               <RefreshCw className={`w-4 h-4 ${cacheRefreshing ? 'animate-spin' : ''}`} />
+               {cacheRefreshing ? 'Обновляем...' : 'Обновить кэш курсов'}
+             </button>
+
              {currentSession ? (
                <Link 
                  href="/dashboard"

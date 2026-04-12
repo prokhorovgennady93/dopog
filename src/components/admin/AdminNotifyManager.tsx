@@ -60,16 +60,21 @@ export function AdminNotifyManager() {
           }
         }
 
+        const isFirstRun = !initRef.current;
+
         // New Order
         const savedOrderId = localStorage.getItem("admin_last_order_id");
         if (data.latestOrder && data.latestOrder.id !== savedOrderId) {
-          triggerNotification(
-            data.latestOrder.id,
-            "ORDER",
-            "Новая заявка! 🚛",
-            `От: ${data.latestOrder.userName}`,
-            `/admin/orders/${data.latestOrder.id}`
-          );
+          if (!isFirstRun) {
+            // Only notify if this is NOT the first check (prevents old order popup on load)
+            triggerNotification(
+              data.latestOrder.id,
+              "ORDER",
+              "Новая заявка! 🚛",
+              `От: ${data.latestOrder.userName}`,
+              `/admin/orders/${data.latestOrder.id}`
+            );
+          }
           lastOrderIdRef.current = data.latestOrder.id;
           localStorage.setItem("admin_last_order_id", data.latestOrder.id);
         }
@@ -77,13 +82,15 @@ export function AdminNotifyManager() {
         // New Payment
         const savedPaymentId = localStorage.getItem("admin_last_payment_id");
         if (data.latestPayment && data.latestPayment.id !== savedPaymentId) {
-          triggerNotification(
-            data.latestPayment.id,
-            "PAYMENT",
-            "Оплата получена! 💳",
-            `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
-            `/admin/orders/${data.latestPayment.id}`
-          );
+          if (!isFirstRun) {
+            triggerNotification(
+              data.latestPayment.id,
+              "PAYMENT",
+              "Оплата получена! 💳",
+              `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
+              `/admin/orders/${data.latestPayment.id}`
+            );
+          }
           lastPaymentIdRef.current = data.latestPayment.id;
           localStorage.setItem("admin_last_payment_id", data.latestPayment.id);
         }

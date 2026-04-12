@@ -11,6 +11,7 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { OfflineSync } from "@/components/OfflineSync";
 import { Header } from "@/components/Header";
+import { AdminNotifyManager } from "@/components/admin/AdminNotifyManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,6 +63,7 @@ export default async function RootLayout({
         <Providers>
           <OfflineIndicator />
           <OfflineSync />
+          {session?.user?.isAdmin && <AdminNotifyManager />}
           <Header session={session} />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
