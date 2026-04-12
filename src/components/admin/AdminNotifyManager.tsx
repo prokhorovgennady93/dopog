@@ -60,48 +60,30 @@ export function AdminNotifyManager() {
           }
         }
 
-        const isFirstRun = !initRef.current;
-
-        // 1. Initial Summary Notification (Show once on login/refresh)
-        if (isFirstRun && (data.unreadCount > 0 || data.unpaidCount > 0)) {
-          triggerNotification(
-            "summary-init",
-            "SYSTEM",
-            "Актуальный статус 📊",
-            `Заявок: ${data.unreadCount}, Неоплачено: ${data.unpaidCount}`,
-            "/admin/orders"
-          );
-        }
-
-        // 2. New Order logic
+        // New Order
         const savedOrderId = localStorage.getItem("admin_last_order_id");
         if (data.latestOrder && data.latestOrder.id !== savedOrderId) {
-          // Only show single toast for NEW items that appear AFTER first load
-          if (!isFirstRun) {
-            triggerNotification(
-              data.latestOrder.id,
-              "ORDER",
-              "Новая заявка! 🚛",
-              `От: ${data.latestOrder.userName}`,
-              `/admin/orders/${data.latestOrder.id}`
-            );
-          }
+          triggerNotification(
+            data.latestOrder.id,
+            "ORDER",
+            "Новая заявка! 🚛",
+            `От: ${data.latestOrder.userName}`,
+            `/admin/orders/${data.latestOrder.id}`
+          );
           lastOrderIdRef.current = data.latestOrder.id;
           localStorage.setItem("admin_last_order_id", data.latestOrder.id);
         }
 
-        // 3. New Payment logic
+        // New Payment
         const savedPaymentId = localStorage.getItem("admin_last_payment_id");
         if (data.latestPayment && data.latestPayment.id !== savedPaymentId) {
-          if (!isFirstRun) {
-            triggerNotification(
-              data.latestPayment.id,
-              "PAYMENT",
-              "Оплата получена! 💳",
-              `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
-              `/admin/orders/${data.latestPayment.id}`
-            );
-          }
+          triggerNotification(
+            data.latestPayment.id,
+            "PAYMENT",
+            "Оплата получена! 💳",
+            `${data.latestPayment.userName}: ${data.latestPayment.totalAmount} ₽`,
+            `/admin/orders/${data.latestPayment.id}`
+          );
           lastPaymentIdRef.current = data.latestPayment.id;
           localStorage.setItem("admin_last_payment_id", data.latestPayment.id);
         }

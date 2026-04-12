@@ -13,8 +13,7 @@ import {
   BookMarked, 
   CreditCard, 
   UserCircle,
-  ClipboardList,
-  RefreshCw
+  ClipboardList
 } from "lucide-react";
 
 interface HeaderProps {
@@ -33,23 +32,7 @@ export function Header({ session: initialSession }: HeaderProps) {
   const currentSession = session || initialSession;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [cacheRefreshing, setCacheRefreshing] = useState(false);
   const pathname = usePathname();
-
-  const handleCacheRefresh = async () => {
-    setCacheRefreshing(true);
-    try {
-      if ('caches' in window) {
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
-      }
-      // We don't unregister SW here to allow them to re-sync immediately after reload
-      setTimeout(() => window.location.reload(), 300);
-    } catch (e) {
-      console.error('Cache clear failed:', e);
-      setCacheRefreshing(false);
-    }
-  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -93,7 +76,7 @@ export function Header({ session: initialSession }: HeaderProps) {
     <header 
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
+          ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
           : "bg-white dark:bg-zinc-950 border-b border-transparent py-4"
       }`}
     >
@@ -173,7 +156,7 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Backdrop */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMenuOpen(false)}
@@ -181,7 +164,7 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Panel */}
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto ${
+        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -229,17 +212,7 @@ export function Header({ session: initialSession }: HeaderProps) {
             })}
           </nav>
 
-          <div className="mt-auto pt-6 flex flex-col gap-3">
-             {/* Cache refresh button */}
-             <button
-               onClick={handleCacheRefresh}
-               disabled={cacheRefreshing}
-               className="flex items-center justify-center gap-2 w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 py-3.5 rounded-2xl font-bold border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all text-sm disabled:opacity-60"
-             >
-               <RefreshCw className={`w-4 h-4 ${cacheRefreshing ? 'animate-spin' : ''}`} />
-               {cacheRefreshing ? 'Обновляем...' : 'Обновить кэш курсов'}
-             </button>
-
+          <div className="mt-auto pt-10 flex flex-col gap-3">
              {currentSession ? (
                <Link 
                  href="/dashboard"

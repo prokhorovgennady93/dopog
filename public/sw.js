@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dopog-cache-v5';
+const CACHE_NAME = 'dopog-cache-v4.1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',

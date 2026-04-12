@@ -3,7 +3,7 @@
  * Version 2: Added cache versioning and improved snapshot logic for SSG
  */
 
-export const CURRENT_OFFLINE_VERSION = 3;
+export const CURRENT_OFFLINE_VERSION = 2;
 
 export async function checkTopicDownloaded(topicId: string): Promise<"missing" | "outdated" | "ok"> {
   if (typeof window === "undefined") return "missing";
@@ -18,7 +18,7 @@ export async function checkTopicDownloaded(topicId: string): Promise<"missing" |
   // 2. Physical Cache Verification (Source of Truth)
   if ("caches" in window) {
     try {
-      const cache = await caches.open("dopog-cache-v5");
+      const cache = await caches.open("dopog-cache-v2");
       const match = await cache.match(`/api/topics/${topicId}/questions`);
       return match ? "ok" : "missing";
     } catch (e) {
@@ -46,7 +46,7 @@ export async function downloadTopic(
     localStorage.setItem(`topic_${topicId}_v`, CURRENT_OFFLINE_VERSION.toString());
 
     if ("caches" in window) {
-      const cache = await caches.open("dopog-cache-v5");
+      const cache = await caches.open("dopog-cache-v2");
       
       // Cache API response
       await cache.put(
