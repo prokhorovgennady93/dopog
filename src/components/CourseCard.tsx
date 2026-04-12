@@ -43,12 +43,16 @@ export function CourseCard({ id, slug, title, description, icon, questionCount, 
     checkAllDownloaded();
 
     // Listen for network and sync events
-    const handleUpdate = () => checkAllDownloaded();
+    const handleUpdate = () => {
+      console.log("[Card] Network changed, immediate re-check...");
+      checkAllDownloaded();
+    };
+    
     window.addEventListener('online', handleUpdate);
     window.addEventListener('offline-status-changed', handleUpdate);
     
-    // Pulse check for iOS staleness (every 5s)
-    const interval = setInterval(checkAllDownloaded, 5000);
+    // Aggressive pulse check for iOS staleness (every 2s)
+    const interval = setInterval(checkAllDownloaded, 2000);
     
     return () => {
       window.removeEventListener('online', handleUpdate);

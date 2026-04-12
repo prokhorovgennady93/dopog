@@ -34,14 +34,15 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
     // Handle global offline status updates and network restoration
     useEffect(() => {
       const handleGlobalUpdate = () => {
+        console.log("[TopicButton] Global state update or online detected...");
         checkStatus();
       };
       
       window.addEventListener('offline-status-changed', handleGlobalUpdate);
       window.addEventListener('online', handleGlobalUpdate);
       
-      // Pulse check for iOS staleness (every 5s)
-      const interval = setInterval(checkStatus, 5000);
+      // Aggressive pulse check for iOS staleness (every 2s)
+      const interval = setInterval(checkStatus, 2000);
       
       return () => {
         window.removeEventListener('offline-status-changed', handleGlobalUpdate);

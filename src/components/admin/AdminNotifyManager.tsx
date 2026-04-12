@@ -46,7 +46,8 @@ export function AdminNotifyManager() {
 
     const checkNotifications = async () => {
       try {
-        const res = await fetch("/api/admin/notifications/stats");
+        // Cache-busting URL to kill any browser/SW caching
+        const res = await fetch(`/api/admin/notifications/stats?t=${Date.now()}`);
         if (!res.ok) return;
         const data: NotificationStats = await res.json();
 
@@ -112,7 +113,18 @@ export function AdminNotifyManager() {
 
     checkNotifications();
     const interval = setInterval(checkNotifications, 30000);
-    return () => clearInterval(interval);
+
+    // Immediate check when network is restored
+    const handleOnline = () => {
+      console.log("[AdminNotify] Connection restored, immediate check...");
+      checkNotifications();
+    };
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+    };
   }, []);
 
   const enableAudio = () => {

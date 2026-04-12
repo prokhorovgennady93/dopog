@@ -50,12 +50,16 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
     checkAllThemes();
 
     // Listen for network and sync events
-    const handleUpdate = () => checkAllThemes();
+    const handleUpdate = () => {
+      console.log("[Button] Network changed, immediate re-check...");
+      checkAllThemes();
+    };
+    
     window.addEventListener('online', handleUpdate);
     window.addEventListener('offline-status-changed', handleUpdate);
     
-    // Pulse check for iOS staleness (every 5s)
-    const interval = setInterval(checkAllThemes, 5000);
+    // Aggressive pulse check for iOS staleness (every 2s)
+    const interval = setInterval(checkAllThemes, 2000);
     
     return () => {
       window.removeEventListener('online', handleUpdate);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dopog-cache-v3';
+const CACHE_NAME = 'dopog-cache-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -30,11 +30,9 @@ self.addEventListener('activate', (event) => {
 async function updateCache(request, response) {
   if (response && response.status === 200 && response.type === 'basic') {
     const cache = await caches.open(CACHE_NAME);
-    // Strip query params for "static" matching
     const url = new URL(request.url);
     url.search = ''; 
     await cache.put(url.toString(), response.clone());
-    // Also store original if it has params but is important
     if (request.url !== url.toString()) {
        await cache.put(request, response.clone());
     }
@@ -47,15 +45,19 @@ self.addEventListener('fetch', (event) => {
 
   if (!isSameOrigin) return;
 
+  // CRITICAL: Block any API or Auth requests from Service Worker caching logic
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/data/')) {
+    // Let these go directly to network
+    return;
+  }
+
   // 1. Navigation (HTML Snapshots)
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).then((response) => {
-        // Online: update cache in background
         updateCache(event.request, response.clone());
         return response;
       }).catch(async () => {
-        // Offline: try cache
         let cached = await caches.match(event.request);
         if (!cached) {
           cached = await caches.match(event.request, { ignoreSearch: true });
@@ -63,7 +65,6 @@ self.addEventListener('fetch', (event) => {
         
         if (cached) return cached;
         
-        // Final fallbacks
         if (url.pathname.startsWith('/course/')) {
            const slug = url.pathname.split('/')[2];
            return caches.match(`/course/${slug}`, { ignoreSearch: true }) || caches.match('/');
@@ -75,7 +76,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Next.js RSC Data requests (very important for offline navigation)
+  // 2. Next.js RSC Data requests
   const isRSC = url.searchParams.has('_rsc') || event.request.headers.get('RSC') === '1';
   if (isRSC) {
     event.respondWith(
@@ -89,11 +90,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Asset Interceptor (Cache-First with Background Update)
+  // 3. Asset Interceptor
   if (event.request.method === 'GET') {
-    if (url.pathname.startsWith('/api/auth')) return;
-    if (url.pathname.startsWith('/api/admin/notifications')) return;
-
     event.respondWith(
       caches.match(event.request).then((cached) => {
         const fetchPromise = fetch(event.request).then((res) => {
