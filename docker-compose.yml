@@ -1,6 +1,9 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY}
     container_name: adr-platform
     expose:
       - "3000"
@@ -11,6 +14,8 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:-9f8e7d6c5b4a32109f8e7d6c5b4a3210}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
       - AUTH_TRUST_HOST=true
+      - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
     restart: always
 
   caddy:

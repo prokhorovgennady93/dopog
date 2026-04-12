@@ -23,6 +23,10 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 ENV CI=true
 
+# Add build-time environment variables for Next.js client-side
+ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY
+ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY
+
 # Generate Prisma Client
 RUN npx prisma generate
 
