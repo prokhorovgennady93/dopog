@@ -488,9 +488,6 @@ export function QuestionView({
             <div className="flex-1 flex flex-col gap-4 animate-in slide-in-from-bottom-4 duration-500">
               <div className="bg-white dark:bg-zinc-900/40 p-5 sm:p-6 rounded-r-3xl rounded-l-none border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500" />
-                <span className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-[0.2em] mb-2 block">
-                  {currentQuestion.topic}
-                </span>
                 <h3 className="text-lg sm:text-xl font-bold leading-relaxed">
                   {currentQuestion.text}
                 </h3>
