@@ -48,14 +48,18 @@ export async function sendPushNotification(userId: string, title: string, body: 
     // Clean up expired subscriptions
     const expiredEndpoints: string[] = [];
     results.forEach((result, index) => {
+      const subId = subscriptions[index].id;
+      const endpoint = subscriptions[index].endpoint;
+
       if (result.status === 'rejected') {
-        console.error(`[PushService] Failed to send to ${subscriptions[index].id}:`, result.reason);
         const error = result.reason as any;
+        console.error(`[PushService] Failed to send to ${subId}. Status: ${error.statusCode}. Reason: ${error.body || error.message}`);
+        
         if (error.statusCode === 404 || error.statusCode === 410) {
-          expiredEndpoints.push(subscriptions[index].endpoint);
+          expiredEndpoints.push(endpoint);
         }
       } else {
-        console.log(`[PushService] Successfully sent to subscription ${subscriptions[index].id}`);
+        console.log(`[PushService] Successfully sent to subscription ${subId}`);
       }
     });
 

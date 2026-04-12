@@ -12,6 +12,8 @@ export function PushManager() {
   const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
+    console.log("[PushManager] VAPID Key status:", VAPID_PUBLIC_KEY ? "LOADED" : "MISSING");
+    
     if ("Notification" in window && "serviceWorker" in navigator) {
       setIsSupported(true);
       setPermission(Notification.permission);
@@ -20,6 +22,9 @@ export function PushManager() {
       navigator.serviceWorker.ready.then(reg => {
         reg.pushManager.getSubscription().then(sub => {
           setHasSubscription(!!sub);
+          if (sub) {
+             console.log("[PushManager] Active subscription found:", sub.endpoint.substring(0, 30) + "...");
+          }
         });
       });
     }
@@ -44,6 +49,16 @@ export function PushManager() {
 
     try {
       setIsSubscribing(true);
+      
+      const registration = await navigator.serviceWorker.ready;
+      
+      // FORCE CLEANUP: Unsubscribe existing if any to avoid stale tokens
+      const existingSub = await registration.pushManager.getSubscription();
+      if (existingSub) {
+        console.log("[PushManager] Unsubscribing from existing session...");
+        await existingSub.unsubscribe();
+      }
+
       const perm = await Notification.requestPermission();
       setPermission(perm);
 
@@ -51,9 +66,8 @@ export function PushManager() {
         setIsSubscribing(false);
         return;
       }
-
-      const registration = await navigator.serviceWorker.ready;
       
+      console.log("[PushManager] Subscribing with key:", VAPID_PUBLIC_KEY);
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
@@ -71,6 +85,7 @@ export function PushManager() {
       setHasSubscription(true);
       setPermission(Notification.permission);
       console.log("Push subscription successful");
+      alert("Уведомления успешно подключены! Проверьте тестовый пуш.");
     } catch (err) {
       console.error("Push subscription error:", err);
     } finally {
