@@ -32,24 +32,29 @@ function CheckoutContent() {
   const isKitOrder = type === "kit_order";
 
   const handleSimulatePayment = async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      console.warn("[Checkout] No session user found!");
+      return;
+    }
 
+    console.log("[Checkout] Starting simulation for:", { type, courseId, paymentId });
     setIsProcessing(true);
     try {
       const response = await fetch("/api/payments/webhook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          paymentId,
+          paymentId: paymentId || `sim_${Date.now()}`,
           userId: session.user.id,
           status: "succeeded",
-          type,
-          courseId,
-          orderId,
+          type: type || "full_access", // Ensure type is passed
+          courseId: courseId, // Ensure courseId is passed
+          orderId: orderId,
         }),
       });
 
       if (response.ok) {
+        console.log("[Checkout] Simulation webhook success! Refreshing session...");
         setIsSuccess(true);
         await update(); // refresh session to get new access
 
@@ -60,6 +65,9 @@ function CheckoutContent() {
             router.push("/dashboard?payment=success");
           }
         }, 1500);
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        console.error("[Checkout] Webhook failed:", errData);
       }
     } catch (error) {
       console.error("Payment simulation failed:", error);

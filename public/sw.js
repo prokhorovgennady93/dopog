@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dopog-cache-v4';
+const CACHE_NAME = 'dopog-cache-v4.1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -31,9 +31,11 @@ async function updateCache(request, response) {
   if (response && response.status === 200 && response.type === 'basic') {
     const cache = await caches.open(CACHE_NAME);
     const url = new URL(request.url);
-    url.search = ''; 
-    await cache.put(url.toString(), response.clone());
-    if (request.url !== url.toString()) {
+    const cleanUrl = url.origin + url.pathname;
+    
+    // Cache both exact and clean URLs
+    await cache.put(cleanUrl, response.clone());
+    if (request.url !== cleanUrl) {
        await cache.put(request, response.clone());
     }
   }
@@ -45,9 +47,8 @@ self.addEventListener('fetch', (event) => {
 
   if (!isSameOrigin) return;
 
-  // CRITICAL: Block any API or Auth requests from Service Worker caching logic
+  // CRITICAL: Block any API or Auth requests from Service Worker caching
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/data/')) {
-    // Let these go directly to network
     return;
   }
 
@@ -57,20 +58,37 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request).then((response) => {
         updateCache(event.request, response.clone());
         return response;
-      }).catch(async () => {
-        let cached = await caches.match(event.request);
-        if (!cached) {
-          cached = await caches.match(event.request, { ignoreSearch: true });
+      }).catch(async (err) => {
+        console.log('[SW] Navigation fetch failed, searching cache for:', url.pathname);
+        
+        // Strategy: Match exact, then ignoreSearch, then clean path
+        const strategy = [
+          event.request,
+          url.pathname,
+          url.origin + url.pathname
+        ];
+
+        for (const target of strategy) {
+          const match = await caches.match(target, { ignoreSearch: true });
+          if (match) return match;
         }
         
-        if (cached) return cached;
-        
+        // Course specific fallback
         if (url.pathname.startsWith('/course/')) {
            const slug = url.pathname.split('/')[2];
-           return caches.match(`/course/${slug}`, { ignoreSearch: true }) || caches.match('/');
+           const courseMatch = await caches.match(`/course/${slug}`, { ignoreSearch: true });
+           if (courseMatch) return courseMatch;
         }
         
-        return caches.match('/');
+        // Last resort: Home Page
+        const homeMatch = await caches.match('/', { ignoreSearch: true });
+        if (homeMatch) return homeMatch;
+
+        // EMERGENCY: Safari crashes on undefined. Return a valid Response.
+        return new Response(
+          '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div style="padding: 20px; font-family: sans-serif; text-align: center;"><h3>Вы в оффлайне</h3><p>Эта страница еще не была скачана для работы без интернета.</p><a href="/">На главную</a></div></body></html>',
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
       })
     );
     return;
