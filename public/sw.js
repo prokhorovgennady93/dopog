@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dopog-cache-v4.1';
+const CACHE_NAME = 'dopog-cache-v4.2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -54,11 +54,15 @@ self.addEventListener('fetch', (event) => {
 
   // 1. Navigation (HTML Snapshots)
   if (event.request.mode === 'navigate') {
+    // If we are online, we MUST try network first to avoid "stale" pages
     event.respondWith(
       fetch(event.request).then((response) => {
-        updateCache(event.request, response.clone());
+        // Only update cache if it's a valid successful response
+        if (response.ok) {
+          updateCache(event.request, response.clone());
+        }
         return response;
-      }).catch(async (err) => {
+      }).catch(async () => {
         console.log('[SW] Navigation fetch failed, searching cache for:', url.pathname);
         
         // Strategy: Match exact, then ignoreSearch, then clean path
@@ -125,4 +129,49 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
+});
+
+// 4. Push Notifications
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  try {
+    const data = event.data.json();
+    const options = {
+      body: data.body || 'У вас новое уведомление',
+      icon: data.icon || '/icon-192x192.png',
+      badge: '/icon-192x192.png',
+      data: {
+        url: data.url || '/'
+      },
+      vibrate: [100, 50, 100],
+      actions: data.actions || []
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'ДОПОГ Экзамен', options)
+    );
+  } catch (err) {
+    console.error('[SW] Push error:', err);
+  }
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const urlToOpen = event.notification.data.url;
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Check if there is already a window open with this URL
+      for (let client of windowClients) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If no window is open, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/../auth";
 import { db } from "@/lib/db";
+import { sendPushToAdmin } from "@/lib/push-service";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -44,6 +45,13 @@ export async function POST(req: Request) {
         isSentToDashboard: true
       }
     });
+
+    // Send notification to admin
+    await sendPushToAdmin(
+      "Новая заявка! 📝",
+      `Поступила заявка от ${userName || 'курсанта'}. Сумма: ${total} ₽`,
+      '/admin/orders'
+    ).catch(e => console.error("Admin push failed:", e));
 
     return NextResponse.json(order);
   } catch (error: any) {

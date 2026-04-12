@@ -3,7 +3,8 @@
  * Version 2: Added cache versioning and improved snapshot logic for SSG
  */
 
-export const CURRENT_OFFLINE_VERSION = 2;
+export const CURRENT_OFFLINE_VERSION = 3;
+export const OFFLINE_CACHE_NAME = "dopog-cache-v4.2";
 
 export async function checkTopicDownloaded(topicId: string): Promise<"missing" | "outdated" | "ok"> {
   if (typeof window === "undefined") return "missing";
@@ -16,11 +17,18 @@ export async function checkTopicDownloaded(topicId: string): Promise<"missing" |
   if (cachedVersion < CURRENT_OFFLINE_VERSION) return "outdated";
 
   // 2. Physical Cache Verification (Source of Truth)
-  if ("caches" in window) {
+  if (typeof window !== "undefined" && "caches" in window) {
     try {
-      const cache = await caches.open("dopog-cache-v2");
+      const cache = await caches.open(OFFLINE_CACHE_NAME);
       const match = await cache.match(`/api/topics/${topicId}/questions`);
-      return match ? "ok" : "missing";
+      if (!match) return "missing";
+      
+      // Also check if the route itself is cached
+      const courseId = localStorage.getItem(`topic_${topicId}_course`) || "base";
+      const routeMatch = await cache.match(`/study/${courseId}?topicId=${topicId}`);
+      if (!routeMatch) return "missing";
+
+      return "ok";
     } catch (e) {
       return "missing";
     }
@@ -46,7 +54,7 @@ export async function downloadTopic(
     localStorage.setItem(`topic_${topicId}_v`, CURRENT_OFFLINE_VERSION.toString());
 
     if ("caches" in window) {
-      const cache = await caches.open("dopog-cache-v2");
+      const cache = await caches.open(OFFLINE_CACHE_NAME);
       
       // Cache API response
       await cache.put(
@@ -101,7 +109,7 @@ export async function downloadCourse(
   if (typeof window === "undefined") return;
 
   if ("caches" in window) {
-    const cache = await caches.open("dopog-cache-v2");
+    const cache = await caches.open(OFFLINE_CACHE_NAME);
     
     // Snaphsot core routes
     const snapshots = [

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { auth } from "@/../auth";
+import { sendPushToAdmin } from "@/lib/push-service";
 
 const RegisterSchema = z.object({
   phone: z.string().min(10, "Введите корректный номер телефона"),
@@ -44,6 +45,13 @@ export async function registerUser(formData: FormData) {
         password: hashedPassword,
       },
     });
+
+    // Send notification to admin
+    await sendPushToAdmin(
+      "Новый курсант! 👋",
+      `Зарегистрирован новый пользователь: ${phone}`,
+      '/admin'
+    ).catch(e => console.error("Admin push failed:", e));
 
     return { 
       success: true, 

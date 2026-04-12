@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { sendPushNotification, sendPushToAdmin } from "@/lib/push-service";
 
 export async function POST(req: Request) {
   try {
@@ -18,13 +19,27 @@ export async function POST(req: Request) {
       });
       console.log(`[Webhook] Order ${orderId} marked as PAID for user ${userId}`);
     } else if (type === "single_course" && courseId) {
-      // Create a Purchase record for the specific course
-      await db.purchase.upsert({
-        where: { userId_courseId: { userId, courseId } },
-        create: { userId, courseId, expiresAt },
-        update: { expiresAt },
+      // Find course by ID or slug to get the real CUID
+      const course = await db.course.findFirst({
+        where: {
+          OR: [
+            { id: courseId },
+            { slug: courseId }
+          ]
+        }
       });
-      console.log(`[Webhook] User ${userId} purchased course ${courseId} until ${expiresAt.toISOString()}`);
+
+      if (course) {
+        // Create a Purchase record for the specific course using is real ID
+        await db.purchase.upsert({
+          where: { userId_courseId: { userId, courseId: course.id } },
+          create: { userId, courseId: course.id, expiresAt },
+          update: { expiresAt },
+        });
+        console.log(`[Webhook] User ${userId} purchased course ${course.slug} (${course.id}) until ${expiresAt.toISOString()}`);
+      } else {
+        console.warn(`[Webhook] Course not found for ID/Slug: ${courseId}`);
+      }
     } else {
       // Full access — set hasFullAccess + expiration
       await db.user.update({
@@ -35,6 +50,34 @@ export async function POST(req: Request) {
         },
       });
       console.log(`[Webhook] User ${userId} now has Full Access until ${expiresAt.toISOString()}`);
+    }
+
+    // --- PUSH NOTIFICATIONS ---
+    try {
+      if (type === "single_course" && courseId) {
+        await sendPushNotification(
+          userId,
+          "Курс активирован! 🚛",
+          "Ваш доступ к Базовому курсу успешно открыт. Приступайте к обучению!",
+          "/dashboard"
+        );
+      } else if (type === "kit_order") {
+        await sendPushNotification(
+          userId,
+          "Заказ оплачен! 📦",
+          "Мы получили оплату за комплект документов и скоро начнем подговку.",
+          "/admin/orders" // Or user orders page if exists
+        );
+      }
+
+      // Always notify admin
+      await sendPushToAdmin(
+        "Оплата получена! 💳",
+        `Пользователь ${userId} совершил оплату (${type})`,
+        "/admin/orders"
+      );
+    } catch (pushError) {
+      console.error("[Webhook] Push notification error:", pushError);
     }
 
     return NextResponse.json({ success: true });

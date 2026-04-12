@@ -14,4 +14,9 @@ const createPrismaClient = () => {
 
 export const db = globalForPrisma.prisma || createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// In development, we attach the client to the global object to prevent 
+// multiple instances from being created during hot-reloading, 
+// but we should ensure it's the latest one if the schema changed.
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = db;
+}

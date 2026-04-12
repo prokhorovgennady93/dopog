@@ -34,7 +34,6 @@ export function DownloadTopicButton({ topicId, topicTitle, courseId, hasAccess }
     // Handle global offline status updates and network restoration
     useEffect(() => {
       const handleGlobalUpdate = () => {
-        console.log("[TopicButton] Global state update or online detected...");
         checkStatus();
       };
       

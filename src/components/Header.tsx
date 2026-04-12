@@ -73,90 +73,92 @@ export function Header({ session: initialSession }: HeaderProps) {
   }
 
   return (
-    <header 
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
-          : "bg-white dark:bg-zinc-950 border-b border-transparent py-4"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:scale-105 transition-transform duration-300">
-            <span className="text-black font-black text-[10px] tracking-tighter">ADR</span>
-          </div>
-          <div className="flex flex-col -space-y-1">
-            <span className="font-black text-lg tracking-tight">ДОПОГ Экзамен</span>
-          </div>
-        </Link>
+    <>
+      <header 
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled 
+            ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
+            : "bg-white dark:bg-zinc-950 border-b border-transparent py-4"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:scale-105 transition-transform duration-300">
+              <span className="text-black font-black text-[10px] tracking-tighter">ADR</span>
+            </div>
+            <div className="flex flex-col -space-y-1">
+              <span className="font-black text-lg tracking-tight">ДОПОГ Экзамен</span>
+            </div>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`relative px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
-                  isActive 
-                    ? "text-orange-600 bg-orange-50 dark:bg-orange-500/10" 
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                }`}
-              >
-                {link.name}
-                {link.badge !== undefined && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white animate-pulse">
-                    {link.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                    isActive 
+                      ? "text-orange-600 bg-orange-50 dark:bg-orange-500/10" 
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                  }`}
+                >
+                  {link.name}
+                  {link.badge !== undefined && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white animate-pulse">
+                      {link.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
 
-        {/* Auth Actions / Profile */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2">
-            {!currentSession ? (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-orange-600 transition-colors px-3 py-2"
-                >
-                  Вход
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-zinc-900 dark:bg-white text-white dark:text-black text-sm font-black px-5 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md"
-                >
-                  Регистрация
-                </Link>
-              </>
-            ) : (
-              <Link 
+          {/* Auth Actions / Profile */}
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              {!currentSession ? (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:text-orange-600 transition-colors px-3 py-2"
+                  >
+                    Вход
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-zinc-900 dark:bg-white text-white dark:text-black text-sm font-black px-5 py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md"
+                  >
+                    Регистрация
+                  </Link>
+                </>
+              ) : (
+                <Link 
                 href="/dashboard" 
                 className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-yellow-500/10 active:scale-95"
               >
                 Личный кабинет
               </Link>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Mobile Menu Toggle */}
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400"
-          >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+            {/* Mobile Menu Toggle */}
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400"
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Mobile Menu Backdrop */}
       <div 
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-md z-[60] transition-opacity duration-300 lg:hidden ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMenuOpen(false)}
@@ -164,7 +166,7 @@ export function Header({ session: initialSession }: HeaderProps) {
 
       {/* Mobile Menu Panel */}
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-50 shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 ${
+        className={`fixed right-0 top-0 bottom-0 w-[85%] max-w-xs bg-white dark:bg-zinc-950 z-[70] shadow-2xl transform transition-transform duration-300 ease-out lg:hidden border-l border-zinc-200 dark:border-zinc-800 ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -239,6 +241,7 @@ export function Header({ session: initialSession }: HeaderProps) {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
+
 }

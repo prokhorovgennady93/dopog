@@ -51,7 +51,6 @@ export function DownloadCourseButton({ courseId, themeIds, hasAccess }: Download
 
     // Listen for network and sync events
     const handleUpdate = () => {
-      console.log("[Button] Network changed, immediate re-check...");
       checkAllThemes();
     };
     

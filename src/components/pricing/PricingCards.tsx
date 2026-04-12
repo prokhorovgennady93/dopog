@@ -10,18 +10,18 @@ export function PricingCards() {
   const { data: session } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
-  const [selectedBasicCourse, setSelectedBasicCourse] = useState("base");
+  const [selectedBasicCourse, setSelectedBasicCourse] = useState("basic");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const courseNames: Record<string, string> = {
-    "base": "Базовый курс",
+    "basic": "Базовый курс",
     "tanks": "Цистерны",
     "class1": "Класс 1 (Взрывчатые)",
     "class7": "Класс 7 (Радиоактивные)"
   };
 
   const courseIcons: Record<string, string> = {
-    "base": "🚛",
+    "basic": "🚛",
     "tanks": "⛽",
     "class1": "🧨",
     "class7": "☢️"
