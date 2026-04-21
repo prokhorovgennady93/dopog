@@ -15,6 +15,7 @@ import {
   UserCircle,
   ClipboardList
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 interface HeaderProps {
   session: any;
@@ -78,14 +79,14 @@ export function Header({ session: initialSession }: HeaderProps) {
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled 
             ? "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 py-3 shadow-lg shadow-black/5" 
-            : "bg-white dark:bg-zinc-950 border-b border-transparent py-4"
+            : "bg-white dark:bg-zinc-950 border-b border-zinc-100 dark:border-zinc-900 py-4 shadow-lg shadow-black/5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:scale-105 transition-transform duration-300">
-              <span className="text-black font-black text-[10px] tracking-tighter">ADR</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 relative">
+              <Logo />
             </div>
             <div className="flex flex-col -space-y-1">
               <span className="font-black text-lg tracking-tight">ДОПОГ Экзамен</span>
@@ -138,7 +139,7 @@ export function Header({ session: initialSession }: HeaderProps) {
               ) : (
                 <Link 
                 href="/dashboard" 
-                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-yellow-500/10 active:scale-95"
+                className="flex items-center gap-2 bg-brand-gradient hover:opacity-90 text-white px-4 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-orange-500/20 active:scale-95"
               >
                 Личный кабинет
               </Link>
@@ -218,7 +219,7 @@ export function Header({ session: initialSession }: HeaderProps) {
              {currentSession ? (
                <Link 
                  href="/dashboard"
-                 className="flex items-center justify-center gap-2 w-full bg-yellow-500 text-black py-4 rounded-2xl font-black shadow-lg shadow-yellow-500/20"
+                 className="flex items-center justify-center gap-2 w-full bg-brand-gradient hover:opacity-90 text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-500/20"
                >
                  <UserCircle className="w-5 h-5" /> Личный кабинет
                </Link>

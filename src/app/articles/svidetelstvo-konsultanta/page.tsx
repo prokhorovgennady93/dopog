@@ -60,25 +60,7 @@ export default function ConsultantPage() {
               </div>
            </section>
 
-           <section>
-              <h2 className="text-3xl font-black mb-10 text-zinc-900 dark:text-white uppercase text-sm tracking-widest">2. Обязанности и ответственность (Chapter 8)</h2>
-              <div className="space-y-10">
-                 <div className="flex gap-8 items-start">
-                    <BookOpen className="w-10 h-10 text-orange-600 shrink-0" />
-                    <div>
-                       <h4 className="text-xl font-black mb-3 italic">Классификация и аудит</h4>
-                       <p className="text-sm text-zinc-500 mb-4 leading-relaxed">Консультант обязан проверять правильность идентификации грузов предприятием и соответствие маркировки требованиям ДОПОГ. Он проводит внутренний аудит транспортных процедур не реже одного раза в квартал.</p>
-                    </div>
-                 </div>
-                 <div className="flex gap-8 items-start">
-                    <Gavel className="w-10 h-10 text-orange-600 shrink-0" />
-                    <div>
-                       <h4 className="text-xl font-black mb-3 italic">Ежегодный отчет</h4>
-                       <p className="text-sm text-zinc-500 leading-relaxed">Главный официальный документ консультанта. Отчет должен храниться на предприятии в течении 5 лет и предоставляться по первому требованию Ространснадзора. В отчете фиксируются все инциденты, объемы перевезенных грузов и нарушения.</p>
-                    </div>
-                 </div>
-              </div>
-           </section>
+
 
            <section className="bg-zinc-900 p-8 sm:p-16 rounded-[56px] text-zinc-400 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600 opacity-5 blur-3xl group-hover:scale-150 transition-all duration-1000" />
@@ -110,7 +92,7 @@ export default function ConsultantPage() {
                  </div>
                  <div className="text-center md:text-left">
                     <h2 className="text-4xl font-black mb-4 text-zinc-900 dark:text-white uppercase leading-none">Станьте экспертом</h2>
-                    <p className="text-zinc-500 font-bold leading-relaxed mb-10 max-w-md font-sans leading-relaxed">Программа обучения консультантов — это высшая ступень в системе ДОПОГ. Подготовьтесь к государственному экзамену на нашем профессиональном тренажере.</p>
+                    <p className="text-zinc-500 font-bold leading-relaxed mb-10 max-w-md font-sans leading-relaxed">Программа обучения консультантов — это высшая ступень в системе ДОПОГ. Подготовьтесь к экзамену Ространснадзора на нашей профессиональной платформе.</p>
                     <Link 
                        href="/#courses" 
                        className="bg-zinc-900 dark:bg-white text-white dark:text-black px-12 py-5 rounded-2xl font-black text-sm hover:scale-[1.05] transition-all uppercase tracking-widest shadow-xl shadow-zinc-950/50"

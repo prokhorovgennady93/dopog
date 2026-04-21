@@ -10,6 +10,43 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Unified Brand Orange for all yellow and orange classes */
+  --color-yellow-50: #fff7ed;
+  --color-yellow-100: #ffedd5;
+  --color-yellow-200: #fed7aa;
+  --color-yellow-300: #fdba74;
+  --color-yellow-400: #fb923c;
+  --color-yellow-500: #f95c00; /* Main brand orange */
+  --color-yellow-600: #ea4800;
+  --color-yellow-700: #c23300;
+  --color-yellow-800: #9a2908;
+  --color-yellow-900: #7c240b;
+  --color-yellow-950: #430f04;
+
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-200: #fed7aa;
+  --color-orange-300: #fdba74;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f95c00; /* Main brand orange */
+  --color-orange-600: #ea4800;
+  --color-orange-700: #c23300;
+  --color-orange-800: #9a2908;
+  --color-orange-900: #7c240b;
+  --color-orange-950: #430f04;
+}
+
+@utility bg-brand-gradient {
+  background: linear-gradient(135deg, var(--color-orange-400) 0%, var(--color-orange-600) 100%);
+}
+
+@utility text-brand-gradient {
+  background: linear-gradient(135deg, var(--color-orange-400) 0%, var(--color-orange-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -106,9 +106,9 @@ export default function SpecPermitPage() {
            <section className="bg-orange-600 rounded-[56px] p-12 sm:p-24 text-white text-center shadow-3xl shadow-orange-900/40 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-96 h-96 bg-white opacity-10 blur-3xl transform -translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-all duration-1000" />
               <Globe className="w-20 h-20 mx-auto mb-8 text-white drop-shadow-lg" />
-              <h2 className="text-4xl sm:text-6xl font-black mb-6">Нужна помощь?</h2>
+              <h2 className="text-4xl sm:text-6xl font-black mb-6">Начать обучение</h2>
               <p className="text-xl mb-12 opacity-80 max-w-xl mx-auto font-medium font-sans italic">
-                 Раздел «Спецразрешения» — один из сложнейших в курсе ДОПОГ. Подготовьтесь к тестам и разберите все правовые тонкости на нашем тренажере.
+                 Тема «Спецразрешения» — одна из сложнейших в Базовом курсе ДОПОГ. Подготовьтесь к тестам и разберите все вопросы на нашей платформе.
               </p>
               <Link 
                  href="/#courses" 

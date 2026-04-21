@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { 
   ArrowRight, 
   Loader2, 
@@ -13,7 +14,8 @@ import {
   Package, 
   Truck, 
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Award
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -22,7 +24,7 @@ export function DocumentKitSection() {
   const router = useRouter();
   
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<string>("base");
+  const [selectedCourses, setSelectedCourses] = useState<string[]>(["base"]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
@@ -41,14 +43,34 @@ export function DocumentKitSection() {
     "class7": "Класс 7"
   };
 
-  const totalPrice = kitPrices[selectedCourse] || 0;
+  const getCourseImage = (id: string) => {
+    const slugMap: Record<string, string> = {
+      "base": "basic",
+      "tanks": "tanks",
+      "class1": "class1",
+      "class7": "class7"
+    };
+    return `/images/courses/course-${slugMap[id]}.png`;
+  };
+
+  const totalPrice = selectedCourses.reduce((sum, id) => sum + (kitPrices[id] || 0), 0);
+
+  const toggleCourse = (id: string) => {
+    setSelectedCourses(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("action") === "order") {
       const course = params.get("course");
       if (course && courseNames[course]) {
-        setSelectedCourse(course);
+        setSelectedCourses([course]);
       }
       if (session) setIsOrderModalOpen(true);
     }
@@ -56,7 +78,7 @@ export function DocumentKitSection() {
 
   const handleOrderClick = () => {
     if (!session) {
-      const callbackUrl = window.location.pathname + "?action=order&course=" + selectedCourse;
+      const callbackUrl = window.location.pathname + "?action=order&course=" + selectedCourses[0];
       router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
@@ -65,7 +87,7 @@ export function DocumentKitSection() {
 
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userName.trim() || !selectedCourse) return;
+    if (!userName.trim() || selectedCourses.length === 0) return;
     setIsSubmittingOrder(true);
     try {
       const res = await fetch("/api/orders/create", {
@@ -73,7 +95,7 @@ export function DocumentKitSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           userName, 
-          courseIds: JSON.stringify([selectedCourse]) 
+          courseIds: JSON.stringify(selectedCourses) 
         }),
       });
 
@@ -108,10 +130,11 @@ export function DocumentKitSection() {
               </h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                <DocumentFeatureItem icon={<Zap className="w-4 h-4 font-black" />} text="Оффлайн доступ" />
-                <DocumentFeatureItem icon={<Shield className="w-4 h-4 font-black" />} text="Полная база (800+ вопросов)" />
-                <DocumentFeatureItem icon={<Package className="w-4 h-4 font-black" />} text="Вносим в систему ФИС ФРДО" />
-                <DocumentFeatureItem icon={<Truck className="w-4 h-4 font-black" />} text="Доставка по всей РФ" />
+                <DocumentFeatureItem icon={<Zap className="w-5 h-5" strokeWidth={3} />} text="Оффлайн доступ" />
+                <DocumentFeatureItem icon={<Shield className="w-5 h-5" strokeWidth={3} />} text="Полная база вопросов" />
+                <DocumentFeatureItem icon={<Package className="w-5 h-5" strokeWidth={3} />} text="Вносим в систему ФИС ФРДО" />
+                <DocumentFeatureItem icon={<Award className="w-5 h-5" strokeWidth={3} />} text="Выдаём документы установленного образца" />
+                <DocumentFeatureItem icon={<Truck className="w-5 h-5" strokeWidth={3} />} text="Доставка по всей РФ" />
               </div>
             </div>
 
@@ -119,7 +142,7 @@ export function DocumentKitSection() {
               <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] mb-2">Лицензия и аккредитация</p>
               <p className="text-xs text-zinc-400 leading-relaxed font-medium">
                 Образовательная лицензия ЛО35-01276-61/02274118 от 05.05.2025 г. 
-                и аккредитация в Ространснадзоре. Выдаем документы установленного образца.
+                и аккредитация Ространснадзора.
               </p>
             </div>
           </div>
@@ -136,12 +159,22 @@ export function DocumentKitSection() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-orange-600/10 flex items-center justify-center text-orange-600 text-sm">
-                      {selectedCourse === "base" ? "🚛" : selectedCourse === "tanks" ? "⛽" : selectedCourse === "class1" ? "🧨" : "☢️"}
+                    <div className="flex -space-x-2">
+                      {selectedCourses.map((id) => (
+                        <div key={id} className="w-8 h-8 rounded-full bg-orange-950/40 border-2 border-zinc-900 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                          <Image src={getCourseImage(id)} alt={id} fill className="object-cover" />
+                        </div>
+                      ))}
                     </div>
                     <div>
-                      <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest block leading-none mb-0.5">Выбранный курс</span>
-                      <span className="font-black text-white text-sm block leading-none">{courseNames[selectedCourse]}</span>
+                      <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest block leading-none mb-0.5">
+                        {selectedCourses.length > 1 ? "Выбранные курсы" : "Выбранный курс"}
+                      </span>
+                      <span className="font-black text-white text-sm block leading-none">
+                        {selectedCourses.length === 0 ? "Ничего не выбрано" : 
+                         selectedCourses.length === 1 ? courseNames[selectedCourses[0]] : 
+                         `Выбрано: ${selectedCourses.length}`}
+                      </span>
                     </div>
                   </div>
                   <ChevronDown className={`w-5 h-5 text-zinc-500 transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`} />
@@ -150,20 +183,19 @@ export function DocumentKitSection() {
                 {isDropdownOpen && (
                   <div className="absolute top-full left-0 right-0 mt-3 bg-zinc-900 border-2 border-zinc-700 rounded-3xl shadow-2xl z-50 max-h-64 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
                     {Object.entries(courseNames).map(([id, name]) => {
-                      const isActive = selectedCourse === id;
+                      const isActive = selectedCourses.includes(id);
                       return (
                         <button
                           key={id}
-                          onClick={() => {
-                            setSelectedCourse(id);
-                            setIsDropdownOpen(false);
-                          }}
+                          onClick={() => toggleCourse(id)}
                           className={`w-full flex items-center justify-between px-6 py-5 transition-all text-left group border-b last:border-b-0 border-zinc-800/50 ${
                             isActive ? "bg-orange-600/10" : "hover:bg-zinc-800"
                           }`}
                         >
                           <div className="flex items-center gap-4">
-                            <span className="text-xl">{id === "base" ? "🚛" : id === "tanks" ? "⛽" : id === "class1" ? "🧨" : "☢️"}</span>
+                            <div className="w-9 h-9 rounded-lg bg-orange-950/40 border border-orange-500/10 overflow-hidden relative flex-shrink-0">
+                              <Image src={getCourseImage(id)} alt={name} fill className="object-cover" />
+                            </div>
                             <span className={`font-black uppercase tracking-tight text-xs ${isActive ? "text-orange-600" : "text-zinc-400 group-hover:text-white"}`}>{name}</span>
                           </div>
                           {isActive && <Check className="w-5 h-5 text-orange-600 stroke-[3]" />}
@@ -173,14 +205,6 @@ export function DocumentKitSection() {
                   </div>
                 )}
 
-                <div className="mt-4 px-6">
-                  <p className="text-xs text-zinc-400 font-bold leading-relaxed">
-                    {selectedCourse === "base" ? "Основной курс подготовки водителей ADR. Общие требования и правила перевозки опасных грузов." : 
-                     selectedCourse === "tanks" ? "Специализированный курс по перевозке опасных грузов в цистернах." :
-                     selectedCourse === "class1" ? "Перевозка взрывчатых веществ и изделий класса 1." :
-                     selectedCourse === "class7" ? "Перевозка радиоактивных материалов класса 7." : ""}
-                  </p>
-                </div>
               </div>
 
               <div className="flex flex-col mb-5 bg-zinc-900/40 p-4 rounded-xl border border-zinc-700/50">
@@ -192,7 +216,7 @@ export function DocumentKitSection() {
 
               <button 
                 onClick={handleOrderClick}
-                className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-xl shadow-xl shadow-yellow-500/10 transition-all active:scale-[0.97] flex items-center justify-center gap-2 text-base"
+                className="w-full bg-brand-gradient hover:opacity-90 text-white font-black py-4 rounded-xl shadow-xl shadow-orange-500/20 transition-all active:scale-[0.97] flex items-center justify-center gap-2 text-base"
               >
                 Оформить заказ <ArrowRight className="w-4 h-4" />
               </button>
@@ -233,8 +257,10 @@ export function DocumentKitSection() {
                     <span className="text-lg font-black text-zinc-900 dark:text-white">{(session?.user as any)?.phone || "Загрузка..."}</span>
                   </div>
                   <div className="bg-zinc-50 dark:bg-zinc-950/50 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 border-l-4 border-l-yellow-500 shadow-sm">
-                    <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1">Курс</span>
-                    <span className="text-base font-black text-yellow-600 dark:text-yellow-500">{courseNames[selectedCourse] || selectedCourse}</span>
+                    <span className="text-[10px] font-black text-zinc-400 uppercase block mb-1">Курсы</span>
+                    <span className="text-sm font-black text-yellow-600 dark:text-yellow-500">
+                      {selectedCourses.map(id => courseNames[id]).join(", ")}
+                    </span>
                   </div>
                </div>
 
@@ -256,7 +282,7 @@ export function DocumentKitSection() {
 function DocumentFeatureItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-3 text-zinc-400 group/item">
-      <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-yellow-500 shadow-lg group-hover/item:scale-110 transition-transform">
+      <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-zinc-800 flex items-center justify-center text-yellow-500 shadow-lg group-hover/item:scale-110 transition-transform">
         {icon}
       </div>
       <span className="text-xs sm:text-sm font-bold text-zinc-300">{text}</span>

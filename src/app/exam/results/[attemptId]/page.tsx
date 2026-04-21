@@ -3,6 +3,7 @@ import { auth } from "@/../auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Timer, Award, ArrowLeft, RefreshCw, ChevronDown } from "lucide-react";
+import { ExamResultsPopupTrigger } from "@/components/exam/ExamResultsPopupTrigger";
 
 export default async function ResultsPage({ params }: { params: Promise<{ attemptId: string }> }) {
   const { attemptId } = await params;
@@ -178,6 +179,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ attemp
         </p>
 
       </div>
+      <ExamResultsPopupTrigger />
     </div>
   );
 }

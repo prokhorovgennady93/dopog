@@ -74,7 +74,7 @@ async function main() {
   const courseConfigs: Record<string, { slug: string, description: string, icon: string }> = {
     "1": {
       slug: "basic",
-      description: "Обязательный курс для всех водителей ДОПОГ. Охватывает основные положения, классификацию и маркировку.",
+      description: "Обязательный курс для всех водителей. Охватывает основные положения ДОПОГ.",
       icon: "🚚",
     },
     "2": {

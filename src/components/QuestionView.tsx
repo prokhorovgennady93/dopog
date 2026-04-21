@@ -31,7 +31,8 @@ interface QuestionViewProps {
   isLoggedIn: boolean;
 }
 
-const GUEST_LIMIT = 25;
+const GUEST_LIMIT = 40;
+const GLOBAL_LIMIT_KEY = 'global_questions_answered';
 
 type Phase = 'QUESTION' | 'INTERMEDIATE' | 'FINAL';
 
@@ -52,6 +53,12 @@ export function QuestionView({
   const [isProgressExpanded, setIsProgressExpanded] = useState(false);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
+  const [globalProgress, setGlobalProgress] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return parseInt(localStorage.getItem(GLOBAL_LIMIT_KEY) || '0', 10);
+    }
+    return 0;
+  });
   const [currentIndex, setCurrentIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(storageKey);
@@ -113,7 +120,7 @@ export function QuestionView({
 
   const isOfflineData = typeof window !== 'undefined' && currentTopicId && !!localStorage.getItem(`topic_${currentTopicId}_data`);
   const hasValidAccess = isFullAccessActive || isPurchaseActive || !!isOfflineData;
-  const isGuestRestricted = (!hasValidAccess && !isOfflineData) && currentIndex >= GUEST_LIMIT;
+  const isGuestRestricted = (!hasValidAccess && !isOfflineData) && globalProgress >= GUEST_LIMIT;
   const currentQuestion = localQuestions[currentIndex] || null;
 
   const hasAnsweredCurrentInfo = answers[currentIndex];
@@ -142,6 +149,13 @@ export function QuestionView({
       ...prev,
       [currentIndex]: { selectedId: optionId, isCorrect }
     }));
+
+    // Update global progress if not premium
+    if (!hasValidAccess) {
+      const newGlobal = globalProgress + 1;
+      setGlobalProgress(newGlobal);
+      localStorage.setItem(GLOBAL_LIMIT_KEY, newGlobal.toString());
+    }
 
     // Every 100 questions, if NO email, show reminder
     const newCount = answeredSessionCount + 1;
@@ -432,9 +446,14 @@ export function QuestionView({
                 <Lock className="w-10 h-10 text-black" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-black mb-4">Время перейти на новый уровень!</h2>
-              <p className="text-zinc-500 dark:text-zinc-400 max-w-md mb-8 leading-relaxed font-medium">
-                Вы успешно ознакомились с первыми 25 вопросами. Получите доступ ко всем {localQuestions.length} вопросам этого курса и неограниченному режиму экзамена!
-              </p>
+              {(() => {
+                const courseTotalQuestions = themes.reduce((acc, t) => acc + (t._count?.questions || 0), 0);
+                return (
+                  <p className="text-zinc-500 dark:text-zinc-400 max-w-md mb-8 leading-relaxed font-medium">
+                    Вы ответили на все {GUEST_LIMIT} бесплатных вопросов. Получите доступ ко всем {courseTotalQuestions} вопросам этого курса и неограниченному режиму экзамена!
+                  </p>
+                );
+              })()}
 
               <div className="flex flex-col gap-6 w-full max-w-2xl justify-center mb-8 transition-all">
                 {/* Tariff 1: Single Course */}

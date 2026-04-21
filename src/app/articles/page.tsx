@@ -36,13 +36,22 @@ const ARTICLES = [
     color: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
   },
   {
-    slug: "markirovka-og",
-    title: "Маркировка опасных грузов",
-    excerpt: "Все о знаках опасности, табличках оранжевого цвета и правилах их размещения на ТС.",
-    tag: "Маркировка",
-    readTime: "12 мин",
+    slug: "kak-proverit-svidetelstvo",
+    title: "Как проверить ДОПОГ на подлинность",
+    excerpt: "Пошаговая инструкция по проверке свидетельства на официальном сайте Росавтотранса.",
+    tag: "Проверка",
+    readTime: "5 мин",
     icon: <Shield className="w-5 h-5" />,
     color: "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400"
+  },
+  {
+    slug: "ekzamen-dopog",
+    title: "Квалификационный экзамен на ДОПОГ",
+    excerpt: "Регламент экзамена, количество попыток, время на прохождение и допустимые ошибки.",
+    tag: "Экзамен",
+    readTime: "6 мин",
+    icon: <LayoutList className="w-5 h-5" />,
+    color: "bg-slate-50 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400"
   },
   {
     slug: "pravila-perevozki",

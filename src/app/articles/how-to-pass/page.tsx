@@ -47,7 +47,7 @@ export default function HowToPassPage() {
                     На Базовый курс отводится 45 минут, в течение которых нужно ответить на 25 вопросов. Допустимое количество ошибок — всего 2. Это означает, что цена каждой ошибки крайне высока. На спецкурс «Цистерны» дается 30 минут на 15 вопросов, где можно ошибиться лишь раз. 
                  </p>
                  <p>
-                    Ловушка кроется в том, что вопросы часто сформулированы максимально похоже. Например, отличия «грузового отделения» от «транспортной единицы» может показаться незначительной деталью, но в ДОПОГ это фундаментально разные понятия с разными требованиями к тушению пожара или маркировке.
+                    Основная ловушка кроется в том, что вопросы часто сформулированы максимально похоже. Например, отличия «грузового отделения» от «транспортной единицы» может показаться незначительной деталью, но в ДОПОГ это фундаментально разные понятия с разными требованиями к тушению пожара или маркировке.
                  </p>
               </div>
            </section>
@@ -66,29 +66,13 @@ export default function HowToPassPage() {
                     <BrainCircuit className="w-8 h-8 text-orange-600 shrink-0 mt-1" />
                     <div>
                        <h4 className="font-bold text-lg mb-2">Логика безопасности</h4>
-                       <p className="text-sm text-zinc-500">Если вы не знаете точный пункт правил, выберите тот ответ, который в реальности приведет к максимальной безопасности. ДОПОГ строится на минимизации любого риска.</p>
+                       <p className="text-sm text-zinc-500">Если вы не знаете правильный ответ, выбирайте тот, который в реальности приведет к максимальной безопасности. ДОПОГ строится на минимизации любого риска.</p>
                     </div>
                  </div>
               </div>
            </section>
 
-           <section>
-              <h2 className="text-3xl font-black mb-12">Ваш 30-дневный план победы</h2>
-              <div className="space-y-4">
-                 {roadmap.map((item, i) => (
-                    <div key={i} className="flex flex-col sm:flex-row items-center gap-8 bg-zinc-900 p-8 rounded-[32px] hover:translate-x-2 transition-transform duration-300">
-                       <div className="text-orange-500 font-bold text-sm uppercase tracking-widest whitespace-nowrap">{item.step}</div>
-                       <div className="flex-1">
-                          <h4 className="text-xl font-black text-white mb-2">{item.t}</h4>
-                          <p className="text-sm text-zinc-400 font-medium leading-relaxed">{item.d}</p>
-                       </div>
-                       <div className="hidden sm:block w-10 h-10 border-2 border-orange-600 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-4 h-4 text-orange-600" />
-                       </div>
-                    </div>
-                 ))}
-              </div>
-           </section>
+
 
            <section className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-[40px] p-8 sm:p-12">
               <div className="flex flex-col md:flex-row gap-10 items-center">
@@ -98,7 +82,7 @@ export default function HowToPassPage() {
                  <div>
                     <h3 className="text-2xl font-black text-amber-900 dark:text-amber-500 mb-4">Главный совет: Не зазубривайте!</h3>
                     <p className="text-lg text-amber-800/80 dark:text-amber-500/70 font-bold leading-relaxed">
-                       База вопросов Ространснадзора в 2026 году регулярно обновляется. Зазубривание «правильных букв» — это путь в никуда. Понимая логику классов опасности и требований к ТС, вы ответите даже на вопрос, который видите впервые.
+                       База вопросов Ространснадзора в 2026 году регулярно обновляется. Зазубривание «правильных ответов» — это путь в никуда. Понимая логику классов опасности и требований к ТС, вы ответите даже на вопрос, который видите впервые.
                     </p>
                  </div>
               </div>
@@ -110,11 +94,11 @@ export default function HowToPassPage() {
                     <Clock className="w-24 h-24 text-black dark:text-white" />
                  </div>
                  <h3 className="text-xl font-black mb-4">Тайм-менеджмент</h3>
-                 <p className="text-zinc-500 font-medium leading-relaxed">Разделите время на тесте. Проходите все легкие вопросы в первые 10 минут. Оставшееся время (35 минут!) потратьте на «сомнительные» баллы. Не зацикливайтесь на одном вопросе — идите дальше и вернитесь к нему в конце.</p>
+                 <p className="text-zinc-500 font-medium leading-relaxed">Не зацикливайтесь на «трудных» вопросах — пройдите все легкие вопросы, а к ним вернитесь в конце. </p>
               </div>
               <div className="border border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 relative overflow-hidden group hover:border-orange-500 transition-all">
                  <h3 className="text-xl font-black mb-4">День накануне</h3>
-                 <p className="text-zinc-500 font-medium leading-relaxed">Никакой учебы после 18:00. Мозгу нужно «заархивировать» данные. Крепкий сон важнее, чем еще одна пройденная тема. Приходите на экзамен на 20 минут раньше, чтобы привыкнуть к обстановке.</p>
+                 <p className="text-zinc-500 font-medium leading-relaxed">Никакой учебы после 18:00. Мозгу нужно отдохнуть. Крепкий сон важнее, чем еще одна пройденная тема. Приходите на экзамен на 20 минут раньше, чтобы настроиться и не волноваться из-за спешки.</p>
               </div>
            </section>
 

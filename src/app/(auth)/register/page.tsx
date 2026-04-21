@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/actions/auth-actions";
 import { ShieldCheck, Lock, Smartphone, ChevronRight } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function RegisterPage() {
   const [phone, setPhone] = useState("");
@@ -43,22 +44,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans selection:bg-yellow-500/30">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-zinc-950 p-4 py-10 sm:py-0 font-sans selection:bg-yellow-500/30">
       <div className="w-full max-w-md">
         {/* Decorative elements */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-500/10 blur-[120px] rounded-full -z-10" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-orange-500/10 blur-[120px] rounded-full -z-10" />
 
-        <div className="bg-zinc-900/40 backdrop-blur-2xl border border-zinc-800/50 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-          <div className="flex flex-col items-center mb-10">
-            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-yellow-500/20 rotate-3 transition-transform hover:rotate-0 duration-500">
-              <span className="text-black font-black text-2xl tracking-tighter">ADR</span>
+        <div className="bg-zinc-900/40 backdrop-blur-2xl border border-zinc-800/50 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          <div className="flex flex-col items-center mb-6 sm:mb-10">
+            <div className="flex justify-center items-center mb-4 sm:mb-8 transition-transform hover:scale-105 duration-500">
+              <Logo size={96} />
             </div>
-            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Регистрация</h1>
-            <p className="text-zinc-500 text-sm font-medium">Создайте профиль для начала обучения</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Регистрация</h1>
+            <p className="text-zinc-500 text-xs sm:text-sm font-medium">Создайте профиль для начала обучения</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-4 rounded-2xl text-center font-bold animate-in fade-in slide-in-from-top-2 duration-300">
                 {error}

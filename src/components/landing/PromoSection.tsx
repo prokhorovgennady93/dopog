@@ -28,12 +28,12 @@ export function PromoSection() {
               {/* Force 3 lines on all devices */}
               <span className="block">Пройдите подготовку</span>{" "}
               <span className="block">и получите <span className="text-yellow-500">скидку 15%</span></span>{" "}
-              <span className="block">на получение свидетельства</span>
+              <span className="block">на свидетельство об обучении</span>
             </h2>
 
             {/* Desktop Details */}
             <div className="hidden lg:block space-y-4">
-              <PromoDetail icon={<ShieldCheck className="w-5 h-5 text-orange-500" />} title="Лицензия и аккредитация" text="Образовательная лицензия ЛО35-01276-61/02274118 от 05.05.2025г. и аккредитация в Ространснадзоре." />
+              <PromoDetail icon={<ShieldCheck className="w-5 h-5 text-orange-500" />} title="Лицензия и аккредитация" text="Образовательная лицензия ЛО35-01276-61/02274118 от 05.05.2025 г. и аккредитация Ространснадзора." />
               <PromoDetail icon={<CheckCircle2 className="w-5 h-5 text-orange-500" />} title="Документы установленного образца" text="Вносим сразу в систему ФИС ФРДО." />
               <PromoDetail icon={<Download className="w-5 h-5 text-orange-500" />} title="Удобное получение" text="Доставка по территории всей Российской Федерации." />
             </div>
@@ -53,7 +53,7 @@ export function PromoSection() {
             <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[800px] opacity-100 mt-8 mb-4' : 'max-h-0 opacity-0'}`}>
               <div className="space-y-8">
                 <div className="space-y-4">
-                  <PromoDetail icon={<ShieldCheck className="w-5 h-5 text-orange-500" />} title="Лицензия и аккредитация" text="Образовательная лицензия ЛО35-01276-61/02274118 от 05.05.2025г." />
+                  <PromoDetail icon={<ShieldCheck className="w-5 h-5 text-orange-500" />} title="Лицензия и аккредитация" text="Образовательная лицензия ЛО35-01276-61/02274118 от 05.05.2025 г. и аккредитация Ространснадзора." />
                   <PromoDetail icon={<CheckCircle2 className="w-5 h-5 text-orange-500" />} title="Документы" text="Вносим сразу в систему ФИС ФРДО." />
                   <PromoDetail icon={<Download className="w-5 h-5 text-orange-500" />} title="Доставка" text="По всей Российской Федерации." />
                 </div>

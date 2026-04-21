@@ -17,11 +17,18 @@ const materials = [
     icon: <Globe className="w-5 h-5 text-blue-500" />
   },
   {
-    title: "Перечень опасных грузов (Алфавитный указатель)",
-    description: "Удобная таблица для быстрого поиска ООН номеров, групп упаковки и специальных положений. Рекомендуется для практических занятий консультантов и водителей.",
-    link: "https://unece.org/transport/dangerous-goods",
-    type: "Справочник",
+    title: "Список экзаменационных вопросов",
+    description: "Официальный перечень экзаменационных вопросов для водителей и консультантов по вопросам безопасности перевозки опасных грузов.",
+    link: "https://rosavtotransport.ru/ru/activities/dangerous-goods/examination-questions/",
+    type: "Росавтотранс",
     icon: <FileStack className="w-5 h-5 text-yellow-500" />
+  },
+  {
+    title: "Адрес экзаменационных комиссий",
+    description: "Актуальные адреса региональных экзаменационных комиссий Ространснадзора для сдачи экзамена ДОПОГ по всей России.",
+    link: "https://rosavtotransport.ru/ru/activities/dangerous-goods/exam-boards-address/",
+    type: "Росавтотранс",
+    icon: <Globe className="w-5 h-5 text-blue-500" />
   }
 ];
 
