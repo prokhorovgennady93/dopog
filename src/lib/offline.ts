@@ -9,28 +9,36 @@ export const OFFLINE_CACHE_NAME = "dopog-cache-v4.3";
 export async function checkTopicDownloaded(topicId: string): Promise<"missing" | "outdated" | "ok"> {
   if (typeof window === "undefined") return "missing";
   
-  // 1. Initial logical check
-  const isFlagged = localStorage.getItem(`topic_${topicId}_offline`) === "true";
   const cachedVersion = parseInt(localStorage.getItem(`topic_${topicId}_v`) || "0");
   
-  // 2. Physical Cache Verification (The absolute source of truth)
-  if (typeof window !== "undefined" && "caches" in window) {
+  // Physical Cache Verification — scan ALL caches, not just the named one
+  // This prevents false "ok" results when the cache name changes between versions
+  if ("caches" in window) {
     try {
-      const cache = await caches.open(OFFLINE_CACHE_NAME);
-      // We check for the most critical piece of data
-      const dataMatch = await cache.match(`/api/topics/${topicId}/questions`);
+      const apiUrl = `/api/topics/${topicId}/questions`;
+      const cacheKeys = await caches.keys();
       
-      if (!dataMatch) {
-        if (isFlagged) {
-          console.log(`[Offline] Physical data missing for ${topicId}, clearing flag.`);
+      let found = false;
+      for (const key of cacheKeys) {
+        const cache = await caches.open(key);
+        const match = await cache.match(apiUrl);
+        if (match) {
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        // Physical data is missing — clear the stale flag if any
+        if (localStorage.getItem(`topic_${topicId}_offline`) === "true") {
+          console.log(`[Offline] Physical data missing for ${topicId}, clearing stale flag.`);
           localStorage.removeItem(`topic_${topicId}_offline`);
         }
         return "missing";
       }
 
-      // If physical data exists but versions mismatch, it's outdated
+      // Data physically exists — check version
       if (cachedVersion < CURRENT_OFFLINE_VERSION) return "outdated";
-
       return "ok";
     } catch (e) {
       console.error("[Offline] Cache check failed:", e);
@@ -38,6 +46,8 @@ export async function checkTopicDownloaded(topicId: string): Promise<"missing" |
     }
   }
   
+  // Fallback for environments without Cache API
+  const isFlagged = localStorage.getItem(`topic_${topicId}_offline`) === "true";
   return isFlagged ? (cachedVersion < CURRENT_OFFLINE_VERSION ? "outdated" : "ok") : "missing";
 }
 
