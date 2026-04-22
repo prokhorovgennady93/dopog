@@ -281,21 +281,7 @@ export function QuestionView({
     <div className="flex-1 flex flex-col p-2 sm:p-4 max-w-3xl mx-auto w-full font-sans">
       
       {/* Course Header */}
-      <div className="flex items-center gap-3 mb-4 px-2">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm flex items-center justify-center shrink-0 relative overflow-hidden">
-          {ICONS_MAP[courseSlug] ? (
-            <Image 
-              src={ICONS_MAP[courseSlug]} 
-              alt={courseTitle} 
-              fill 
-              className="object-cover p-1.5"
-            />
-          ) : (
-             <GraduationCap className="w-6 h-6 text-yellow-500" />
-          )}
-        </div>
-        {/* Removed redundant course title as requested */}
-      </div>
+      {/* Removed course icon container as requested */}
       
       {/* Email Reminder Modal */}
       {isEmailReminderOpen && (
