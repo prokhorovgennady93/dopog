@@ -169,11 +169,6 @@ export function ExamSimulation({
                 </div>
                  <div className="flex items-center gap-2 px-2 overflow-hidden">
                     <div className="w-6 h-6 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-100 dark:border-zinc-700 shadow-sm flex items-center justify-center shrink-0 relative overflow-hidden hidden sm:flex">
-                        {ICONS_MAP[courseSlug] ? (
-                            <Image src={ICONS_MAP[courseSlug]} alt={courseSlug} fill className="object-cover p-1" />
-                        ) : (
-                            <GraduationCap className="w-3 h-3 text-yellow-500" />
-                        )}
                     </div>
                  </div>
              </div>
