@@ -1,16 +1,10 @@
-/// <reference lib="webworker" />
-
 /**
  * Custom Service Worker for DOPOG Platform
- * This file is automatically compiled and bundled into the final sw.js 
- * by @ducanh2912/next-pwa.
- * 
- * Includes:
- * 1. Web Push Notification Handlers
- * 2. Safari/Yandex Browser Offline Stability
  */
 
-declare let self: ServiceWorkerGlobalScope;
+// This fix ensures TypeScript treats this as a module and doesn't complain about 'self'
+export type {};
+declare const self: ServiceWorkerGlobalScope;
 
 // --- 1. Push Notifications ---
 
