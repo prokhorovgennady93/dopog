@@ -53,9 +53,11 @@ export async function POST(req: Request) {
     });
   }
 
-  const score = Math.round((correctCount / totalQuestions) * 100);
-  const passThreshold = 75; // ДОПОГ standard
-  const isPassed = score >= passThreshold;
+  const mistakesCount = totalQuestions - correctCount;
+  const isBasic = course.slug === "basic";
+  const maxMistakes = isBasic ? 6 : 3;
+  
+  const isPassed = mistakesCount <= maxMistakes;
 
   // Save attempt
   const attempt = await db.examAttempt.create({

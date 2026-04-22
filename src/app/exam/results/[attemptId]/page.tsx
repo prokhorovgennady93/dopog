@@ -46,11 +46,22 @@ export default async function ResultsPage({ params }: { params: Promise<{ attemp
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-10">
-           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
-              <span className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Ваш результат</span>
-              <span className={`text-4xl font-black ${attempt.score >= 75 ? 'text-green-500' : 'text-red-500'}`}>{attempt.score}%</span>
-              <span className="text-xs text-zinc-500 mt-2">Порог прохождения: 75%</span>
-           </div>
+           {(() => {
+             const detailsData = JSON.parse((attempt as any).details || "[]");
+             const mistakesCount = detailsData.filter((d: any) => !d.isCorrect).length;
+             const isBasic = attempt.course.slug === "basic";
+             const maxMistakes = isBasic ? 6 : 3;
+             
+             return (
+               <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+                  <span className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Ваш результат</span>
+                  <span className={`text-4xl font-black ${attempt.isPassed ? 'text-green-500' : 'text-red-500'}`}>
+                    {mistakesCount} {mistakesCount === 1 ? 'ошибка' : (mistakesCount > 1 && mistakesCount < 5 ? 'ошибки' : 'ошибок')}
+                  </span>
+                  <span className="text-xs text-zinc-500 mt-2">Допустимо: {maxMistakes}</span>
+               </div>
+             );
+           })()}
            
            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
               <span className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1 flex items-center gap-1">

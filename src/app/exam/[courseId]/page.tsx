@@ -28,10 +28,10 @@ export default async function ExamPage({ params }: { params: Promise<{ courseId:
     notFound();
   }
 
-  // Determine question count and time limit (official rules)
+  // Determine question count and time limit based on course type
   const isBasic = course.slug === "basic";
-  const targetCount = 25; // Always 25 as per user request
-  const timeLimitMinutes = 45; // Always 45 minutes as per user request
+  const targetCount = isBasic ? 25 : 15;
+  const timeLimitMinutes = isBasic ? 45 : 30;
 
   // BALANCED SELECTION LOGIC
   // 1. Group questions by topic and shuffle each topic pool

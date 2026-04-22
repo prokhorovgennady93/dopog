@@ -3,8 +3,8 @@
  * Version 2: Added cache versioning and improved snapshot logic for SSG
  */
 
-export const CURRENT_OFFLINE_VERSION = 3;
-export const OFFLINE_CACHE_NAME = "dopog-cache-v4.2";
+export const CURRENT_OFFLINE_VERSION = 4;
+export const OFFLINE_CACHE_NAME = "dopog-cache-v4.3";
 
 export async function checkTopicDownloaded(topicId: string): Promise<"missing" | "outdated" | "ok"> {
   if (typeof window === "undefined") return "missing";
@@ -17,12 +17,12 @@ export async function checkTopicDownloaded(topicId: string): Promise<"missing" |
   if (typeof window !== "undefined" && "caches" in window) {
     try {
       const cache = await caches.open(OFFLINE_CACHE_NAME);
-      const match = await cache.match(`/api/topics/${topicId}/questions`);
+      // We check for the most critical piece of data
+      const dataMatch = await cache.match(`/api/topics/${topicId}/questions`);
       
-      // If the critical data is missing from cache, the status is "missing" regardless of localStorage
-      if (!match) {
+      if (!dataMatch) {
         if (isFlagged) {
-          console.warn(`[Offline] Stale flag found for topic ${topicId}, cleaning up...`);
+          console.log(`[Offline] Physical data missing for ${topicId}, clearing flag.`);
           localStorage.removeItem(`topic_${topicId}_offline`);
         }
         return "missing";
@@ -75,7 +75,7 @@ export async function downloadTopic(
         `${studyUrl}&_rsc=1`,
         "/manifest.json",
         "/icon.png",
-        // Add branded icons to ensures they show up offline
+        "/favicon.ico",
         "/images/courses/course-basic.png",
         "/images/courses/course-tanks.png",
         "/images/courses/course-class1.png",
@@ -94,7 +94,7 @@ export async function downloadTopic(
             await cache.put(assets[i], assetResponse);
           }
         } catch (e) {
-          console.warn(`[Sync] Failed to cache: ${assets[i]}`, e);
+          console.warn(`[Sync] Failed to cache asset: ${assets[i]}`);
         }
         if (onProgress) {
           onProgress(Math.round(((i + 1) / assets.length) * 100));
@@ -124,14 +124,15 @@ export async function downloadCourse(
     const snapshots = [
       "/",
       `/course/${slug}`,
-      `/study/${courseId}`
+      `/study/${courseId}`,
+      `/exam/${courseId}` // Critical addition
     ];
     
-    // Critical App Assets (SSG support)
+    // Critical App Assets
     const criticalAssets = [
       "/manifest.json",
       "/icon.png",
-      "/_next/static/css/app/layout.css"
+      "/favicon.ico"
     ];
 
     const all = [...snapshots, ...criticalAssets];
@@ -139,16 +140,18 @@ export async function downloadCourse(
     for (const route of all) {
       try {
         const res = await fetch(route);
-        if (res.ok) await cache.put(route, res);
-
-        // Snapshot RSC for static routing
-        if (!route.includes(".") && !route.startsWith("/_next")) {
-          const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
-          const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
-          if (rscRes.ok) await cache.put(rscUrl, rscRes);
+        if (res.ok) {
+          await cache.put(route, res.clone());
+          
+          // Also snapshot RSC for Next.js app router navigation
+          if (!route.includes(".") && !route.startsWith("/_next")) {
+            const rscUrl = `${route}${route.includes("?") ? "&" : "?"}_rsc=1`;
+            const rscRes = await fetch(rscUrl, { headers: { "RSC": "1" } });
+            if (rscRes.ok) await cache.put(rscUrl, rscRes);
+          }
         }
       } catch (e) {
-        console.warn(`[Snapshot] Error: ${route}`, e);
+        console.warn(`[Snapshot] Error: ${route}`);
       }
     }
   }
