@@ -1,10 +1,11 @@
+/// <reference lib="webworker" />
+
 /**
  * Custom Service Worker for DOPOG Platform
  */
 
-// This fix ensures TypeScript treats this as a module and doesn't complain about 'self'
+// This fix ensures TypeScript treats this as a module and uses the webworker library
 export type {};
-declare const self: ServiceWorkerGlobalScope;
 
 // --- 1. Push Notifications ---
 
