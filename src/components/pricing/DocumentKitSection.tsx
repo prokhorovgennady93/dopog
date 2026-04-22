@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { 
@@ -28,6 +28,20 @@ export function DocumentKitSection() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
 
   const kitPrices: Record<string, number> = {
     "base": 5000,
@@ -151,7 +165,7 @@ export function DocumentKitSection() {
             <div className="bg-zinc-800/80 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-10 border border-zinc-700 shadow-2xl">
               <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-6 block px-1">Выберите нужные курсы</label>
               
-              <div className="relative mb-6">
+              <div className="relative mb-6" ref={dropdownRef}>
                 <button 
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className={`w-full flex items-center justify-between px-5 py-4 rounded-xl border-2 transition-all text-left bg-zinc-900 shadow-xl ${
