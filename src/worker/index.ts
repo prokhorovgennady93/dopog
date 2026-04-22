@@ -13,7 +13,7 @@ declare const self: ServiceWorkerGlobalScope;
 self.addEventListener('push', (event: any) => {
   console.log('[Worker] Push event received');
   
-  let data = {
+  let data: { title: string; body: string; url: string; actions?: any[] } = {
     title: 'ДОПОГ Экзамен 🔔',
     body: 'У вас новое уведомление',
     url: '/'
