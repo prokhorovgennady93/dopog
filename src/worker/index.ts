@@ -9,7 +9,7 @@ export type {};
 
 // --- 1. Push Notifications ---
 
-self.addEventListener('push', (event) => {
+self.addEventListener('push', (event: any) => {
   console.log('[Worker] Push event received');
   
   let data = {
@@ -44,7 +44,7 @@ self.addEventListener('push', (event) => {
   );
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', (event: any) => {
   event.notification.close();
   const urlToOpen = event.notification.data.url || '/';
 
@@ -66,7 +66,7 @@ self.addEventListener('notificationclick', (event) => {
 
 // --- 2. Offline Stability Fallbacks (Safari/Yandex Fix) ---
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', (event: any) => {
   const url = new URL(event.request.url);
   
   // Only handle navigation requests for our own origin
