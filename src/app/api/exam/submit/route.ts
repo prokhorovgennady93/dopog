@@ -54,6 +54,7 @@ export async function POST(req: Request) {
   }
 
   const mistakesCount = totalQuestions - correctCount;
+  const score = Math.round((correctCount / totalQuestions) * 100);
   const isBasic = course.slug === "basic";
   const maxMistakes = isBasic ? 6 : 3;
   
