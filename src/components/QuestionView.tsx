@@ -294,10 +294,7 @@ export function QuestionView({
              <GraduationCap className="w-6 h-6 text-yellow-500" />
           )}
         </div>
-        <div className="flex flex-col">
-          <h1 className="text-sm sm:text-base font-black leading-tight">{courseTitle}</h1>
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Режим обучения</span>
-        </div>
+        {/* Removed redundant course title as requested */}
       </div>
       
       {/* Email Reminder Modal */}

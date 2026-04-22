@@ -9,32 +9,36 @@ export const OFFLINE_CACHE_NAME = "dopog-cache-v4.2";
 export async function checkTopicDownloaded(topicId: string): Promise<"missing" | "outdated" | "ok"> {
   if (typeof window === "undefined") return "missing";
   
-  // 1. Check logical flag and version
+  // 1. Initial logical check
   const isFlagged = localStorage.getItem(`topic_${topicId}_offline`) === "true";
-  if (!isFlagged) return "missing";
-
-  const cachedVersion = parseInt(localStorage.getItem(`topic_${topicId}_v`) || "1");
-  if (cachedVersion < CURRENT_OFFLINE_VERSION) return "outdated";
-
-  // 2. Physical Cache Verification (Source of Truth)
+  const cachedVersion = parseInt(localStorage.getItem(`topic_${topicId}_v`) || "0");
+  
+  // 2. Physical Cache Verification (The absolute source of truth)
   if (typeof window !== "undefined" && "caches" in window) {
     try {
       const cache = await caches.open(OFFLINE_CACHE_NAME);
       const match = await cache.match(`/api/topics/${topicId}/questions`);
-      if (!match) return "missing";
       
-      // Also check if the route itself is cached
-      const courseId = localStorage.getItem(`topic_${topicId}_course`) || "base";
-      const routeMatch = await cache.match(`/study/${courseId}?topicId=${topicId}`);
-      if (!routeMatch) return "missing";
+      // If the critical data is missing from cache, the status is "missing" regardless of localStorage
+      if (!match) {
+        if (isFlagged) {
+          console.warn(`[Offline] Stale flag found for topic ${topicId}, cleaning up...`);
+          localStorage.removeItem(`topic_${topicId}_offline`);
+        }
+        return "missing";
+      }
+
+      // If physical data exists but versions mismatch, it's outdated
+      if (cachedVersion < CURRENT_OFFLINE_VERSION) return "outdated";
 
       return "ok";
     } catch (e) {
+      console.error("[Offline] Cache check failed:", e);
       return "missing";
     }
   }
   
-  return "ok";
+  return isFlagged ? (cachedVersion < CURRENT_OFFLINE_VERSION ? "outdated" : "ok") : "missing";
 }
 
 export async function downloadTopic(
@@ -70,7 +74,12 @@ export async function downloadTopic(
         studyUrl,
         `${studyUrl}&_rsc=1`,
         "/manifest.json",
-        "/icon.png"
+        "/icon.png",
+        // Add branded icons to ensures they show up offline
+        "/images/courses/course-basic.png",
+        "/images/courses/course-tanks.png",
+        "/images/courses/course-class1.png",
+        "/images/courses/course-class7.png"
       ];
 
       // Add topic images

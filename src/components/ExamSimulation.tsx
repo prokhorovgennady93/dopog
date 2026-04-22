@@ -175,7 +175,6 @@ export function ExamSimulation({
                             <GraduationCap className="w-3 h-3 text-yellow-500" />
                         )}
                     </div>
-                    <h1 className="text-[10px] font-black uppercase text-zinc-400 tracking-tighter truncate max-w-[120px]">{courseTitle}</h1>
                  </div>
              </div>
 
