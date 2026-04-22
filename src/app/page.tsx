@@ -37,7 +37,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col flex-1">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white dark:bg-zinc-950 pt-2 pb-8 sm:pt-12 sm:pb-24 border-b-0 sm:border-b border-zinc-100 dark:border-zinc-900">
+      <section className="relative overflow-hidden bg-white dark:bg-zinc-950 pt-10 pb-8 sm:pt-12 sm:pb-24 border-b-0 sm:border-b border-zinc-100 dark:border-zinc-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(234,179,8,0.05)_0%,transparent_50%)]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto mt-6 sm:mt-0">

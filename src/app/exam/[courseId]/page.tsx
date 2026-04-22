@@ -84,6 +84,7 @@ export default async function ExamPage({ params }: { params: Promise<{ courseId:
     <div className="flex-1 flex flex-col">
       <ExamSimulation 
         courseId={course.id}
+        courseSlug={course.slug}
         courseTitle={course.title}
         questions={examQuestions}
         timeLimitMinutes={timeLimitMinutes}

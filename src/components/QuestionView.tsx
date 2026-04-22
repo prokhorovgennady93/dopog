@@ -3,9 +3,17 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck, Play, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock, Zap, Loader2, ChevronDown, ShieldCheck, Play, Share2, GraduationCap } from "lucide-react";
 import { PremiumModal } from "./PremiumModal";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+
+const ICONS_MAP: Record<string, string> = {
+  "basic": "/images/courses/course-basic.png",
+  "tanks": "/images/courses/course-tanks.png",
+  "class1": "/images/courses/course-class1.png",
+  "class7": "/images/courses/course-class7.png",
+};
 
 interface Option {
   id: string;
@@ -24,6 +32,7 @@ interface Question {
 
 interface QuestionViewProps {
   courseTitle: string;
+  courseSlug: string;
   courseId: string;
   questions: Question[];
   themes: { id: string; title: string; _count: { questions: number } }[];
@@ -38,6 +47,7 @@ type Phase = 'QUESTION' | 'INTERMEDIATE' | 'FINAL';
 
 export function QuestionView({
   courseTitle,
+  courseSlug,
   courseId,
   questions,
   themes,
@@ -269,6 +279,26 @@ export function QuestionView({
 
   return (
     <div className="flex-1 flex flex-col p-2 sm:p-4 max-w-3xl mx-auto w-full font-sans">
+      
+      {/* Course Header */}
+      <div className="flex items-center gap-3 mb-4 px-2">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm flex items-center justify-center shrink-0 relative overflow-hidden">
+          {ICONS_MAP[courseSlug] ? (
+            <Image 
+              src={ICONS_MAP[courseSlug]} 
+              alt={courseTitle} 
+              fill 
+              className="object-cover p-1.5"
+            />
+          ) : (
+             <GraduationCap className="w-6 h-6 text-yellow-500" />
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h1 className="text-sm sm:text-base font-black leading-tight">{courseTitle}</h1>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Режим обучения</span>
+        </div>
+      </div>
       
       {/* Email Reminder Modal */}
       {isEmailReminderOpen && (

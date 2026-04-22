@@ -10,8 +10,17 @@ import {
   Settings2,
   Flag,
   HelpCircle,
-  Loader2 // Added Loader2
+  Loader2,
+  GraduationCap
 } from "lucide-react";
+import Image from "next/image";
+
+const ICONS_MAP: Record<string, string> = {
+  "basic": "/images/courses/course-basic.png",
+  "tanks": "/images/courses/course-tanks.png",
+  "class1": "/images/courses/course-class1.png",
+  "class7": "/images/courses/course-class7.png",
+};
 
 interface Option {
   id: string;
@@ -28,6 +37,7 @@ interface Question {
 
 interface ExamSimulationProps {
   courseId: string;
+  courseSlug: string;
   courseTitle: string;
   questions: Question[];
   timeLimitMinutes: number;
@@ -35,6 +45,7 @@ interface ExamSimulationProps {
 
 export function ExamSimulation({ 
   courseId, 
+  courseSlug,
   courseTitle, 
   questions, 
   timeLimitMinutes 
@@ -156,7 +167,16 @@ export function ExamSimulation({
                    <Timer className="w-4 h-4" />
                    {formatTime(timeLeft)}
                 </div>
-                <h1 className="text-[10px] font-black uppercase text-zinc-400 tracking-tighter hidden sm:block truncate max-w-[150px]">{courseTitle}</h1>
+                 <div className="flex items-center gap-2 px-2 overflow-hidden">
+                    <div className="w-6 h-6 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-100 dark:border-zinc-700 shadow-sm flex items-center justify-center shrink-0 relative overflow-hidden hidden sm:flex">
+                        {ICONS_MAP[courseSlug] ? (
+                            <Image src={ICONS_MAP[courseSlug]} alt={courseSlug} fill className="object-cover p-1" />
+                        ) : (
+                            <GraduationCap className="w-3 h-3 text-yellow-500" />
+                        )}
+                    </div>
+                    <h1 className="text-[10px] font-black uppercase text-zinc-400 tracking-tighter truncate max-w-[120px]">{courseTitle}</h1>
+                 </div>
              </div>
 
              <button 

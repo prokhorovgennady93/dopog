@@ -4,6 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookOpen, Play, CheckCircle, Lock, CloudDownload } from "lucide-react";
 import { DownloadCourseButton } from "@/components/DownloadCourseButton";
+import Image from "next/image";
+
+const ICONS_MAP: Record<string, string> = {
+  "basic": "/images/courses/course-basic.png",
+  "tanks": "/images/courses/course-tanks.png",
+  "class1": "/images/courses/course-class1.png",
+  "class7": "/images/courses/course-class7.png",
+};
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -54,8 +62,17 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
             </Link>
 
             <div className="flex items-center gap-4 mb-4 mt-2">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-[20px] flex items-center justify-center text-3xl sm:text-4xl shadow-sm border border-zinc-200 dark:border-zinc-800 shrink-0">
-                {course.icon || "📦"}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-[20px] flex items-center justify-center shadow-sm border border-zinc-200 dark:border-zinc-800 shrink-0 overflow-hidden relative">
+                {ICONS_MAP[course.slug] ? (
+                  <Image 
+                    src={ICONS_MAP[course.slug]} 
+                    alt={course.title} 
+                    fill 
+                    className="object-cover p-2"
+                  />
+                ) : (
+                  <span className="text-3xl sm:text-4xl">{course.icon || "📦"}</span>
+                )}
               </div>
               <h1 className="text-3xl sm:text-4xl font-black leading-tight">{course.title}</h1>
             </div>

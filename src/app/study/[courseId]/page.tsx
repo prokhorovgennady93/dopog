@@ -69,6 +69,7 @@ export default async function StudyPage({
     <div className="flex-1 bg-white dark:bg-zinc-950 flex flex-col">
       <QuestionView
         courseTitle={course.title}
+        courseSlug={course.slug}
         courseId={course.id}
         questions={questions}
         themes={(course as any).themes}
