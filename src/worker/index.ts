@@ -72,11 +72,18 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate' && url.origin === self.location.origin) {
     event.respondWith(
       fetch(event.request).catch(async () => {
-        // If fetch fails (offline), try to find a cached version of the page
-        const cache = await caches.open('next-pwa-pages'); // Default cache name for @ducanh2912/next-pwa
-        const match = await cache.match(event.request, { ignoreSearch: true });
-        
-        if (match) return match;
+        // Try to find a cached version of the page. 
+        // We check both 'pages' (Workbox default) and 'next-pwa-pages' (Nex PWA default)
+        const cacheNames = ['pages', 'next-pwa-pages'];
+        for (const name of cacheNames) {
+          try {
+            const cache = await caches.open(name);
+            const match = await cache.match(event.request, { ignoreSearch: true });
+            if (match) return match;
+          } catch (e) {
+            // Continue to next cache name
+          }
+        }
         
         // Final fallback document for uncached pages
         return new Response(
