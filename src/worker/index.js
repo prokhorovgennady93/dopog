@@ -1,15 +1,11 @@
-/// <reference lib="webworker" />
-
 /**
  * Custom Service Worker for DOPOG Platform
+ * (Pure JavaScript version to bypass TypeScript build issues)
  */
-
-// This fix ensures TypeScript treats this as a module and uses the webworker library
-export type {};
 
 // --- 1. Push Notifications ---
 
-self.addEventListener('push', (event: any) => {
+self.addEventListener('push', (event) => {
   console.log('[Worker] Push event received');
   
   let data = {
@@ -21,20 +17,20 @@ self.addEventListener('push', (event: any) => {
   if (event.data) {
     try {
       const parsed = event.data.json();
-      data = { ...data, ...parsed };
+      data = Object.assign({}, data, parsed);
     } catch (err) {
       const text = event.data.text();
       if (text) data.body = text;
     }
   }
 
-  const options: NotificationOptions = {
+  const options = {
     body: data.body,
-    icon: '/icon-192x192.png', // Main PWA icon
+    icon: '/icon-192x192.png',
     badge: '/icon-192x192.png',
     data: { url: data.url },
     vibrate: [100, 50, 100],
-    actions: (data as any).actions || []
+    actions: data.actions || []
   };
 
   event.waitUntil(
@@ -44,7 +40,7 @@ self.addEventListener('push', (event: any) => {
   );
 });
 
-self.addEventListener('notificationclick', (event: any) => {
+self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const urlToOpen = event.notification.data.url || '/';
 
@@ -66,7 +62,7 @@ self.addEventListener('notificationclick', (event: any) => {
 
 // --- 2. Offline Stability Fallbacks (Safari/Yandex Fix) ---
 
-self.addEventListener('fetch', (event: any) => {
+self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
   // Only handle navigation requests for our own origin
@@ -95,3 +91,5 @@ self.addEventListener('fetch', (event: any) => {
     );
   }
 });
+
+export {};
